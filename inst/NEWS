@@ -1,0 +1,36 @@
+CHANGES IN VERSION 1.5.4.4
+--------------------------
+
+USER VISIBLE CHANGES
+
+    o packaged script
+
+#IPO_V1.5.4.3: * LIP calculation in calcPPS fixed 
+
+#IPO_V1.5.4.2: * added initial parameter check
+#              * renamed all factor-variables to params
+#              * in optimizeXcmsSet: - also look for mzML-files
+#                                    - check if files were found
+#  		   * bug in optimization for matchedFilter fixed; sigma and mzdiff have to be 
+#                    definded later (combineFactors()) when sigma and step as well as steps are already known
+
+#IPO_V1.5.4.1: changes in calcPPS: 
+#                   rt_window <- rt * 0.005
+#                   rt_lower <- part_peaks[,"rt"] - rt_window
+#	              	  rt_upper <- part_peaks[,"rt"] + rt_window
+
+#IPO_V1.5.4: if bad_group == 0; bad_group = 1 && good_group += 1
+
+#IPO_V1.5.3: no parameter for isotope detection. 
+#            c13_peak[,"mz"] has to be within (mzmin + isotope_mass) and (mzmax + isotope_mass)
+#            c13_peak[,"rt"] has to be within (rtmin + isotope_mass) and (rtmax + isotope_mass)
+
+#IPO_V1.5.: in RCSandGSIncreased: also used good_groups ^ 2
+
+#IPO_V1.4.: vectorized isotope identification; 
+#           no intensity window, between intensity of max carbon and 1
+
+#IPO_V1.3.: good_groups ^ 2 to increase recall 
+
+
+
