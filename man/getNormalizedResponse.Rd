@@ -1,11 +1,11 @@
 \name{getNormalizedResponse}
 \alias{getNormalizedResponse}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+	It combines Retention time Correction Scores (RCS) and Grouping Scores (GS)
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+	This function does unity based normalization on Retention time Correction 
+	Scores (RCS) as well as Grouping Scores (GS). 
 }
 \usage{
 getNormalizedResponse(response)
@@ -13,33 +13,32 @@ getNormalizedResponse(response)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{response}{
-%%     ~~Describe \code{response} here~~
+	A List of all responses calculated by getRGTVValues for all experiments of an
+	Design of Experiment
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+	Grouping Score (GS)	is calculated by:\cr
+	'good groups'^2/'bad groups\cr\cr
+	
+	For all RCS and GS values unitiy based normalization is done. For every 
+	experiment within the DoE these two values are added together and returned.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+	A vector with RTGV values 
 }
 \references{
-%% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Gunnar Libiseller
 }
 \note{
-%%  ~~further notes~~
+	Since RCS and GS can be within completely different ranges, normalization has
+	to be done to prevent an excessive influence of either RCS or GS.
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{getRGTVValues}
 }
 \examples{
 ##---- Should be DIRECTLY executable !! ----
@@ -67,5 +66,4 @@ function (response)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{method}

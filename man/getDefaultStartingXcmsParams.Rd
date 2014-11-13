@@ -2,49 +2,56 @@
 \alias{getDefaultStartingXcmsParams}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  Gives a List parameters for xcms-methods xcmsSet.findPeak which are optimized by default
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  This function creates a list of parameters used in the xcmsSet.findPeak-methods 
+  'centWave' and 'matchedFilter'. Per default the following parameters 
+  have a defined range where optimization should start:\cr
+  'centWave' parameters: 'peakwidth' (split into 'min_peakwidth' and 'max_peakwidth'), 
+  'ppm', 'mzdiff'\cr
+  'matchedFilter' parameters: 'fwhm', 'snthresh', 'step', 'steps'\cr  
 }
 \usage{
 getDefaultStartingXcmsParams(method = "centWave")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{method}{
-%%     ~~Describe \code{method} here~~
+  \item{method}{Either parameters for 'centWave' or 'matchedFilter' should be created
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+  * Do not delete a parameter from the list returned.\cr
+  * Optimization of qualitative parameters is not supported yet.\cr
+  * If you want to optimize additional parameter just set an lower and
+  an upper bound (e.g. params$snthresh <- c(5,20))\cr
+  * If you dont want to optimize a parameter set a default value 
+  (e.g. params$snthresh <- 10)
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  A List of parameters for the xcmsSet.findPeak-methods 
+  'centWave' or 'matchedFilter'
 }
 \references{
-%% ~put references to the literature/web site here ~
+
 }
 \author{
-%%  ~~who you are~~
+Gunnar Libiseller
 }
 \note{
-%%  ~~further notes~~
+
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+params <- getDefaultStartingXcmsParams()
+params$ppm <- 10
+params$snthresh <- c(5,15)
+params
+
 
 ## The function is currently defined as
 function (method = "centWave") 
@@ -61,7 +68,5 @@ function (method = "centWave")
             index = FALSE))
   }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{method}
+

@@ -1,6 +1,6 @@
 sendRetGroupSlaveFunctions <-
 function(parameters, xset) {
-  mpi.bcast.Robj2slave(calculateRGTV)
+  mpi.bcast.Robj2slave(getRTGVValues)
   mpi.bcast.cmd(slave <- mpi.comm.rank())
   mpi.bcast.Robj2slave(parameters)
   mpi.bcast.Robj2slave(xset)  

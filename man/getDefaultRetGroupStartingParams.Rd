@@ -1,95 +1,58 @@
 \name{getDefaultRetGroupStartingParams}
 \alias{getDefaultRetGroupStartingParams}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{
-%%  ~~function to do ... ~~
+	Gives a List parameters for xcms-methods retcor.obiwarp and group.density 
+	which are optimized by default
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  This function creates a list of parameters used in the xcms-methods 
+  retcor.obiwarp and group.density. Per default the following parameters 
+  have a defined range where optimization should start:\cr
+  retcor.obiwarp parameters: 'gapInit'; 'gapExtend', 'profStep'\cr
+  group.density parameters: 'bw', 'minfrac', 'mzwid'\cr  
 }
 \usage{
 getDefaultRetGroupStartingParams(distfunc = "cor_opt", high_resolution = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{distfunc}{
-%%     ~~Describe \code{distfunc} here~~
+	The name of the distance function used by retcor.obiwarp
 }
   \item{high_resolution}{
-%%     ~~Describe \code{high_resolution} here~~
+	If high_resolution = TRUE starting values for mzwid are set to 0.015 and 0.035;
+	if high_resolution = FALSE to 0.15, 0.35
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+  * Do not delete a parameter from the list returned.\cr
+  * Optimization of qualitative parameters is not supported yet.\cr
+  * If you want to optimize additional parameter just set an lower and
+  an upper bound (e.g. params$max <- c(4,8))\cr
+  * If you dont want to optimize a parameter set a default value 
+  (e.g. params$max <- 10)
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  A List of parameters used in the xcms-methods retcor.obiwarp and group.density
 }
 \references{
-%% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Gunnar Libiseller
 }
 \note{
-%%  ~~further notes~~
-}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+}
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (distfunc = "cor_opt", high_resolution = TRUE) 
-{
-    ret <- NULL
-    if (!is.null(distfunc)) {
-        if (distfunc == "cor") 
-            ret <- (list(distFunc = "cor", gapInit = c(0, 0.4), 
-                gapExtend = c(2.1, 2.7)))
-        if (distfunc == "cor_opt") 
-            ret <- (list(distFunc = "cor_opt", gapInit = c(0, 
-                0.4), gapExtend = c(2.1, 2.7)))
-        if (distfunc == "cov") 
-            ret <- (list(distFunc = "cov", gapInit = c(0, 0.4), 
-                gapExtend = c(11.4, 12)))
-        if (distfunc == "prd") 
-            ret <- (list(distFunc = "prd", gapInit = c(0, 0.4), 
-                gapExtend = c(7.5, 8.1)))
-        if (distfunc == "euc") 
-            ret <- (list(distFunc = "euc", gapInit = c(0.7, 1.1), 
-                gapExtend = c(1.5, 2.1)))
-        ret$profStep <- c(0.7, 1)
-        ret$plottype <- "none"
-        ret$response <- 1
-        ret$factorDiag <- 2
-        ret$factorGap <- 1
-        ret$localAlignment <- 0
-    }
-    else {
-        ret <- list()
-    }
-    ret$bw <- c(22, 38)
-    ret$minfrac <- c(0.3, 0.7)
-    ret$mzwid <- c(0.15, 0.35)
-    if (high_resolution) 
-        ret$mzwid <- c(0.015, 0.035)
-    ret$minsamp <- 1
-    ret$max <- 50
-    return(ret)
-  }
+params <- getDefaultRetGroupStartingParams()
+params$bw <- 10
+params$max <- c(4,8)
+params
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{method}
+

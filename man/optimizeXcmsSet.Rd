@@ -1,59 +1,60 @@
 \name{optimizeXcmsSet}
 \alias{optimizeXcmsSet}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{Optimisation of peak picking parameters by using natural, stable 13C isotopes
+\title{
+Optimisation of peak picking parameters by using natural, stable 13C isotopes
 }
 \description{
-It provides optimisation of peak picking parameters by using natural, stable 13C isotopes.
+    This function provides optimisation of peak picking parameters by using natural, stable 13C isotopes.
 }
 \usage{
-optimizeXcmsSet(params = getDefaultStartingXcmsParams(), n_slaves = 4, subdir = "IPO")
+    optimizeXcmsSet(params = getDefaultStartingXcmsParams(), n_slaves = 4, subdir = "IPO")
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{params}{
-%%     ~~Describe \code{params} here~~
-}
-  \item{n_slaves}{
-%%     ~~Describe \code{n_slaves} here~~
-}
+     A list of parameters which are needed by XCMS::findPeaks-Methods. List-items with
+     two values will be optimized. The first value defines the lower test value, the 
+     second one the higher test value.
+  }
+  \item{n_slaves}{Number of slaves the optimization process should spawn.}
   \item{subdir}{
-%%     ~~Describe \code{subdir} here~~
-}
+     The name of the subdirectory which is created and where the figures of the response
+     surface models will be saved to.
+  }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
-No details yet.
+
 }
 \value{
-result_peakpicking
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+    A LIST of length n+1 with n beeing the optimization runs needed
+
+  \item{comp1-comp(n) }{A LIST containing:\cr 
+    1. Parameters used for the nth optimization run\cr 
+	2. Box-Behnken or Central Composite Design used for optimization run\cr 
+	3. Responses from calcPPS for every experiment in the design\cr 
+	4. Response surface model for the design\cr 
+	5. The normalized parameter settings giving the best PPS (values between -1 and 1)}
+  \item{comp(n+1) }{A LIST containing:\cr   
+    1. Parameters giving the best PPS\cr 
+	2. An xcmsSet-object created with the optimized parameters\cr 
+	3. The result of calcPPS() of the xcmsSet created with the best parameters}
 }
 \references{
-%% ~put references to the literature/web site here ~
+% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Gunnar Libiseller
 }
 \note{
-%%  ~~further notes~~
+
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{getDefaultStartingXcmsParams}
+  \code{\link{calcPPS)}
+}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+	setwd("/...") #set working directory to where files are located\cr
+	peakPickingOptimization <- optimizeXcmsSet()
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{method}
+

@@ -45,7 +45,7 @@ function() {
       try(xset <- group(xset, method="density", bw=parameters$bw[exp_index], mzwid=parameters$mzwid[exp_index], minfrac=minfrac, 
                   minsamp=parameters$minsamp[exp_index], max=parameters$max[exp_index]))	 
  
-      result <- calculateRGTV(xset, exp_index, retcor_failed)
+      result <- getRGTVValues(xset, exp_index, retcor_failed)
 
       mpi.send.Robj(result,0,2)
 

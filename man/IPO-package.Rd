@@ -13,23 +13,21 @@ showing exactly one peak from each injection of a pooled sample.
 An overview of how to use the package, including the most important functions
 }
 \author{
-Who wrote it
+Gunnar Libiseller
 
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Maintainer: gunnar.libiseller@joanneum.at
 
 }
 \references{
 Literature or other references for background information
 }
-
-# Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation ~~
-# directory ~~
-\keyword{ package }
+\keyword{
+}
 \seealso{
-# ~~ Optional links to other man pages, e.g. ~~
-#\code{\link[<pkg>:<pkg>-package]{<pkg>}}
-\code{\link[xcms:xcmsSet]{xcms}}
+\code{
+\link[xcms:xcmsSet]{xcms}
+}
 }
 \examples{
-# simple examples of the most important functions 
+%# simple examples of the most important functions 
 }
