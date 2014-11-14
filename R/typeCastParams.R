@@ -1,4 +1,4 @@
-typeCastFactor <-
+typeCastParams <-
 function(params) {
   ret_1 <- list()
   ret_2 <- list()  

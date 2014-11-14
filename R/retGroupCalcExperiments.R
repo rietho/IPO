@@ -1,14 +1,14 @@
 retGroupCalcExperiments <-
-function(params, xset, n_slaves=4) {
+function(params, xset, nSlaves=4) {
 							   
   library(Rmpi)  
   library(rsm)
     
   junk <- 0
   closed_slaves <- 0
-  #n_slaves <- min(mpi.comm.size()-1, n_slaves)  
+  #nSlaves <- min(mpi.comm.size()-1, nSlaves)  
   
-  typ_params <- typeCastFactor(params)
+  typ_params <- typeCastParams(params)
   
   if(length(typ_params$to_optimize) > 2) {
     design <- getBbdParameter(typ_params$to_optimize) 
@@ -18,7 +18,7 @@ function(params, xset, n_slaves=4) {
  
   parameters <- decode.data(design)	
   tasks <- as.list(1:nrow(design))    
-  startSlaves(n_slaves)
+  startSlaves(nSlaves)
   
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
@@ -26,7 +26,7 @@ function(params, xset, n_slaves=4) {
   
   response <- list()  
   finished <- 0
-  while(closed_slaves < n_slaves) {
+  while(closed_slaves < nSlaves) {
     # Receive a message from a slave
     message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
     message_info <- mpi.get.sourcetag()

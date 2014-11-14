@@ -43,6 +43,6 @@ calcPPS(xset)
 }
 \examples{
 calcPPS(xset)
-\
+}
 
 \keyword{method}

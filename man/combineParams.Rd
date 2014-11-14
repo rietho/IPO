@@ -1,53 +1,58 @@
 \name{combineParams}
 \alias{combineParams}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+	Combining two lists of parameters together.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+	This function combines two lists of parameters. The first is a list of parameters
+	which should be optimized. This parameters have different values set by Design of 
+	Experimnt. The second list consists of parameters which should not be optimized, 
+	hence only one value is set for each parameter. The parameters of the second list
+	are replicated to have the same length as the number experiments in the DoE. Then
+	the two lists are combined.
 }
 \usage{
 combineParams(params_1, params_2)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{params_1}{
-%%     ~~Describe \code{params_1} here~~
+	A list holding parameters which should be optimized. Each parameter already has
+	value set for each experiment of an Design of Experiment.
 }
-  \item{params_2}{
-%%     ~~Describe \code{params_2} here~~
+  \item{params_2}{	
+	A list holding parameters which should not be optimized, hence only one value is set.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+	Special treatment is needed for the findPeaks.matchedFilter-parameters 'sigma', 'mzdiff'
+	since these two parameters are defined by default relative to the parameters 'fwhm' or 
+	'step' and 'steps' respectively.\cr
+	\code{sigma=fwhm/2.3548}
+	\code{mzdiff=0.8-step*steps}
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+	A list of consting of all parameters needed for an xcms-method (findPeaks.centWave, 
+	findPeaks.matchedFilter, retcor.obiwarp or group.density). Each list item has the 
+	same length which is equal to the number of experiments within the DoE.
 }
 \references{
-%% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Gunnar Libiseller
 }
 \note{
-%%  ~~further notes~~
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+params <- getDefaultXcmsSetStartingParams()
+typ_params <- typeCastParams(params)
+design <- getBbdParameter(typ_params$to_optimize) 
+xcms_design <- decode.data(design) 
+xcms_design <- combineParams(xcms_design, typ_params$no_optimization)  
+xcms_design
 
 ## The function is currently defined as
 function (params_1, params_2) 
@@ -107,5 +112,4 @@ function (params_1, params_2)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{method}

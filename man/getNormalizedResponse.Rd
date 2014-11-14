@@ -38,7 +38,7 @@ Gunnar Libiseller
 }
 
 \seealso{
-  \code{\link{getRGTVValues}
+  \code{\link{getRGTVValues}}
 }
 \examples{
 ##---- Should be DIRECTLY executable !! ----

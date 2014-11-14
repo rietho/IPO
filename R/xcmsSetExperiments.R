@@ -1,13 +1,13 @@
 xcmsSetExperiments <-
-function(example_sample, params, n_slaves=4) { #ppm=5, rt_diff=0.01, n_slaves=4) {
+function(example_sample, params, nSlaves=4) { #ppm=5, rt_diff=0.01, nSlaves=4) {
   library(Rmpi)  
   library(rsm)
     
   junk <- 0
   closed_slaves <- 0
-  #n_slaves <- min(mpi.comm.size()-1, n_slaves)  
+  #nSlaves <- min(mpi.comm.size()-1, nSlaves)  
   
-  typ_params <- typeCastFactor(params)
+  typ_params <- typeCastParams(params)
   
   if(length(typ_params[[1]])>2)
     design <- getBbdParameter(typ_params$to_optimize) 
@@ -18,13 +18,13 @@ function(example_sample, params, n_slaves=4) { #ppm=5, rt_diff=0.01, n_slaves=4)
   xcms_design <- combineParams(xcms_design, typ_params$no_optimization)  
   tasks <- as.list(1:nrow(design))  
   
-  startSlaves(n_slaves)
+  startSlaves(nSlaves)
   sendXcmsSetSlaveFunctions(example_sample, xcms_design) #,  ppm, rt_diff)
 
   response <- matrix(0, nrow=length(design[[1]]), ncol=5)
   colnames(response) <- c("exp", "num_peaks", "notLLOQP", "num_C13", "PPS")
   finished <- 0
-  while(closed_slaves < n_slaves) {
+  while(closed_slaves < nSlaves) {
     # Receive a message from a slave
     message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
     message_info <- mpi.get.sourcetag()

@@ -1,5 +1,5 @@
 optimizeRetGroup <-
-function(xset, params=getDefaultRetGroupStartingParams(), n_slaves=4, subdir="IPO") {
+function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO") {
                                                  
   library(xcms)
   iterator = 1 
@@ -21,7 +21,7 @@ function(xset, params=getDefaultRetGroupStartingParams(), n_slaves=4, subdir="IP
     cat("starting new DoE with:\n")
     print(params)
         
-    retcor_result <- retGroupCalcExperiments(params, xset, n_slaves)  
+    retcor_result <- retGroupCalcExperiments(params, xset, nSlaves)  
                        
     retcor_result <- retGroupExperimentStatistic(retcor_result, subdir, iterator, xset)
     
@@ -101,7 +101,7 @@ function(xset, params=getDefaultRetGroupStartingParams(), n_slaves=4, subdir="IP
 		
 	}
 	
-	params <- attachparams(params, retcor_result$params$no_optimization)
+	params <- attachList(params, retcor_result$params$no_optimization)
               
     iterator <- iterator + 1
                  

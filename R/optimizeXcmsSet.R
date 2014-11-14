@@ -1,9 +1,9 @@
 optimizeXcmsSet <-
-function(params=getDefaultStartingXcmsParams(), n_slaves=4, subdir="IPO") { #ppm=5, rt_diff=0.02, n_slaves=4, subdir="IPO") {
+function(params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
 
   checkXcmsSetParams(params)
    
-  example_sample <- list.files(full.names=TRUE, ignore.case=TRUE, recursive=TRUE, pattern="(*.mzX?ML$)") 
+  example_sample <- list.files(full.names=TRUE, ignore.case=TRUE, recursive=TRUE, pattern="(*.mzX?ML$)|(*.CDF)") 
   if(length(example_sample)==0)
     stop("no files in directory, stopping!")
 	
@@ -23,8 +23,8 @@ function(params=getDefaultStartingXcmsParams(), n_slaves=4, subdir="IPO") { #ppm
     cat("starting new DoE with:\n")
     print(params)
         
-    xcms_result <- xcmsSetExperiments(example_sample, params, n_slaves) 
-#                       ppm, rt_diff, n_slaves)                        
+    xcms_result <- xcmsSetExperiments(example_sample, params, nSlaves) 
+#                       ppm, rt_diff, nSlaves)                        
                        
     xcms_result <- xcmsSetStatistic(xcms_result, subdir, iterator)
     history[[iterator]] <- xcms_result     
@@ -61,7 +61,7 @@ function(params=getDefaultStartingXcmsParams(), n_slaves=4, subdir="IPO") { #ppm
 				          prefilter=c(xcms_parameters$prefilter, xcms_parameters$value_of_prefilter),
 				          mzCenterFun=xcms_parameters$mzCenterFun, integrate=xcms_parameters$integrate,
 				          fitgauss=xcms_parameters$fitgauss, verbose.columns=xcms_parameters$verbose.columns, 
-                  nSlaves=n_slaves)
+                  nSlaves=nSlaves)
       } else {
         xset <- xcmsSet(files=example_sample, method="matchedFilter", 
                   fwhm=xcms_parameters$fwhm, snthresh=xcms_parameters$snthresh,
@@ -127,7 +127,7 @@ function(params=getDefaultStartingXcmsParams(), n_slaves=4, subdir="IPO") { #ppm
       }
     }
 	
-	params <- attachparams(params$to_optimize, params$no_optimization)	    
+	params <- attachList(params$to_optimize, params$no_optimization)	    
     iterator <- iterator + 1
                  
   }

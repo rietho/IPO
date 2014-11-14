@@ -7,7 +7,7 @@ Optimisation of peak picking parameters by using natural, stable 13C isotopes
     This function provides optimisation of peak picking parameters by using natural, stable 13C isotopes.
 }
 \usage{
-    optimizeXcmsSet(params = getDefaultStartingXcmsParams(), n_slaves = 4, subdir = "IPO")
+    optimizeXcmsSet(params = getDefaultStartingXcmsParams(), nSlaves = 4, subdir = "IPO")
 }
 \arguments{
   \item{params}{
@@ -15,7 +15,7 @@ Optimisation of peak picking parameters by using natural, stable 13C isotopes
      two values will be optimized. The first value defines the lower test value, the 
      second one the higher test value.
   }
-  \item{n_slaves}{Number of slaves the optimization process should spawn.}
+  \item{nSlaves}{Number of slaves the optimization process should spawn.}
   \item{subdir}{
      The name of the subdirectory which is created and where the figures of the response
      surface models will be saved to.
@@ -48,9 +48,8 @@ Gunnar Libiseller
 
 }
 \seealso{
-  \code{\link{getDefaultStartingXcmsParams}
-  \code{\link{calcPPS)}
-}
+  \code{\link{getDefaultStartingXcmsParams}}
+  \code{\link{calcPPS)}}
 }
 \examples{
 	setwd("/...") #set working directory to where files are located\cr

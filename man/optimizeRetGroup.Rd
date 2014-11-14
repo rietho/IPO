@@ -10,7 +10,7 @@
 	have exactly one peak per sample.
 }
 \usage{
-optimizeRetGroup(xset, params = getDefaultRetGroupStartingParams(), n_slaves = 4, subdir = "IPO")
+optimizeRetGroup(xset, params = getDefaultRetGroupStartingParams(), nSlaves = 4, subdir = "IPO")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -22,7 +22,7 @@ optimizeRetGroup(xset, params = getDefaultRetGroupStartingParams(), n_slaves = 4
 	 List-items with two values will be optimized. The first value defines the lower test value, the 
      second one the higher test value.
   }
-  \item{n_slaves}{
+  \item{nSlaves}{
 Number of slaves the optimization process should spawn.
   }
   \item{subdir}{
@@ -40,15 +40,15 @@ The name of the subdirectory which is created and where the figures of the respo
 	2. Box-Behnken or Central Composite Design used for optimization run\cr 
 	3. Responses from calculateRGTV for every experiment in the design\cr 
 	4. Response surface model for the design\cr 
-	5. The normalized parameter settings giving the best Retention time and Grouping Target Value (RGTV) (values between -1 and 1)}
+	5. The normalized parameter settings giving the best Retention time and Grouping Target Value (RGTV) (values between -1 and 1)
 	6. Response from calculateRGTV for xcmsSet-object created with best parameters in this run
 	7. xcmsSet-object created with best parameters in this run
+  }
   \item{comp(n+1) }{A LIST containing:\cr   
     1. Parameters giving the best RGTV\cr 
-
+  }
 }
 \references{
-%% ~put references to the literature/web site here ~
 }
 \author{
 Gunnar Libiseller
@@ -56,8 +56,8 @@ Gunnar Libiseller
 \note{
 }
 \seealso{
-  \code{\link{getDefaultRetGroupStartingParams}
-  \code{\link{calculateRGTV)}
+  \code{\link{getDefaultRetGroupStartingParams}}
+  \code{\link{calculateRGTV)}}
 }
 \examples{
 	setwd("/...") #set working directory to where files are located\cr

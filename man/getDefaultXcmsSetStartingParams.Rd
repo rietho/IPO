@@ -1,5 +1,5 @@
-\name{getDefaultStartingXcmsParams}
-\alias{getDefaultStartingXcmsParams}
+\name{getDefaultXcmsSetStartingParams}
+\alias{getDefaultXcmsSetStartingParams}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
   Gives a List parameters for xcms-methods xcmsSet.findPeak which are optimized by default
@@ -13,7 +13,7 @@
   'matchedFilter' parameters: 'fwhm', 'snthresh', 'step', 'steps'\cr  
 }
 \usage{
-getDefaultStartingXcmsParams(method = "centWave")
+getDefaultXcmsSetStartingParams(method = "centWave")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -47,7 +47,7 @@ Gunnar Libiseller
 \seealso{
 }
 \examples{
-params <- getDefaultStartingXcmsParams()
+params <- getDefaultXcmsSetStartingParams()
 params$ppm <- 10
 params$snthresh <- c(5,15)
 params

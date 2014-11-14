@@ -1,4 +1,4 @@
-attachparams <-
+attachList <-
 function(params_1, params_2) {
   params <- params_1
   for(factor in params_2)

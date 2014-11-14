@@ -1,4 +1,4 @@
-calculateRGTV <-
+getRGTVValues <-
 function(xset, exp_index=1, retcor_penalty=1) {
   features <- nrow(xset@groups)
 

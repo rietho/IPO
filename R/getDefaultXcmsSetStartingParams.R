@@ -1,4 +1,4 @@
-getDefaultStartingXcmsParams <-
+getDefaultXcmsSetStartingParams <-
 function(method="centWave") {
   if(method=="centWave")
     return(list(min_peakwidth=c(10,30), max_peakwidth=c(35,65), ppm=c(15,35),

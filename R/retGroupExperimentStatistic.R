@@ -42,7 +42,7 @@ function(retcor_result, subdir, iterator, xset) {
   try(xset_tmp <- group(xset_tmp, method="density", bw=parameters$bw[exp_index], mzwid=parameters$mzwid[exp_index], minfrac=minfrac, 
                   minsamp=parameters$minsamp[exp_index], max=parameters$max[exp_index]))	 
  
-  tv <- calculateRGTV(xset_tmp, exp_index, retcor_failed)
+  tv <- getRGTVValues(xset_tmp, exp_index, retcor_failed)
 
   retcor_result$max_settings <- max_settings
   retcor_result$target_value <- tv   

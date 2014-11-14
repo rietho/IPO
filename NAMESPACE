@@ -1,2 +1,16 @@
 
+
+export("attachList")
+export("calcPPS")
+export("combineParams")
+export("getBbdParameter")
+export("getCcdParameter")
+export("getDefaultRetCorCenterSample")
+export("getDefaultRetGroupStartingParams")
+export("getDefaultXcmsSetStartingParams")
+export("getNormalizedResponse")
+export("getRGTVValues")
 export("optimizeXcmsSet")
+export("optimizeRetGroup")
+export("toMatrix")
+export("typeCastParams")
