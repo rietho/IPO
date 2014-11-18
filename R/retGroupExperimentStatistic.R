@@ -10,7 +10,8 @@ function(retcor_result, subdir, iterator, xset) {
   tmp <- max_settings[-1]
   tmp[is.na(tmp)] <- 1
 
-  plotContours(retcor_result$model, tmp, paste(subdir, "/retgroup_rsm_", iterator, sep=""))  
+  if(!is.null(subdir))
+    plotContours(retcor_result$model, tmp, paste(subdir, "/retgroup_rsm_", iterator, sep=""))  
     
   parameters <- as.list(decodeAll(max_settings[-1], params$to_optimize)) 
   parameters <- combineParams(parameters, params$no_optimization)

@@ -15,7 +15,10 @@ USER VISIBLE CHANGES
 	getDefaultRetCorCenterSample, getDefaultRetGroupStartingParams, getDefaultXcmsSetStartingParams, 
 	getNormalizedResponse, getRGTVValues, IPO-package, optimizeRetGroup, optimizeXcmsSet, 
 	toMatrix, typeCastParams
-	
+	o getResponses: now able to handle NULL value for slices parameter
+	o calcPPS: peaks with NA values are removed before isotopes identification
+	o if subdir is NULL, no rsm's are saved
+	o optimizeXcmsSet: lowere minimum value for min_peakwith from 5 to 3
 
 #IPO_V1.5.4.3: * LIP calculation in calcPPS fixed 
 

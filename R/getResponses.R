@@ -1,5 +1,9 @@
 getResponses <-
 function(slices, model) {
+
+   if(is.null(slices)) {
+     slices= matrix(nrow=1, ncol=0)
+   }
    add_col <- array(0, dim=c(nrow(slices), 2))
    slices <- cbind(add_col, slices)
    

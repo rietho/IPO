@@ -1,10 +1,15 @@
 optimizeXcmsSet <-
-function(params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
+function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
 
   checkXcmsSetParams(params)
-   
-  example_sample <- list.files(full.names=TRUE, ignore.case=TRUE, recursive=TRUE, pattern="(*.mzX?ML$)|(*.CDF)") 
-  if(length(example_sample)==0)
+  
+  if(is.null(files)) {
+    files <- list.files(full.names=TRUE, ignore.case=TRUE, recursive=TRUE, pattern="(*.mzX?ML$)|(*.CDF)") 
+  } else {
+  #check files for valid extensions
+  }
+    
+  if(length(files)==0)
     stop("no files in directory, stopping!")
 	
   centWave <- is.null(params$fwhm)  
@@ -13,7 +18,7 @@ function(params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #p
   iterator = 1 
   best_range <- 0.25
 
-  if(!file.exists(subdir))
+  if(!is.null(subdir) & !file.exists(subdir))
     dir.create(file.path(getwd(), subdir))
     
   while(iterator < 50) {
@@ -23,7 +28,7 @@ function(params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #p
     cat("starting new DoE with:\n")
     print(params)
         
-    xcms_result <- xcmsSetExperiments(example_sample, params, nSlaves) 
+    xcms_result <- xcmsSetExperiments(files, params, nSlaves) 
 #                       ppm, rt_diff, nSlaves)                        
                        
     xcms_result <- xcmsSetStatistic(xcms_result, subdir, iterator)
@@ -54,7 +59,7 @@ function(params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #p
       
       
       if(centWave) {		
-        xset <- xcmsSet(files=example_sample, method="centWave", 
+        xset <- xcmsSet(files=files, method="centWave", 
                   peakwidth=c(xcms_parameters$min_peakwidth, xcms_parameters$max_peakwidth),
                   ppm=xcms_parameters$ppm, noise=xcms_parameters$noise, 
 				          snthresh=xcms_parameters$snthresh, mzdiff=xcms_parameters$mzdiff,
@@ -63,7 +68,7 @@ function(params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #p
 				          fitgauss=xcms_parameters$fitgauss, verbose.columns=xcms_parameters$verbose.columns, 
                   nSlaves=nSlaves)
       } else {
-        xset <- xcmsSet(files=example_sample, method="matchedFilter", 
+        xset <- xcmsSet(files=files, method="matchedFilter", 
                   fwhm=xcms_parameters$fwhm, snthresh=xcms_parameters$snthresh,
                   step=xcms_parameters$step, steps=xcms_parameters$steps,
                   sigma=xcms_parameters$sigma, max=xcms_parameters$max, 
@@ -87,7 +92,7 @@ function(params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #p
       parameter_setting <- xcms_result$max_settings[i+1]
       bounds <- params$to_optimize[[i]] 
       fact <- names(params$to_optimize)[i]
-	  min_factor <- ifelse(fact=="min_peakwidth", 5, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), ifelse(fact=="step",0.0005,1)))
+	  min_factor <- ifelse(fact=="min_peakwidth", 3, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), ifelse(fact=="step",0.0005,1)))
 
       #if the parameter is NA, we increase the range by 20%, if it was within the inner 25% of the previous range or at the minimum value we decrease the range by 20%
       step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) < best_range), 0.8, ifelse(parameter_setting==-1 & decode(-1, params$to_optimize[[i]]) == min_factor,0.8,1)))

@@ -6,7 +6,7 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
   history <- list()  
   best_range <- 0.25
 
-  if(!file.exists(subdir))
+  if(!is.null(subdir) & !file.exists(subdir))
     dir.create(file.path(getwd(), subdir))
 	
   if(is.null(params$center))

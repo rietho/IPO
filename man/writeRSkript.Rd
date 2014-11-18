@@ -1,42 +1,37 @@
 \name{writeRSkript}
 \alias{writeRSkript}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+	Prints an R-script to the screen which can be used for xcms processing
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+	This function that prints a script out of the optimized findPeaks, 
+	retcor and grouping parameters to the screen.
 }
 \usage{
 writeRSkript(peakPickingSettings, retCorGroupSettings, nSlaves)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{peakPickingSettings}{
-%%     ~~Describe \code{peakPickingSettings} here~~
+	The optimized settings for xcms-methods findPeaks.centWave or findPeaks.matchedFilter
 }
   \item{retCorGroupSettings}{
-%%     ~~Describe \code{retCorGroupSettings} here~~
+	The optimized settings for xcms-methods for retcor.obiwarp and group.density
 }
   \item{nSlaves}{
-%%     ~~Describe \code{nSlaves} here~~
+	The number of slaves which should be used in the script
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+	none
 }
 \references{
-%% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Gunnar Libiseller
 }
 \note{
 %%  ~~further notes~~
@@ -48,9 +43,11 @@ writeRSkript(peakPickingSettings, retCorGroupSettings, nSlaves)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+	setwd("/...") #set working directory to where files are located\cr
+	peakPickingOptimization <- optimizeXcmsSet()
+	retcorGroupOptimization <- optimizeRetGroup(peakPickingOptimization$best_settings$xset)
+    writeRSkript(peakPickingOptimization$best_settings$parameters, retcorGroupOptimization$best_settings, 4)
 
 ## The function is currently defined as
 function (peakPickingSettings, retCorGroupSettings, nSlaves) 
@@ -94,7 +91,5 @@ function (peakPickingSettings, retCorGroupSettings, nSlaves)
         sep = ""))
   }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+\keyword{method}

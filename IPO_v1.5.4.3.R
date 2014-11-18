@@ -21,13 +21,13 @@
 
 ###methods used for peak picking optimization
 ###
-xcmsSetExperiments <- function(example_sample, params, n_slaves=4) { #ppm=5, rt_diff=0.01, n_slaves=4) {
+xcmsSetExperiments <- function(example_sample, params, nSlaves=4) { #ppm=5, rt_diff=0.01, nSlaves=4) {
   library(Rmpi)  
   library(rsm)
     
   junk <- 0
   closed_slaves <- 0
-  #n_slaves <- min(mpi.comm.size()-1, n_slaves)  
+  #nSlaves <- min(mpi.comm.size()-1, nSlaves)  
   
   typ_params <- typeCastFactor(params)
   
@@ -40,13 +40,13 @@ xcmsSetExperiments <- function(example_sample, params, n_slaves=4) { #ppm=5, rt_
   xcms_design <- combineParams(xcms_design, typ_params$no_optimization)  
   tasks <- as.list(1:nrow(design))  
   
-  startSlaves(n_slaves)
+  startSlaves(nSlaves)
   sendXcmsSetSlaveFunctions(example_sample, xcms_design) #,  ppm, rt_diff)
 
   response <- matrix(0, nrow=length(design[[1]]), ncol=5)
   colnames(response) <- c("exp", "num_peaks", "notLLOQP", "num_C13", "PPS")
   finished <- 0
-  while(closed_slaves < n_slaves) {
+  while(closed_slaves < nSlaves) {
     # Receive a message from a slave
     message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
     message_info <- mpi.get.sourcetag()
@@ -97,7 +97,8 @@ xcmsSetStatistic <- function(xcms_result, subdir, iterator, score_name="PPS") {
   max_settings <- getMaximumExperiment(xcms_result$model)
   tmp <- max_settings[-1]
   tmp[is.na(tmp)] <- 1
-  plotContours(xcms_result$model, tmp, paste(subdir,"/rsm_", iterator, sep=""))
+  if(!is.null(subdir))
+    plotContours(xcms_result$model, tmp, paste(subdir,"/rsm_", iterator, sep=""))
 
   xcms_result$max_settings <- max_settings
 
@@ -150,7 +151,7 @@ checkParams <- function(params, quantitative_parameters, qualitative_parameters,
   
 }
 
-optimizeXcmsSet <- function(params=getDefaultStartingXcmsParams(), n_slaves=4, subdir="IPO") { #ppm=5, rt_diff=0.02, n_slaves=4, subdir="IPO") {
+optimizeXcmsSet <- function(params=getDefaultStartingXcmsParams(), nSlaves=4, subdir="IPO") { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
 
   checkXcmsSetParams(params)
    
@@ -174,8 +175,8 @@ optimizeXcmsSet <- function(params=getDefaultStartingXcmsParams(), n_slaves=4, s
     cat("starting new DoE with:\n")
     print(params)
         
-    xcms_result <- xcmsSetExperiments(example_sample, params, n_slaves) 
-#                       ppm, rt_diff, n_slaves)                        
+    xcms_result <- xcmsSetExperiments(example_sample, params, nSlaves) 
+#                       ppm, rt_diff, nSlaves)                        
                        
     xcms_result <- xcmsSetStatistic(xcms_result, subdir, iterator)
     history[[iterator]] <- xcms_result     
@@ -212,7 +213,7 @@ optimizeXcmsSet <- function(params=getDefaultStartingXcmsParams(), n_slaves=4, s
 				          prefilter=c(xcms_parameters$prefilter, xcms_parameters$value_of_prefilter),
 				          mzCenterFun=xcms_parameters$mzCenterFun, integrate=xcms_parameters$integrate,
 				          fitgauss=xcms_parameters$fitgauss, verbose.columns=xcms_parameters$verbose.columns, 
-                  nSlaves=n_slaves)
+                  nSlaves=nSlaves)
       } else {
         xset <- xcmsSet(files=example_sample, method="matchedFilter", 
                   fwhm=xcms_parameters$fwhm, snthresh=xcms_parameters$snthresh,
@@ -238,7 +239,7 @@ optimizeXcmsSet <- function(params=getDefaultStartingXcmsParams(), n_slaves=4, s
       parameter_setting <- xcms_result$max_settings[i+1]
       bounds <- params$to_optimize[[i]] 
       fact <- names(params$to_optimize)[i]
-	  min_factor <- ifelse(fact=="min_peakwidth", 5, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), ifelse(fact=="step",0.0005,1)))
+	  min_factor <- ifelse(fact=="min_peakwidth", 3, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), ifelse(fact=="step",0.0005,1)))
 
       #if the parameter is NA, we increase the range by 20%, if it was within the inner 25% of the previous range or at the minimum value we decrease the range by 20%
       step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) < best_range), 0.8, ifelse(parameter_setting==-1 & decode(-1, params$to_optimize[[i]]) == min_factor,0.8,1)))
@@ -313,8 +314,8 @@ getDefaultStartingXcmsParams <- function(method="centWave") {
   
 }
 
-startSlaves <- function(n_slaves) {
-  mpi.spawn.Rslaves(nslaves=n_slaves)
+startSlaves <- function(nSlaves) {
+  mpi.spawn.Rslaves(nslaves=nSlaves)
                                                                                 
   .Last <- function() {
     if (is.loaded("mpi_initialize")) {
@@ -398,16 +399,24 @@ optimizeSlave <- function() {
   
 }
 
-calcPPS <- function(xset) {
-  
-  peak_source <- xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax")]
+calcPPS <- function(xset) { 
    
   iso_list <- list()
   ret <- array(0, dim=c(1,5))  
+  if(is.null(xset)) {
+    return(ret)
+  }
+  
+  peak_source <- toMatrix(xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax")])
   if(nrow(peak_source) == 0) {
 	  return(ret)
-  }  
-  ret[2] <- nrow(xset@peaks)
+  }
+  
+  for(i in 1:ncol(peak_source)) {
+    peak_source <- toMatrix(peak_source[!is.na(peak_source[,i]),])
+  }
+  
+  ret[2] <- nrow(peak_source)
 
   peak_source <- cbind(1:nrow(peak_source), peak_source)
   colnames(peak_source)[1] <- "id"  
@@ -422,11 +431,11 @@ calcPPS <- function(xset) {
   #start_sample
   for(sample in 1:samples) { 
     #only taking peaks from current sample   
-	  speaks <- peak_source[peak_source[,"sample"]==sample,]	
+	  speaks <- toMatrix(peak_source[peak_source[,"sample"]==sample,])	
 	  found_isotope <- FALSE
     split <- 250
     	
-	  if(!is.null(ncol(speaks)) & length(speaks) > 3) {  		      
+	  if(nrow(speaks)>1) {  		      
 	    #speaks <- speaks[,-c("sample")]
 	    speaks <- speaks[order(speaks[,"mz"]),]
 		      
@@ -438,7 +447,7 @@ calcPPS <- function(xset) {
 	      } else {          
             upper_bound <- speaks[split,"mzmax"] + isotope_mass# + (speaks[split,"mz"] + isotope_mass) * ppm / 1000000          
 	        end_point <- sum(speaks[,"mz"] < upper_bound)
-	        part_peaks <- speaks[1:end_point,]
+	        part_peaks <- toMatrix(speaks[1:end_point,])
 	      }		
 
 		    rt <- part_peaks[,"rt"]
@@ -484,16 +493,16 @@ calcPPS <- function(xset) {
 	      
       }#end_while_sample_peaks      
 
-      sample_isos_peaks <- xset@peaks
-      sample_non_isos_peaks <- xset@peaks
+      sample_isos_peaks <- peak_source
+      sample_non_isos_peaks <- peak_source
       
       if(found_isotope) {
-        sample_isos_peaks <- xset@peaks[unique(unlist(iso_list)),]
-        sample_non_isos_peaks <- xset@peaks[-unique(unlist(iso_list)),]
+        sample_isos_peaks <- toMatrix(peak_source[unique(unlist(iso_list)),])
+        sample_non_isos_peaks <- toMatrix(peak_source[-unique(unlist(iso_list)),])
       } 
 
-      speaks <- sample_non_isos_peaks[sample_non_isos_peaks[,"sample"]==sample,]
-      sample_isos_peaks <- sample_isos_peaks[sample_isos_peaks[,"sample"]==sample,]
+      speaks <- toMatrix(sample_non_isos_peaks[sample_non_isos_peaks[,"sample"]==sample,])
+      sample_isos_peaks <- toMatrix(sample_isos_peaks[sample_isos_peaks[,"sample"]==sample,])
       int_cutoff = 0
       iso_int <- speaks[,"into"]
 
@@ -509,13 +518,18 @@ calcPPS <- function(xset) {
       not_loq_peaks <- sum(iso_int>int_cutoff)
       ret[3] <- ret[3] + not_loq_peaks
       ret[4] <- length(unique(unlist(iso_list)))
-      ret[5] <- ret[4]^1.5/ret[3]  
+	  if(ret[3] == 0) {
+	    ret[5] <- (ret[4]+1)^1.5/(ret[3]+1)  
+	  } else {	  
+        ret[5] <- ret[4]^1.5/ret[3]  
+	  }
 	  }    
   }#end_for_sample    
   
   return(ret)
 
 }
+
 
 xcmsSetsettingsAsString <- function(parameters) {  
   
@@ -539,14 +553,14 @@ checkRetGroupSetParams <- function(params) {
   checkParams(params, quantitative_parameters, qualitative_parameters, unsupported_parameters)
 } 
 
-retGroupCalcExperiments <- function(params, xset, n_slaves=4) {
+retGroupCalcExperiments <- function(params, xset, nSlaves=4) {
 							   
   library(Rmpi)  
   library(rsm)
     
   junk <- 0
   closed_slaves <- 0
-  #n_slaves <- min(mpi.comm.size()-1, n_slaves)  
+  #nSlaves <- min(mpi.comm.size()-1, nSlaves)  
   
   typ_params <- typeCastFactor(params)
   
@@ -558,7 +572,7 @@ retGroupCalcExperiments <- function(params, xset, n_slaves=4) {
  
   parameters <- decode.data(design)	
   tasks <- as.list(1:nrow(design))    
-  startSlaves(n_slaves)
+  startSlaves(nSlaves)
   
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
@@ -566,7 +580,7 @@ retGroupCalcExperiments <- function(params, xset, n_slaves=4) {
   
   response <- list()  
   finished <- 0
-  while(closed_slaves < n_slaves) {
+  while(closed_slaves < nSlaves) {
     # Receive a message from a slave
     message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
     message_info <- mpi.get.sourcetag()
@@ -685,7 +699,8 @@ retGroupExperimentStatistic<- function(retcor_result, subdir, iterator, xset) {
   tmp <- max_settings[-1]
   tmp[is.na(tmp)] <- 1
 
-  plotContours(retcor_result$model, tmp, paste(subdir, "/retgroup_rsm_", iterator, sep=""))  
+  if(!is.null(subdir))
+    plotContours(retcor_result$model, tmp, paste(subdir, "/retgroup_rsm_", iterator, sep=""))  
     
   parameters <- as.list(decodeAll(max_settings[-1], params$to_optimize)) 
   parameters <- combineParams(parameters, params$no_optimization)
@@ -750,14 +765,14 @@ getNormalizedResponse <- function(response) {
 
 }
 
-optimizeRetGroup <- function(xset, params=getDefaultRetGroupStartingParams(), n_slaves=4, subdir="IPO") {
+optimizeRetGroup <- function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO") {
                                                  
   library(xcms)
   iterator = 1 
   history <- list()  
   best_range <- 0.25
 
-  if(!file.exists(subdir))
+  if(!is.null(subdir) & !file.exists(subdir))
     dir.create(file.path(getwd(), subdir))
 	
   if(is.null(params$center))
@@ -772,7 +787,7 @@ optimizeRetGroup <- function(xset, params=getDefaultRetGroupStartingParams(), n_
     cat("starting new DoE with:\n")
     print(params)
         
-    retcor_result <- retGroupCalcExperiments(params, xset, n_slaves)  
+    retcor_result <- retGroupCalcExperiments(params, xset, nSlaves)  
                        
     retcor_result <- retGroupExperimentStatistic(retcor_result, subdir, iterator, xset)
     
@@ -1071,6 +1086,10 @@ decodeAll <- function(values, params) {
 }
 
 getResponses <- function(slices, model) {
+
+   if(is.null(slices)) {
+     slices= matrix(nrow=1, ncol=0)
+   }
    add_col <- array(0, dim=c(nrow(slices), 2))
    slices <- cbind(add_col, slices)
    
@@ -1084,6 +1103,7 @@ getResponses <- function(slices, model) {
 }
 
 getMaxima <- function(slice, model) {
+  	
   values <- contour(model, ~ x1 * x2, at=slice, plot.it=FALSE, decode=FALSE) 
     
   z_values <- values[[1]]$z
@@ -1253,9 +1273,9 @@ writeRSkript <- function(peakPickingSettings, retCorGroupSettings, nSlaves) {
 #setwd("/...")
 
 #peakpicking_parameter <- getDefaultStartingXcmsParams()
-#result_peakpicking <- optimizeXcmsSet(params=peakpicking_parameter, n_slaves=4)
+#result_peakpicking <- optimizeXcmsSet(params=peakpicking_parameter, nSlaves=4)
 
 #retcor_parameter <- getDefaultRetGroupStartingParams()
-#result_retcor <- optimizeRetGroup(result_peakpicking$best_settings$xset, params=retcor_parameter, n_slaves=4)
+#result_retcor <- optimizeRetGroup(result_peakpicking$best_settings$xset, params=retcor_parameter, nSlaves=4)
 
 

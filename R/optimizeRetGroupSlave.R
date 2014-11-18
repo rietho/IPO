@@ -13,7 +13,7 @@ function() {
     tag <- task_info[2]
     print(paste("tag", tag, "task", task))
 	
-	#print(parameters)
+	print(parameters)
     
     if (tag == 1) {
       require(xcms)

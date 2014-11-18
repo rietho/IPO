@@ -1,14 +1,22 @@
 calcPPS <-
-function(xset) {
-  
-  peak_source <- xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax")]
+function(xset) { 
    
   iso_list <- list()
   ret <- array(0, dim=c(1,5))  
+  if(is.null(xset)) {
+    return(ret)
+  }
+  
+  peak_source <- toMatrix(xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax")])
   if(nrow(peak_source) == 0) {
 	  return(ret)
-  }  
-  ret[2] <- nrow(xset@peaks)
+  }
+  
+  for(i in 1:ncol(peak_source)) {
+    peak_source <- toMatrix(peak_source[!is.na(peak_source[,i]),])
+  }
+  
+  ret[2] <- nrow(peak_source)
 
   peak_source <- cbind(1:nrow(peak_source), peak_source)
   colnames(peak_source)[1] <- "id"  
@@ -23,11 +31,11 @@ function(xset) {
   #start_sample
   for(sample in 1:samples) { 
     #only taking peaks from current sample   
-	  speaks <- peak_source[peak_source[,"sample"]==sample,]	
+	  speaks <- toMatrix(peak_source[peak_source[,"sample"]==sample,])	
 	  found_isotope <- FALSE
     split <- 250
     	
-	  if(!is.null(ncol(speaks)) & length(speaks) > 3) {  		      
+	  if(nrow(speaks)>1) {  		      
 	    #speaks <- speaks[,-c("sample")]
 	    speaks <- speaks[order(speaks[,"mz"]),]
 		      
@@ -39,7 +47,7 @@ function(xset) {
 	      } else {          
             upper_bound <- speaks[split,"mzmax"] + isotope_mass# + (speaks[split,"mz"] + isotope_mass) * ppm / 1000000          
 	        end_point <- sum(speaks[,"mz"] < upper_bound)
-	        part_peaks <- speaks[1:end_point,]
+	        part_peaks <- toMatrix(speaks[1:end_point,])
 	      }		
 
 		    rt <- part_peaks[,"rt"]
@@ -85,16 +93,16 @@ function(xset) {
 	      
       }#end_while_sample_peaks      
 
-      sample_isos_peaks <- xset@peaks
-      sample_non_isos_peaks <- xset@peaks
+      sample_isos_peaks <- peak_source
+      sample_non_isos_peaks <- peak_source
       
       if(found_isotope) {
-        sample_isos_peaks <- xset@peaks[unique(unlist(iso_list)),]
-        sample_non_isos_peaks <- xset@peaks[-unique(unlist(iso_list)),]
+        sample_isos_peaks <- toMatrix(peak_source[unique(unlist(iso_list)),])
+        sample_non_isos_peaks <- toMatrix(peak_source[-unique(unlist(iso_list)),])
       } 
 
-      speaks <- sample_non_isos_peaks[sample_non_isos_peaks[,"sample"]==sample,]
-      sample_isos_peaks <- sample_isos_peaks[sample_isos_peaks[,"sample"]==sample,]
+      speaks <- toMatrix(sample_non_isos_peaks[sample_non_isos_peaks[,"sample"]==sample,])
+      sample_isos_peaks <- toMatrix(sample_isos_peaks[sample_isos_peaks[,"sample"]==sample,])
       int_cutoff = 0
       iso_int <- speaks[,"into"]
 
@@ -110,7 +118,11 @@ function(xset) {
       not_loq_peaks <- sum(iso_int>int_cutoff)
       ret[3] <- ret[3] + not_loq_peaks
       ret[4] <- length(unique(unlist(iso_list)))
-      ret[5] <- ret[4]^1.5/ret[3]  
+	  if(ret[3] == 0) {
+	    ret[5] <- (ret[4]+1)^1.5/(ret[3]+1)  
+	  } else {	  
+        ret[5] <- ret[4]^1.5/ret[3]  
+	  }
 	  }    
   }#end_for_sample    
   
