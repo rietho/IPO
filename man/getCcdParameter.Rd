@@ -26,6 +26,8 @@ getCcdParameter(params)
 	A Central-Composite Design of Experiments
 }
 \references{
+  Lenth, R. V. (2009). Response-Surface Methods in R , Using rsm. Journal of Statistical Software, 32(7), 1–17. Retrieved from 
+  \url{http://www.jstatsoft.org/v32/i07}
 }
 \author{
 Gunnar Libiseller

@@ -1,5 +1,5 @@
-\name{writeRSkript}
-\alias{writeRSkript}
+\name{writeRScript}
+\alias{writeRScript}
 \title{
 	Prints an R-script to the screen which can be used for xcms processing
 }
@@ -8,7 +8,7 @@
 	retcor and grouping parameters to the screen.
 }
 \usage{
-writeRSkript(peakPickingSettings, retCorGroupSettings, nSlaves)
+writeRScript(peakPickingSettings, retCorGroupSettings, nSlaves)
 }
 
 \arguments{
@@ -47,7 +47,7 @@ Gunnar Libiseller
 	setwd("/...") #set working directory to where files are located\cr
 	peakPickingOptimization <- optimizeXcmsSet()
 	retcorGroupOptimization <- optimizeRetGroup(peakPickingOptimization$best_settings$xset)
-    writeRSkript(peakPickingOptimization$best_settings$parameters, retcorGroupOptimization$best_settings, 4)
+    writeRScript(peakPickingOptimization$best_settings$parameters, retcorGroupOptimization$best_settings, 4)
 
 ## The function is currently defined as
 function (peakPickingSettings, retCorGroupSettings, nSlaves) 

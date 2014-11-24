@@ -8,13 +8,16 @@ USER VISIBLE CHANGES
 	o changed method name calculateRGTV to getRGTVValues
 	o changed method name getDefaultStartingXcmsParams to getDefaultXcmsSetStartingParams
 	o changed method name typeCastFactor to typeCastParams
+	o changed method name writeRSkript to writeRScript
 	o changed the parameter name n_slaves to nSlaves
 	o resultIncreased: if last optimization score was 0, no isotopes have been found hence
 					   the dataset is not optimizable with IPO.
-	o added man files for attachList, calcPPS, combineParams, getBbdParameter, getCcdParameter, 
+	o added man files for attachList, calcPPS, combineParams, createModel, decode, decodeAll, 
+	encode, getBbdParameter, getCcdParameter, 
 	getDefaultRetCorCenterSample, getDefaultRetGroupStartingParams, getDefaultXcmsSetStartingParams, 
 	getNormalizedResponse, getRGTVValues, IPO-package, optimizeRetGroup, optimizeXcmsSet, 
-	toMatrix, typeCastParams
+	startSlaves, toMatrix, typeCastParams
+	o removed xcmsSetsettingsAsString.R
 	o getResponses: now able to handle NULL value for slices parameter
 	o calcPPS: peaks with NA values are removed before isotopes identification
 	o if subdir is NULL, no rsm's are saved

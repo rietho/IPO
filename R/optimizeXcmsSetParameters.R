@@ -1,0 +1,485 @@
+calcPPS <-
+function(xset) { 
+   
+  iso_list <- list()
+  ret <- array(0, dim=c(1,5))  
+  if(is.null(xset)) {
+    return(ret)
+  }
+  
+  peak_source <- toMatrix(xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax")])
+  if(nrow(peak_source) == 0) {
+	  return(ret)
+  }
+  
+  for(i in 1:ncol(peak_source)) {
+    peak_source <- toMatrix(peak_source[!is.na(peak_source[,i]),])
+  }
+  
+  ret[2] <- nrow(peak_source)
+
+  peak_source <- cbind(1:nrow(peak_source), peak_source)
+  colnames(peak_source)[1] <- "id"  
+  
+  carbon = 12.0
+  hydrogen	= 1.0078250170
+  CH3 = carbon + 3 * hydrogen
+  CH2 = carbon + 2 * hydrogen
+  isotope_mass = 1.0033548
+  samples <- max(peak_source[,"sample"])
+
+  #start_sample
+  for(sample in 1:samples) { 
+    #only taking peaks from current sample   
+	  speaks <- toMatrix(peak_source[peak_source[,"sample"]==sample,])	
+	  found_isotope <- FALSE
+    split <- 250
+    	
+	  if(nrow(speaks)>1) {  		      
+	    #speaks <- speaks[,-c("sample")]
+	    speaks <- speaks[order(speaks[,"mz"]),]
+		      
+	    while(!is.null(nrow(speaks)) & length(speaks) > 3) {
+	      part_peaks <- NULL
+	      #splitting the data into smaller pieces to improve speed    
+	      if(nrow(speaks) < split) {
+	        part_peaks <- speaks
+	      } else {          
+            upper_bound <- speaks[split,"mzmax"] + isotope_mass# + (speaks[split,"mz"] + isotope_mass) * ppm / 1000000          
+	        end_point <- sum(speaks[,"mz"] < upper_bound)
+	        part_peaks <- toMatrix(speaks[1:end_point,])
+	      }		
+
+		    rt <- part_peaks[,"rt"]
+		    rt_window <- rt * 0.005
+		    rt_lower <- part_peaks[,"rt"] - rt_window
+		    rt_upper <- part_peaks[,"rt"] + rt_window
+		    rt_matrix <-  t(matrix(rep(rt, nrow(part_peaks)), ncol=nrow(part_peaks)))
+		    rt_matrix_bool <- rt_matrix >= rt_lower & rt_matrix <= rt_upper
+
+		    mz <- part_peaks[,"mz"]
+		    mz_lower <- part_peaks[,"mzmin"] + isotope_mass #isotope_masses - mz_window
+		    mz_upper <- part_peaks[,"mzmax"] + isotope_mass #isotope_masses + mz_window
+		    mz_matrix <-  t(matrix(rep(mz, nrow(part_peaks)), ncol=nrow(part_peaks)))
+		    mz_matrix_bool <- mz_matrix >= mz_lower & mz_matrix <= mz_upper
+
+		    rt_mz_matrix_bool <- rt_matrix_bool & mz_matrix_bool
+		  
+		    rt_mz_peak_ids <- which(rowSums(rt_mz_matrix_bool)>0)
+		    calculations <- min(split, nrow(speaks))
+		    rt_mz_peak_ids <- rt_mz_peak_ids[rt_mz_peak_ids < calculations]
+      
+        #if(length(rt_mz_peak_ids)>0) {
+		      for(i in rt_mz_peak_ids) {
+			      current <- part_peaks[i,]
+			      rt_mz_peaks <- toMatrix(part_peaks[rt_mz_matrix_bool[i,],])
+			      rt_difference <- abs(current["rt"] - rt_mz_peaks[, "rt"]) / current["rt"]
+			      rt_mz_peaks <- cbind(rt_mz_peaks, rt_difference)
+            #test intensity_window
+            maximum_carbon <- floor((current["mz"]-2*CH3)/CH2) + 2
+            carbon_probabilty <- c(1,maximum_carbon)*0.01108
+            iso_intensity <- current["into"] * carbon_probabilty
+
+            int_bools <- rt_mz_peaks[,"into"] >= iso_intensity[1] & rt_mz_peaks[,"into"] <= iso_intensity[2]
+            if(sum(int_bools) > 0) {
+              int_peaks <- toMatrix(rt_mz_peaks[int_bools,])
+              iso_id <- int_peaks[which.min(int_peaks[,"rt_difference"]), "id"]
+              iso_list[[length(iso_list)+1]] <- c(current["id"], iso_id)  
+              found_isotope <- TRUE              
+            }
+		      }
+        #}
+		    speaks <- speaks[-(1:calculations),]		    
+	      
+      }#end_while_sample_peaks      
+
+      sample_isos_peaks <- peak_source
+      sample_non_isos_peaks <- peak_source
+      
+      if(found_isotope) {
+        sample_isos_peaks <- toMatrix(peak_source[unique(unlist(iso_list)),])
+        sample_non_isos_peaks <- toMatrix(peak_source[-unique(unlist(iso_list)),])
+      } 
+
+      speaks <- toMatrix(sample_non_isos_peaks[sample_non_isos_peaks[,"sample"]==sample,])
+      sample_isos_peaks <- toMatrix(sample_isos_peaks[sample_isos_peaks[,"sample"]==sample,])
+      int_cutoff = 0
+      iso_int <- speaks[,"into"]
+
+      tmp <- iso_int[order(iso_int)]      
+      int_cutoff <- mean(tmp[1:round((length(tmp)/33),0)])
+
+      masses <- speaks[, "mz"]
+      maximum_carbon <- floor((masses-2*CH3)/CH2) + 2
+      carbon_probabilty <- maximum_carbon*0.01108
+
+      iso_int <- iso_int * carbon_probabilty
+  
+      not_loq_peaks <- sum(iso_int>int_cutoff)
+      ret[3] <- ret[3] + not_loq_peaks
+      ret[4] <- length(unique(unlist(iso_list)))
+	  if(ret[3] == 0) {
+	    ret[5] <- (ret[4]+1)^1.5/(ret[3]+1)  
+	  } else {	  
+        ret[5] <- ret[4]^1.5/ret[3]  
+	  }
+	  }    
+  }#end_for_sample    
+  
+  return(ret)
+
+}
+
+
+checkXcmsSetParams <-
+function(params) {
+  if(is.null(params$step)) {     #centWave   
+    quantitative_parameters <- c("ppm", "min_peakwidth", "max_peakwidth", "snthresh", "mzdiff", "noise", "prefilter", "value_of_prefilter")
+    qualitative_parameters <- c("integrate", "fitgauss", "verbose.columns", "mzCenterFun")
+    unsupported_parameters <- c("scanrange", "sleep", "ROI.list")
+  } else {    
+    quantitative_parameters <- c("fwhm", "sigma", "max", "snthresh", "step", "steps", "mzdiff")
+    qualitative_parameters <- c("index")
+    unsupported_parameters <- c("sleep")  
+  } 
+  checkParams(params, quantitative_parameters, qualitative_parameters, unsupported_parameters)
+}
+
+
+getDefaultXcmsSetStartingParams <-
+function(method="centWave") {
+  if(method=="centWave")
+    return(list(min_peakwidth=c(10,30), max_peakwidth=c(35,65), ppm=c(15,35),
+              mzdiff=c(-0.001, 0.01), snthresh=10, noise=0, prefilter=3, 
+			        value_of_prefilter=100,  mzCenterFun="wMean", integrate=1, 
+			        fitgauss=FALSE, verbose.columns=FALSE))
+			  
+  if(method=="matchedFilter")
+    return(list(fwhm=c(25,35), snthresh=c(3,17), step=c(0.05, 0.15), steps=c(1,3), 
+           sigma=0, max=5, mzdiff=0, index=FALSE)) 
+  
+}
+
+
+optimizeSlave <-
+function() {
+  junk <- 0
+  done <- 0
+
+  library(Rmpi)
+  
+  while (done != 1) {
+    # Signal being ready to receive a new task
+    mpi.send.Robj(junk,0,1)
+
+    # Receive a task
+    task <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag()) 
+    task_info <- mpi.get.sourcetag()
+    tag <- task_info[2]
+    
+    if (tag == 1) {
+      require(xcms)
+      exp_index <- task
+	  xset <- NULL
+      print(sapply(xcmsSet_parameters, "[[", exp_index))
+      if(is.null(xcmsSet_parameters$step)) {     #centWave  	
+        xset <- xcmsSet(files=example_sample, method="centWave", 
+                  peakwidth=c(xcmsSet_parameters$min_peakwidth[exp_index], xcmsSet_parameters$max_peakwidth[exp_index]),
+                  ppm=xcmsSet_parameters$ppm[exp_index], noise=xcmsSet_parameters$noise[exp_index], 
+				  snthresh=xcmsSet_parameters$snthresh[exp_index], mzdiff=xcmsSet_parameters$mzdiff[exp_index],
+				  prefilter=c(xcmsSet_parameters$prefilter[exp_index], xcmsSet_parameters$value_of_prefilter[exp_index]),
+				  mzCenterFun=xcmsSet_parameters$mzCenterFun[exp_index], integrate=xcmsSet_parameters$integrate[exp_index],
+				  fitgauss=xcmsSet_parameters$fitgauss[exp_index], verbose.columns=xcmsSet_parameters$verbose.columns[exp_index])
+                  
+      } else {
+      #matchedFilter  
+        try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
+                  fwhm=xcmsSet_parameters$fwhm[exp_index], snthresh=xcmsSet_parameters$snthresh[exp_index],
+                  step=xcmsSet_parameters$step[exp_index], steps=xcmsSet_parameters$steps[exp_index],
+                  sigma=xcmsSet_parameters$sigma[exp_index], max=xcmsSet_parameters$max[exp_index], 
+                  mzdiff=xcmsSet_parameters$mzdiff[exp_index], index=xcmsSet_parameters$index[exp_index]))   
+
+      }                   
+      
+      result <- calcPPS(xset) #, ppm, rt_diff)
+      result[1] <- exp_index
+   
+      rm(xset)
+      mpi.send.Robj(result,0,2)
+      print("result sent")
+    } else if (tag == 2) {
+    # Master is saying all tasks are done.  Exit
+      done <- 1
+    }
+    # Else ignore the message or report an error
+  }
+
+  # Tell master that this slave is exiting.  Send master an exiting message
+  mpi.send.Robj(junk,0,3) 
+  
+}
+
+
+optimizeXcmsSet <-
+function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
+
+  checkXcmsSetParams(params)
+  
+  if(is.null(files)) {
+    files <- list.files(full.names=TRUE, ignore.case=TRUE, recursive=TRUE, pattern="(*.mzX?ML$)|(*.CDF)") 
+  } else {
+  #check files for valid extensions
+  }
+    
+  if(length(files)==0)
+    stop("no files in directory, stopping!")
+	
+  centWave <- is.null(params$fwhm)  
+  
+  history <- list()
+  iterator = 1 
+  best_range <- 0.25
+
+  if(!is.null(subdir) & !file.exists(subdir))
+    dir.create(file.path(getwd(), subdir))
+    
+  while(iterator < 50) {
+    cat("\n")
+    cat("\n")
+    cat("\n")
+    cat("starting new DoE with:\n")
+    print(params)
+        
+    xcms_result <- xcmsSetExperiments(files, params, nSlaves) 
+#                       ppm, rt_diff, nSlaves)                        
+                       
+    xcms_result <- xcmsSetStatistic(xcms_result, subdir, iterator)
+    history[[iterator]] <- xcms_result     
+    params <- xcms_result$params 
+    
+    if(!resultIncreased(history)) {
+      cat("no increase, stopping")
+      maxima <- 0
+	    max_index <- 1
+	    for(i in 1:length(history)) {
+	      if(history[[i]]$max_settings[1] > maxima) {
+		      maxima <- history[[i]]$max_settings[1]
+		      max_index <- i
+		    }
+	    }
+   
+        xcms_parameters <- as.list(decodeAll(history[[max_index]]$max_settings[-1], history[[max_index]]$params$to_optimize))      
+	    xcms_parameters <- combineParams(xcms_parameters, params$no_optimization)
+      
+	    if(!is.list(xcms_parameters))
+	      xcms_parameters <- as.list(xcms_parameters)
+		
+	    best_settings <- list()
+      best_settings$parameters <- xcms_parameters
+      library(xcms)
+	  library(Rmpi)
+      
+      
+      if(centWave) {		
+        xset <- xcmsSet(files=files, method="centWave", 
+                  peakwidth=c(xcms_parameters$min_peakwidth, xcms_parameters$max_peakwidth),
+                  ppm=xcms_parameters$ppm, noise=xcms_parameters$noise, 
+				          snthresh=xcms_parameters$snthresh, mzdiff=xcms_parameters$mzdiff,
+				          prefilter=c(xcms_parameters$prefilter, xcms_parameters$value_of_prefilter),
+				          mzCenterFun=xcms_parameters$mzCenterFun, integrate=xcms_parameters$integrate,
+				          fitgauss=xcms_parameters$fitgauss, verbose.columns=xcms_parameters$verbose.columns, 
+                  nSlaves=nSlaves)
+      } else {
+        xset <- xcmsSet(files=files, method="matchedFilter", 
+                  fwhm=xcms_parameters$fwhm, snthresh=xcms_parameters$snthresh,
+                  step=xcms_parameters$step, steps=xcms_parameters$steps,
+                  sigma=xcms_parameters$sigma, max=xcms_parameters$max, 
+                  mzdiff=xcms_parameters$mzdiff, index=xcms_parameters$index) 
+                
+                
+      }
+                
+	  best_settings$xset <- xset
+      target_value <- calcPPS(xset)#, ppm, rt_diff)
+      best_settings$result <- target_value
+      history$best_settings <- best_settings
+      
+      print(best_settings)
+      
+      return(history)   
+    }
+
+         
+    for(i in 1:length(params$to_optimize)) {
+      parameter_setting <- xcms_result$max_settings[i+1]
+      bounds <- params$to_optimize[[i]] 
+      fact <- names(params$to_optimize)[i]
+	  min_factor <- ifelse(fact=="min_peakwidth", 3, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), ifelse(fact=="step",0.0005,1)))
+
+      #if the parameter is NA, we increase the range by 20%, if it was within the inner 25% of the previous range or at the minimum value we decrease the range by 20%
+      step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) < best_range), 0.8, ifelse(parameter_setting==-1 & decode(-1, params$to_optimize[[i]]) == min_factor,0.8,1)))
+      step <- (diff(bounds) / 2) * step_factor
+      
+      if(is.na(parameter_setting))
+        parameter_setting <- 0
+      new_center <- decode(parameter_setting, bounds)
+      
+      if((new_center-min_factor) > step) {
+        new_bounds <- c(new_center - step, new_center + step) 
+      } else {
+        new_bounds <- c(min_factor, 2*step+min_factor) 
+      }      
+		  
+	  names(new_bounds) <- NULL         
+          
+      if(names(params$to_optimize)[i] != "mzdiff" & names(params$to_optimize)[i] != "step")
+        params$to_optimize[[i]] <- round(new_bounds, 0)
+      else 
+        params$to_optimize[[i]] <- new_bounds
+    } 
+    
+    if(centWave) {
+    #checking peakwidths plausiability
+	  if(!is.null(params$to_optimize$min_peakwidth) | !is.null(params$to_optimize$max_peakwidth)) {
+	    pw_min <- ifelse(is.null(params$to_optimize$min_peakwidth), params$no_optimization$min_peakwidth, max(params$to_optimize$min_peakwidth))
+		  pw_max <- ifelse(is.null(params$to_optimize$max_peakwidth), params$no_optimization$max_peakwidth, min(params$to_optimize$max_peakwidth))
+        if(pw_min >= pw_max) {
+          additional <- abs(pw_min-pw_max) + 1
+          if(!is.null(params$to_optimize$max_peakwidth)) {		  
+            params$to_optimize$max_peakwidth <- params$to_optimize$max_peakwidth + additional
+          } else {
+            params$no_optimization$max_peakwidth <- params$no_optimization$max_peakwidth + additional
+		  }
+		}
+      }
+    }
+	
+	params <- attachList(params$to_optimize, params$no_optimization)	    
+    iterator <- iterator + 1
+                 
+  }
+  return(history)
+
+}
+
+
+resultIncreased <-
+function(history) {
+
+  index = length(history)
+  if(history[[index]]$max_settings[1] == 0 & index == 1)
+    stop("No isotopes have been detected, peak picking not optimizable by IPO!")
+  
+  if(index < 2)
+    return(TRUE)
+   
+  if(history[[index-1]]$max_settings[1] >= history[[index]]$max_settings[1])
+    return(FALSE)
+    
+  return(TRUE)
+
+}
+
+
+sendXcmsSetSlaveFunctions <-
+function(example_sample, xcmsSet_parameters) {#, ppm, rt_diff) {
+  mpi.bcast.Robj2slave(toMatrix) 
+  mpi.bcast.Robj2slave(calcPPS) 
+  mpi.bcast.cmd(slave <- mpi.comm.rank())
+  mpi.bcast.Robj2slave(example_sample)
+  mpi.bcast.Robj2slave(xcmsSet_parameters)
+  mpi.bcast.Robj2slave(optimizeSlave)
+  
+  mpi.bcast.cmd("library(xcms)")
+  mpi.bcast.cmd(optimizeSlave())
+}
+
+
+xcmsSetExperiments <-
+function(example_sample, params, nSlaves=4) { #ppm=5, rt_diff=0.01, nSlaves=4) {
+  library(Rmpi)  
+  library(rsm)
+    
+  junk <- 0
+  closed_slaves <- 0
+  #nSlaves <- min(mpi.comm.size()-1, nSlaves)  
+  
+  typ_params <- typeCastParams(params)
+  
+  if(length(typ_params[[1]])>2)
+    design <- getBbdParameter(typ_params$to_optimize) 
+  else
+    design <- getCcdParameter(typ_params$to_optimize)  	
+  xcms_design <- decode.data(design) 
+
+  xcms_design <- combineParams(xcms_design, typ_params$no_optimization)  
+  tasks <- as.list(1:nrow(design))  
+  
+  startSlaves(nSlaves)
+  sendXcmsSetSlaveFunctions(example_sample, xcms_design) #,  ppm, rt_diff)
+
+  response <- matrix(0, nrow=length(design[[1]]), ncol=5)
+  colnames(response) <- c("exp", "num_peaks", "notLLOQP", "num_C13", "PPS")
+  finished <- 0
+  while(closed_slaves < nSlaves) {
+    # Receive a message from a slave
+    message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
+    message_info <- mpi.get.sourcetag()
+    slave_id <- message_info[1]
+    tag <- message_info[2]
+      
+    if(tag == 1) {
+      # slave is ready for a task.  Give it the next task, or tell it tasks
+      # are done if there are none.
+      if(length(tasks) > 0) {
+        # Send a task, and then remove it from the task list
+        mpi.send.Robj(tasks[[1]], slave_id, 1);
+        tasks[[1]] <- NULL
+      } else {
+        mpi.send.Robj(junk, slave_id, 2)
+      }
+    } else if (tag == 2) {
+      response[message[1],] <- message
+      finished <- finished + 1    
+    } else if (tag == 3) {
+      # A slave has closed down. 
+      closed_slaves <- closed_slaves + 1
+    }
+    cat(paste("finished ", finished, " of ", nrow(design), " tasks\r", sep="")) 
+    flush.console()
+  }
+  cat("\n\r")  
+  print("done")
+  mpi.close.Rslaves()
+
+  ret <- list()
+  ret$params <- typ_params
+  ret$design <- design
+  ret$response <- response
+
+  return(ret)
+
+}
+
+
+xcmsSetStatistic <-
+function(xcms_result, subdir, iterator, score_name="PPS") {
+
+  params <- xcms_result$params
+  resp <- xcms_result$response[, "PPS"]
+  model <- createModel(xcms_result$design, params$to_optimize, resp)
+  xcms_result$model <- model                  
+     
+  max_settings <- getMaximumExperiment(xcms_result$model)
+  tmp <- max_settings[-1]
+  tmp[is.na(tmp)] <- 1
+  if(!is.null(subdir))
+    plotContours(xcms_result$model, tmp, paste(subdir,"/rsm_", iterator, sep=""))
+
+  xcms_result$max_settings <- max_settings
+
+  return(xcms_result)
+}
+
+
+

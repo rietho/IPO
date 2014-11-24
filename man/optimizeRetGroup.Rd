@@ -12,7 +12,7 @@
 \usage{
 optimizeRetGroup(xset, params = getDefaultRetGroupStartingParams(), nSlaves = 4, subdir = "IPO")
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{xset}{
 	\code{xcmsSet} object
@@ -49,6 +49,10 @@ The name of the subdirectory which is created and where the figures of the respo
   }
 }
 \references{
+
+Obiwarp
+  \code{Prince, J. T., & Marcotte, E. M. (2006). Chromatographic alignment of ESI-LC-MS proteomics data sets by ordered bijective interpolated warping. Analytical chemistry, 78(17), 6140–52. doi:10.1021/ac0605344}
+
 }
 \author{
 Gunnar Libiseller

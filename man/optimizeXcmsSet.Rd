@@ -39,7 +39,20 @@ Optimisation of peak picking parameters by using natural, stable 13C isotopes
 	3. The result of calcPPS() of the xcmsSet created with the best parameters}
 }
 \references{
-% ~put references to the literature/web site here ~
+
+  Smith, C.A. and Want, E.J. and O'Maille, G. and Abagyan,R. and
+  Siuzdak, G.: XCMS: Processing mass spectrometry data for metabolite
+  profiling using nonlinear peak alignment, matching and
+  identification, Analytical Chemistry, 78:779-787 (2006)
+
+  Ralf Tautenhahn, Christoph Boettcher, Steffen Neumann: Highly
+  sensitive feature detection for high resolution LC/MS BMC
+  Bioinformatics, 9:504 (2008)
+
+  H. Paul Benton, Elizabeth J. Want and Timothy M. D. Ebbels Correction
+  of mass calibration gaps in liquid chromatography-mass spectrometry
+  metabolomics data Bioinformatics, 26:2488 (2010)
+
 }
 \author{
 Gunnar Libiseller
