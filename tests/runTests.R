@@ -1,4 +1,3 @@
-library("mzR")
 library("msdata")
 
-BiocGenerics:::testPackage("mzR")
+BiocGenerics:::testPackage("IPO")

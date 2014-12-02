@@ -152,7 +152,6 @@ function(value, bounds) {
 getBbdParameter <-
 function(params) {
  
-  require(rsm)
   lower_bounds <- unlist(lapply(X=params, FUN=function(x) x[1]))
   higher_bounds <- unlist(lapply(X=params, FUN=function(x) x[2]))
   
@@ -173,7 +172,6 @@ function(params) {
 getCcdParameter <-
 function(params) {
  
-  require(rsm)
   lower_bounds <- unlist(lapply(X=params, FUN=function(x) x[1]))
   higher_bounds <- unlist(lapply(X=params, FUN=function(x) x[2]))
   
@@ -255,7 +253,7 @@ function(model, maximum_slice, plot_name) {
 
   if(!is.null(plot_name)) {
     plot_name = paste(plot_name, ".jpg", sep="")
-    jpeg(plot_name, width=4*plot_cols, height=2*plot_rows+2, unit="in", res=c(200,200))
+    jpeg(plot_name, width=4*plot_cols, height=2*plot_rows+2, units="in", res=c(200,200))
   } else 
     dev.new(width=4*plot_cols, height=2*plot_rows+2)
   par(mfrow=c(plot_rows, plot_cols), oma=c(3,0,2,0))  
@@ -293,7 +291,7 @@ function(nSlaves) {
 	    mpi.close.Rslaves()
 	  }
       print("Please use mpi.quit() to quit R")
-      .Call("mpi_finalize")
+      .Call("mpi_finalize", PACKAGE="Rmpi")
     }
   }
 }

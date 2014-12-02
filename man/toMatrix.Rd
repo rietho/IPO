@@ -1,4 +1,4 @@
-\name{toMatrix}
+>\name{toMatrix}
 \alias{toMatrix}
 \title{
 	Converts an array into a matrix
@@ -36,8 +36,8 @@ Gunnar Libsieller
 \seealso{
 }
 \examples{
-	data <- matrix(1:9, nrow=3)\cr
-	colnames(data) <- c("a","b","c")\cr
+	data <- matrix(1:9, nrow=3)
+	colnames(data) <- c("a","b","c")
 	x <- data[1,]
 	is.matrix(x)
 	x <- toMatrix(x)

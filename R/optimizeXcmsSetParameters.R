@@ -166,8 +166,6 @@ function() {
   junk <- 0
   done <- 0
 
-  library(Rmpi)
-  
   while (done != 1) {
     # Signal being ready to receive a new task
     mpi.send.Robj(junk,0,1)
@@ -178,7 +176,6 @@ function() {
     tag <- task_info[2]
     
     if (tag == 1) {
-      require(xcms)
       exp_index <- task
 	  xset <- NULL
       print(sapply(xcmsSet_parameters, "[[", exp_index))
@@ -276,9 +273,6 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
 		
 	    best_settings <- list()
       best_settings$parameters <- xcms_parameters
-      library(xcms)
-	  library(Rmpi)
-      
       
       if(centWave) {		
         xset <- xcmsSet(files=files, method="centWave", 
@@ -389,7 +383,6 @@ function(example_sample, xcmsSet_parameters) {#, ppm, rt_diff) {
   mpi.bcast.Robj2slave(example_sample)
   mpi.bcast.Robj2slave(xcmsSet_parameters)
   mpi.bcast.Robj2slave(optimizeSlave)
-  
   mpi.bcast.cmd("library(xcms)")
   mpi.bcast.cmd(optimizeSlave())
 }
@@ -397,8 +390,6 @@ function(example_sample, xcmsSet_parameters) {#, ppm, rt_diff) {
 
 xcmsSetExperiments <-
 function(example_sample, params, nSlaves=4) { #ppm=5, rt_diff=0.01, nSlaves=4) {
-  library(Rmpi)  
-  library(rsm)
     
   junk <- 0
   closed_slaves <- 0

@@ -43,6 +43,8 @@ Gunnar Libiseller
 \seealso{
 }
 \examples{
+\dontrun{
 getRGTVValues(xset)
+}
 }
 \keyword{method}

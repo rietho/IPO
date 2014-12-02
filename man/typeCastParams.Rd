@@ -1,4 +1,4 @@
-\name{typeCastParams}
+>\name{typeCastParams}
 \alias{typeCastParams}
 \title{
 	Splits parameters into those which should be optimized and those which are fixed.

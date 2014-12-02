@@ -1,3 +1,6 @@
+import("xcms")
+import("Rmpi")
+import("rsm")
 
 export("attachList")
 export("calcPPS")

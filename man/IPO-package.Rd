@@ -44,8 +44,20 @@ Maintainer: gunnar.libiseller@joanneum.at
 \code{\link[xcms:xcmsSet]{xcms}}
 }
 \examples{
-	setwd("/...") #set working directory to where files are located\cr
-	peakPickingOptimization <- optimizeXcmsSet()
-	retcorGroupOptimization <- optimizeRetGroup(peakPickingOptimization$best_settings$xset)
-	writeRScript(peakPickingOptimization$best_settings$parameters, retcorGroupOptimization$best_settings, 4)
+\dontrun{
+library(msdata)
+library(IPO)
+ 
+mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
+ 
+paramsPP <- getDefaultXcmsSetStartingParams()
+paramsPP$mzdiff <- -0.001
+paramsPP$min_peakwidth <- c(7,14)
+paramsPP$max_peakwidth <- c(20,30)
+resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, subdir="microtofq")
+#resultRG <- optimizeRetGroup(resultPP$best_settings$xset)
+
+#writeRScript(resultPP$best_settings$parameters, resultRG$best_settings,
+ 4)
+}
 }

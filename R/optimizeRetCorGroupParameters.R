@@ -118,7 +118,6 @@ function(xset, exp_index=1, retcor_penalty=1) {
 optimizeRetGroup <-
 function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO") {
                                                  
-  library(xcms)
   iterator = 1 
   history <- list()  
   best_range <- 0.25
@@ -246,8 +245,6 @@ function() {
 	print(parameters)
     
     if (tag == 1) {
-      require(xcms)
-
       exp_index <- task
 
       do_retcor <- !(is.null(parameters$distFunc) && is.null(parameters$profStep) && is.null(parameters$gapInit) && is.null(parameters$gapExtend)
@@ -321,9 +318,6 @@ function(history) {
 
 retGroupCalcExperiments <-
 function(params, xset, nSlaves=4) {
-							   
-  library(Rmpi)  
-  library(rsm)
     
   junk <- 0
   closed_slaves <- 0
@@ -450,8 +444,8 @@ function(parameters, xset) {
   mpi.bcast.cmd(slave <- mpi.comm.rank())
   mpi.bcast.Robj2slave(parameters)
   mpi.bcast.Robj2slave(xset)  
-  mpi.bcast.cmd("library(xcms)")
   mpi.bcast.Robj2slave(optimizeRetGroupSlave)  
+  mpi.bcast.cmd("library(xcms)")
   mpi.bcast.cmd(optimizeRetGroupSlave())
 }
 
