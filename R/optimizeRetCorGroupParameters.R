@@ -137,7 +137,7 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
     cat("starting new DoE with:\n")
     print(params)
         
-    retcor_result <- retGroupCalcExperiments(params, xset, nSlaves)  
+    retcor_result <- retGroupCalcExperimentsCluster(params, xset, nSlaves)  
                        
     retcor_result <- retGroupExperimentStatistic(retcor_result, subdir, iterator, xset)
     
@@ -226,25 +226,11 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
 
 }
 
-
-optimizeRetGroupSlave <-
-function() {
-  junk <- 0
-  done <- 0
-  
-  while (done != 1) {
-    # Signal being ready to receive a new task
-    mpi.send.Robj(junk,0,1)
-
-    # Receive a task
-    task <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag()) 
-    task_info <- mpi.get.sourcetag()
-    tag <- task_info[2]
-    print(paste("tag", tag, "task", task))
-	
+optimizeRetGroupSlaveCluster <-
+function(task, xset, parameters) {
 	print(parameters)
-    
-    if (tag == 1) {
+    library(xcms)
+    #if (tag == 1) {
       exp_index <- task
 
       do_retcor <- !(is.null(parameters$distFunc) && is.null(parameters$profStep) && is.null(parameters$gapInit) && is.null(parameters$gapExtend)
@@ -271,21 +257,82 @@ function() {
       minfrac <- ifelse(is.null(parameters$minfrac), 1, parameters$minfrac[exp_index])      
       try(xset <- group(xset, method="density", bw=parameters$bw[exp_index], mzwid=parameters$mzwid[exp_index], minfrac=minfrac, 
                   minsamp=parameters$minsamp[exp_index], max=parameters$max[exp_index]))	 
- 
+	  print(xset)
       result <- getRGTVValues(xset, exp_index, retcor_failed)
+	  return(result)
+      #mpi.send.Robj(result,0,2)
 
-      mpi.send.Robj(result,0,2)
-
-    } else if (tag == 2) {
-      done <- 1
-    }
+    #} else if (tag == 2) {
+    #  done <- 1
+    #}
     # Else ignore the message or report an error
-  }
+  #}
 
   # Tell master that this slave is exiting.  Send master an exiting message
-  mpi.send.Robj(junk,0,3) 
+  #mpi.send.Robj(junk,0,3) 
   
 }
+
+
+# optimizeRetGroupSlave <-
+# function() {
+  # junk <- 0
+  # done <- 0
+  
+  # while (done != 1) {
+  #  #Signal being ready to receive a new task
+    # mpi.send.Robj(junk,0,1)
+
+  #  #Receive a task
+    # task <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag()) 
+    # task_info <- mpi.get.sourcetag()
+    # tag <- task_info[2]
+    # print(paste("tag", tag, "task", task))
+	
+	# print(parameters)
+    
+    # if (tag == 1) {
+      # exp_index <- task
+
+      # do_retcor <- !(is.null(parameters$distFunc) && is.null(parameters$profStep) && is.null(parameters$gapInit) && is.null(parameters$gapExtend)
+	                # && is.null(parameters$plottype) && is.null(parameters$response) 
+					# && is.null(parameters$factorDiag) && is.null(parameters$factorGap) && is.null(parameters$localAlignment) 
+					# && is.null(parameters$initPenalty)) #&& is.null(parameters$center)) 
+					
+      # retcor_failed = ifelse(do_retcor, 1.1, 1)  
+  
+      # if(do_retcor) {
+        # try(retcor_failed <- retcor(xset, method="obiwarp", plottype=parameters$plottype[exp_index], distFunc=parameters$distFunc[exp_index],
+                             # profStep=parameters$profStep[exp_index], center=parameters$center[exp_index], response=parameters$response[exp_index], 
+							 # gapInit=parameters$gapInit[exp_index], gapExtend=parameters$gapExtend[exp_index],
+							 # factorDiag=parameters$factorDiag[exp_index], factorGap=parameters$factorGap[exp_index], 
+							 # localAlignment=parameters$localAlignment[exp_index]))
+  	
+	
+        # if(!is.numeric(retcor_failed)) {
+          # xset <- retcor_failed
+          # retcor_failed=1
+        # } 
+      # }
+	  
+      # minfrac <- ifelse(is.null(parameters$minfrac), 1, parameters$minfrac[exp_index])      
+      # try(xset <- group(xset, method="density", bw=parameters$bw[exp_index], mzwid=parameters$mzwid[exp_index], minfrac=minfrac, 
+                  # minsamp=parameters$minsamp[exp_index], max=parameters$max[exp_index]))	 
+ 
+      # result <- getRGTVValues(xset, exp_index, retcor_failed)
+
+      # mpi.send.Robj(result,0,2)
+
+    # } else if (tag == 2) {
+      # done <- 1
+    # }
+  #  #Else ignore the message or report an error
+  # }
+
+#  #Tell master that this slave is exiting.  Send master an exiting message
+  # mpi.send.Robj(junk,0,3) 
+  
+# }
 
 
 RCSandGSIncreased <-
@@ -316,13 +363,9 @@ function(history) {
 }
 
 
-retGroupCalcExperiments <-
+retGroupCalcExperimentsCluster <-
 function(params, xset, nSlaves=4) {
-    
-  junk <- 0
-  closed_slaves <- 0
-  #nSlaves <- min(mpi.comm.size()-1, nSlaves)  
-  
+
   typ_params <- typeCastParams(params)
   
   if(length(typ_params$to_optimize) > 2) {
@@ -332,54 +375,100 @@ function(params, xset, nSlaves=4) {
   }	
  
   parameters <- decode.data(design)	
-  tasks <- as.list(1:nrow(design))    
-  startSlaves(nSlaves)
-  
+  tasks <- as.list(1:nrow(design))      
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
-  sendRetGroupSlaveFunctions(parameters, xset) 
+  library(parallel)
+  cl <- makeCluster(nSlaves, type = "PSOCK")#, outfile="log.txt")
+  #exporting all functions to cluster but only calcRGTV is needed
+  ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
+  clusterExport(cl, ex)
+  #print(as.list(tasks))
+  #print(parameters)
+  #print(xset)
   
-  response <- list()  
-  finished <- 0
-  while(closed_slaves < nSlaves) {
-    # Receive a message from a slave
-    message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
-    message_info <- mpi.get.sourcetag()
-    slave_id <- message_info[1]
-    tag <- message_info[2]
-      
-    if(tag == 1) {
-      if(length(tasks) > 0) {
-        mpi.send.Robj(tasks[[1]], slave_id, 1);
-        tasks[[1]] <- NULL
-      } else {
-        mpi.send.Robj(junk, slave_id, 2)
-      }
-    } else if (tag == 2) {
-	  #print(message)
-      response[[message$exp_index]] <- message
-      finished <- finished + 1     
-    } else if (tag == 3) {
-      # A slave has closed down. 
-      closed_slaves <- closed_slaves + 1
-    }
-    cat(paste("finished ", finished, " of ", nrow(design), " tasks\r", sep="")) 
-    flush.console()
-  }
-  cat("\n\r")  
-  print("done")
-
-  mpi.close.Rslaves()
+  result <- parLapply(cl, tasks, optimizeRetGroupSlaveCluster, xset, parameters)
+  print(result)
+  stopCluster(cl)
+   
+  #print(result) 
+  response <- list()   
+  for(i in 1:length(result))
+    response[[result[[i]]$exp_index]] <- result[[i]]
   
   ret <- list()
   ret$params <- typ_params
   ret$design <- design
-  #ret$model <- model
   ret$response <- response
   
   return(ret)
 
 }
+
+#retGroupCalcExperiments <-
+#function(params, xset, nSlaves=4) {
+#    
+#  junk <- 0
+#  closed_slaves <- 0
+#  #nSlaves <- min(mpi.comm.size()-1, nSlaves)  
+#  
+#  typ_params <- typeCastParams(params)
+#  
+#  if(length(typ_params$to_optimize) > 2) {
+#    design <- getBbdParameter(typ_params$to_optimize) 
+#  } else {
+#    design <- getCcdParameter(typ_params$to_optimize) 
+#  }	
+# 
+#  parameters <- decode.data(design)	
+#  tasks <- as.list(1:nrow(design))    
+#  startSlaves(nSlaves)
+#  
+#  parameters <- combineParams(parameters, typ_params$no_optimization)
+#  
+#  sendRetGroupSlaveFunctions(parameters, xset) 
+#  
+#  response <- list()  
+#  finished <- 0
+#  while(closed_slaves < nSlaves) {
+#    # Receive a message from a slave
+#    message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
+#    message_info <- mpi.get.sourcetag()
+#    slave_id <- message_info[1]
+#    tag <- message_info[2]
+#      
+#    if(tag == 1) {
+#      if(length(tasks) > 0) {
+#        mpi.send.Robj(tasks[[1]], slave_id, 1);
+#        tasks[[1]] <- NULL
+#      } else {
+#        mpi.send.Robj(junk, slave_id, 2)
+#      }
+#    } else if (tag == 2) {
+#	  #print(message)
+#      response[[message$exp_index]] <- message
+#      finished <- finished + 1     
+#    } else if (tag == 3) {
+#      # A slave has closed down. 
+#      closed_slaves <- closed_slaves + 1
+#    }
+#    cat(paste("finished ", finished, " of ", nrow(design), " tasks\r", sep="")) 
+#    flush.console()
+#  }
+#  cat("\n\r")  
+#  print("done")
+#
+#  mpi.close.Rslaves()
+#  
+#  ret <- list()
+#  ret$params <- typ_params
+#  ret$design <- design
+#  #ret$model <- model
+#  ret$response <- response
+#  
+#  return(ret)
+#
+#}
 
 retGroupExperimentStatistic <-
 function(retcor_result, subdir, iterator, xset) {

@@ -126,6 +126,7 @@ function(xset) {
 	  }    
   }#end_for_sample    
   
+  
   return(ret)
 
 }
@@ -160,6 +161,42 @@ function(method="centWave") {
   
 }
 
+
+optimizeSlaveCluster <-
+function(task, xcmsSet_parameters, example_sample) {
+
+	  print(task)  
+
+	  library(xcms)
+	  xset <- NULL
+      print(sapply(xcmsSet_parameters, "[[", task))
+      if(is.null(xcmsSet_parameters$step)) {     #centWave  	
+        xset <- xcmsSet(files=example_sample, method="centWave", 
+                  peakwidth=c(xcmsSet_parameters$min_peakwidth[task], xcmsSet_parameters$max_peakwidth[task]),
+                  ppm=xcmsSet_parameters$ppm[task], noise=xcmsSet_parameters$noise[task], 
+				  snthresh=xcmsSet_parameters$snthresh[task], mzdiff=xcmsSet_parameters$mzdiff[task],
+				  prefilter=c(xcmsSet_parameters$prefilter[task], xcmsSet_parameters$value_of_prefilter[task]),
+				  mzCenterFun=xcmsSet_parameters$mzCenterFun[task], integrate=xcmsSet_parameters$integrate[task],
+				  fitgauss=xcmsSet_parameters$fitgauss[task], verbose.columns=xcmsSet_parameters$verbose.columns[task])
+                  
+      } else {     #matchedFilter  
+        try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
+                  fwhm=xcmsSet_parameters$fwhm[task], snthresh=xcmsSet_parameters$snthresh[task],
+                  step=xcmsSet_parameters$step[task], steps=xcmsSet_parameters$steps[task],
+                  sigma=xcmsSet_parameters$sigma[task], max=xcmsSet_parameters$max[task], 
+                  mzdiff=xcmsSet_parameters$mzdiff[task], index=xcmsSet_parameters$index[task]))   
+
+      }  
+	  #val <- list()
+	  #val$xset <- xset
+      #result <- do.call(calcPPS, val) #, ppm, rt_diff)
+	  result <- calcPPS(xset)
+      result[1] <- task   
+      rm(xset)
+
+ result
+  
+}
 
 optimizeSlave <-
 function() {
@@ -239,6 +276,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
 
   if(!is.null(subdir) & !file.exists(subdir))
     dir.create(file.path(getwd(), subdir))
+
     
   while(iterator < 50) {
     cat("\n")
@@ -247,8 +285,10 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
     cat("starting new DoE with:\n")
     print(params)
         
-    xcms_result <- xcmsSetExperiments(files, params, nSlaves) 
-#                       ppm, rt_diff, nSlaves)                        
+#    xcms_result <- xcmsSetExperiments(files, params, nSlaves) 
+#                       ppm, rt_diff, nSlaves)   
+    xcms_result <- xcmsSetExperimentsCluster(files, params, nSlaves) 
+                     
                        
     xcms_result <- xcmsSetStatistic(xcms_result, subdir, iterator)
     history[[iterator]] <- xcms_result     
@@ -387,6 +427,42 @@ function(example_sample, xcmsSet_parameters) {#, ppm, rt_diff) {
   mpi.bcast.cmd(optimizeSlave())
 }
 
+xcmsSetExperimentsCluster <-
+function(example_sample, params, nSlaves=4) { 
+
+  typ_params <- typeCastParams(params)  
+  if(length(typ_params[[1]])>2) {
+    design <- getBbdParameter(typ_params$to_optimize) 
+  } else {
+    design <- getCcdParameter(typ_params$to_optimize)  
+  }	
+  xcms_design <- decode.data(design) 
+
+  xcms_design <- combineParams(xcms_design, typ_params$no_optimization)   
+  tasks <- 1:nrow(design)  
+  
+  library(parallel)
+  cl <- makeCluster(nSlaves, type = "PSOCK")
+  response <- matrix(0, nrow=length(design[[1]]), ncol=5)
+ 
+  #exporting all functions to cluster but only calcPPS and toMatrix are needed
+  ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
+  clusterExport(cl, ex)
+  response <- parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, example_sample, USE.NAMES=FALSE)
+  stopCluster(cl)
+  
+  response <- t(response)
+  colnames(response) <- c("exp", "num_peaks", "notLLOQP", "num_C13", "PPS")
+  response <- response[order(response[,1]),]
+
+  ret <- list()
+  ret$params <- typ_params
+  ret$design <- design
+  ret$response <- response
+
+  return(ret)
+
+}
 
 xcmsSetExperiments <-
 function(example_sample, params, nSlaves=4) { #ppm=5, rt_diff=0.01, nSlaves=4) {
@@ -454,7 +530,7 @@ function(example_sample, params, nSlaves=4) { #ppm=5, rt_diff=0.01, nSlaves=4) {
 
 
 xcmsSetStatistic <-
-function(xcms_result, subdir, iterator, score_name="PPS") {
+function(xcms_result, subdir, iterator) {
 
   params <- xcms_result$params
   resp <- xcms_result$response[, "PPS"]
