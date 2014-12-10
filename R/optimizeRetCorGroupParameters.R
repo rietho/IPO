@@ -228,7 +228,7 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
 
 optimizeRetGroupSlaveCluster <-
 function(task, xset, parameters) {
-	print(parameters)
+	#print(parameters)
     library(xcms)
     #if (tag == 1) {
       exp_index <- task
@@ -257,7 +257,7 @@ function(task, xset, parameters) {
       minfrac <- ifelse(is.null(parameters$minfrac), 1, parameters$minfrac[exp_index])      
       try(xset <- group(xset, method="density", bw=parameters$bw[exp_index], mzwid=parameters$mzwid[exp_index], minfrac=minfrac, 
                   minsamp=parameters$minsamp[exp_index], max=parameters$max[exp_index]))	 
-	  print(xset)
+	  #print(xset)
       result <- getRGTVValues(xset, exp_index, retcor_failed)
 	  return(result)
       #mpi.send.Robj(result,0,2)
@@ -388,7 +388,7 @@ function(params, xset, nSlaves=4) {
   #print(xset)
   
   result <- parLapply(cl, tasks, optimizeRetGroupSlaveCluster, xset, parameters)
-  print(result)
+  #print(result)
   stopCluster(cl)
    
   #print(result) 
