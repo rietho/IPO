@@ -1,5 +1,4 @@
 import("xcms")
-import("Rmpi")
 import("rsm")
 
 export("attachList")
@@ -34,7 +33,6 @@ export("retGroupCalcExperimentsCluster")
 export("retGroupExperimentStatistic")
 export("sendRetGroupSlaveFunctions")
 export("sendXcmsSetSlaveFunctions")
-export("startSlaves")
 export("toMatrix")
 export("typeCastParams")
 export("writeRScript")

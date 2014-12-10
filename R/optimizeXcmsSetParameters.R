@@ -482,7 +482,7 @@ function(example_sample, params, nSlaves=4) { #ppm=5, rt_diff=0.01, nSlaves=4) {
   xcms_design <- combineParams(xcms_design, typ_params$no_optimization)  
   tasks <- as.list(1:nrow(design))  
   
-  startSlaves(nSlaves)
+#  startSlaves(nSlaves)
   sendXcmsSetSlaveFunctions(example_sample, xcms_design) #,  ppm, rt_diff)
 
   response <- matrix(0, nrow=length(design[[1]]), ncol=5)
