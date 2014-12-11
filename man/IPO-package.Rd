@@ -44,7 +44,6 @@ Maintainer: gunnar.libiseller@joanneum.at
 \code{\link[xcms:xcmsSet]{xcms}}
 }
 \examples{
-\dontrun{
 library(msdata)
 library(IPO)
  
@@ -57,7 +56,5 @@ paramsPP$max_peakwidth <- c(20,30)
 resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, subdir="microtofq")
 #resultRG <- optimizeRetGroup(resultPP$best_settings$xset)
 
-#writeRScript(resultPP$best_settings$parameters, resultRG$best_settings,
- 4)
-}
+#writeRScript(resultPP$best_settings$parameters, resultRG$best_settings, 4)
 }
