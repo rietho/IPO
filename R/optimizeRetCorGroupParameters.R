@@ -378,19 +378,17 @@ function(params, xset, nSlaves=4) {
   tasks <- as.list(1:nrow(design))      
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
-  library(parallel)
-  cl <- makeCluster(nSlaves, type = "PSOCK")#, outfile="log.txt")
+  if(nSlaves > 1) {
+    library(parallel)
+    cl <- makeCluster(nSlaves, type = "PSOCK")#, outfile="log.txt")
   #exporting all functions to cluster but only calcRGTV is needed
-  ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
-  clusterExport(cl, ex)
-  #print(as.list(tasks))
-  #print(parameters)
-  #print(xset)
-  
-  result <- parLapply(cl, tasks, optimizeRetGroupSlaveCluster, xset, parameters)
-  #print(result)
-  stopCluster(cl)
-   
+    ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
+    clusterExport(cl, ex)
+    result <- parLapply(cl, tasks, optimizeRetGroupSlaveCluster, xset, parameters)
+    stopCluster(cl)
+  } else {
+	result <- lapply(tasks, optimizeRetGroupSlaveCluster, xset, parameters)
+  }  
   #print(result) 
   response <- list()   
   for(i in 1:length(result))

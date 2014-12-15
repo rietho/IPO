@@ -441,15 +441,19 @@ function(example_sample, params, nSlaves=4) {
   xcms_design <- combineParams(xcms_design, typ_params$no_optimization)   
   tasks <- 1:nrow(design)  
   
-  library(parallel)
-  cl <- makeCluster(nSlaves, type = "PSOCK")
-  response <- matrix(0, nrow=length(design[[1]]), ncol=5)
+  if(nSlaves > 1) {
+    library(parallel)
+    cl <- makeCluster(nSlaves, type = "PSOCK")
+    response <- matrix(0, nrow=length(design[[1]]), ncol=5)
  
-  #exporting all functions to cluster but only calcPPS and toMatrix are needed
-  ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
-  clusterExport(cl, ex)
-  response <- parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, example_sample, USE.NAMES=FALSE)
-  stopCluster(cl)
+    #exporting all functions to cluster but only calcPPS and toMatrix are needed
+    ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
+    clusterExport(cl, ex)
+    response <- parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, example_sample, USE.NAMES=FALSE)
+    stopCluster(cl)
+  } else {
+   response <- sapply(tasks, optimizeSlaveCluster, xcms_design, example_sample)
+  }
   
   response <- t(response)
   colnames(response) <- c("exp", "num_peaks", "notLLOQP", "num_C13", "PPS")
