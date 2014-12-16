@@ -1,4 +1,4 @@
->\name{toMatrix}
+\name{toMatrix}
 \alias{toMatrix}
 \title{
 	Converts an array into a matrix
