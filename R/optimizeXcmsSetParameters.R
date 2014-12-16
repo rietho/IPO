@@ -258,15 +258,11 @@ optimizeXcmsSet <-
 function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
 
   checkXcmsSetParams(params)
-  
+
+
   if(is.null(files)) {
-    files <- list.files(full.names=TRUE, ignore.case=TRUE, recursive=TRUE, pattern="(*.mzX?ML$)|(*.CDF)") 
-  } else {
-  #check files for valid extensions
+  	files <- getwd()
   }
-    
-  if(length(files)==0)
-    stop("no files in directory, stopping!")
 	
   centWave <- is.null(params$fwhm)  
   
