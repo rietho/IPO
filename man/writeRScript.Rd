@@ -23,28 +23,15 @@ writeRScript(peakPickingSettings, retCorGroupSettings, nSlaves)
 }
 }
 \details{
-
+	This function that prints a script out of the optimized findPeaks, 
+	retcor and grouping parameters to the screen.
+  
 }
 \value{
 	none
 }
-\references{
-}
 \author{
 Gunnar Libiseller
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
-\examples{
-
-  
 }
 
 \keyword{method}

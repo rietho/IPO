@@ -23,12 +23,15 @@ createModel(design, params, resp)
 }
 }
 \details{
+	This function uses a design of experiments, a response for the experiments within the
+	design and the used parameters to create a response surface model
 }
 \value{
 	A response surface model.
 }
 \references{
-Lenth, R. V. (2009). Response-Surface Methods in R , Using rsm. Journal of Statistical Software, 32(7), 1–17. Retrieved from http://www.jstatsoft.org/v32/i07
+Lenth, R. V. (2009). Response-Surface Methods in R , Using rsm. Journal
+  of Statistical Software, 32(7), 1-17. Retrieved from \url{http://www.jstatsoft.org/v32/i07}
 }
 \author{
 	Gunnar Libiseller
@@ -39,10 +42,6 @@ Lenth, R. V. (2009). Response-Surface Methods in R , Using rsm. Journal of Stati
   \code{\link{typeCastParams}}
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-}
 \examples{
 
   params <- getDefaultXcmsSetStartingParams()

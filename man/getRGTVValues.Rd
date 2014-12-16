@@ -24,23 +24,15 @@ getRGTVValues(xset, exp_index = 1, retcor_penalty = 1)
 }
 }
 \details{
+	This function calculates the Average Retention Time Shifts (ARTS) of all features within
+	an xcmsSet-object. Also features having exactly one peak from each sample are defined as
+	'good groups', all others a 'bad groups'.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-
+  something.
 }
 \author{
 Gunnar Libiseller
-}
-\note{
-}
-\seealso{
 }
 \examples{
 \dontrun{

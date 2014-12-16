@@ -1,4 +1,4 @@
->\name{toMatrix}
+\name{toMatrix}
 \alias{toMatrix}
 \title{
 	Converts an array into a matrix
@@ -10,30 +10,18 @@
 	is returned.
 }
 \usage{
-	data <- toMatrix(data)
+	toMatrix(data)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{data}{
 	An array or a matrix
 }
 }
-\details{
-
-}
 \value{
   A matrix
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
 \author{
 Gunnar Libsieller
-}
-\note{
-}
-
-\seealso{
 }
 \examples{
 	data <- matrix(1:9, nrow=3)

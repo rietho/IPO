@@ -31,6 +31,10 @@ The name of the subdirectory which is created and where the figures of the respo
   }
 }
 \details{
+	This function provides optimisation for parameters of the xcms-method retcor.obiwarp and
+	group.density. The retention time correction is optimised by minimizing intra-feature 
+	retention time shifts; grouping is optimized by increasing the number of features which
+	have exactly one peak per sample.
 }
 \value{
     A LIST of length n+1 with n beeing the optimization runs needed
@@ -51,17 +55,15 @@ The name of the subdirectory which is created and where the figures of the respo
 \references{
 
 Obiwarp
-  \code{Prince, J. T., & Marcotte, E. M. (2006). Chromatographic alignment of ESI-LC-MS proteomics data sets by ordered bijective interpolated warping. Analytical chemistry, 78(17), 6140–52. doi:10.1021/ac0605344}
+  \code{Prince, J. T., & Marcotte, E. M. (2006). Chromatographic alignment of ESI-LC-MS proteomics data sets by ordered bijective interpolated warping. Analytical chemistry, 78(17), 6140-52. doi:10.1021/ac0605344}
 
 }
 \author{
 Gunnar Libiseller
 }
-\note{
-}
 \seealso{
   \code{\link{getDefaultRetGroupStartingParams}}
-  \code{\link{calculateRGTV)}}
+%  \code{\link{calculateRGTV}}
 }
 \examples{
 \dontrun{

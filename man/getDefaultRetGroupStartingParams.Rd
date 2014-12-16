@@ -36,16 +36,8 @@ getDefaultRetGroupStartingParams(distfunc = "cor_opt", high_resolution = TRUE)
 \value{
   A List of parameters used in the xcms-methods retcor.obiwarp and group.density
 }
-\references{
-}
 \author{
 Gunnar Libiseller
-}
-\note{
-
-}
-
-\seealso{
 }
 \examples{
 params <- getDefaultRetGroupStartingParams()

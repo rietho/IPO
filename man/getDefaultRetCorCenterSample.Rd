@@ -15,19 +15,14 @@ getDefaultRetCorCenterSample(xset)
   \item{xset}{\code{xcmsSet} object}
 }
 \details{
-
+	Gets the index of the sample with most peaks in it. This is used if no center sample
+	for retention time correction has been defined by the user.
 }
 \value{
 	The file index of the sample with most peaks in it.
 }
-\references{
-}
 \author{
 Gunnar Libiseller
-}
-\note{
-}
-\seealso{
 }
 \examples{
 

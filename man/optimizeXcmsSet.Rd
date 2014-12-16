@@ -7,9 +7,13 @@ Optimisation of peak picking parameters by using natural, stable 13C isotopes
     This function provides optimisation of peak picking parameters by using natural, stable 13C isotopes.
 }
 \usage{
-    optimizeXcmsSet(params = getDefaultStartingXcmsParams(), nSlaves = 4, subdir = "IPO")
+    optimizeXcmsSet(files, params = getDefaultXcmsSetStartingParams(),
+nSlaves = 4, subdir = "IPO")
 }
 \arguments{
+  \item{files}{A directory or list of files, passed to xcmsSet(). If no
+    files are given, xcmsSet() will check recursively all MS files in
+    the current working directory. }
   \item{params}{
      A list of parameters which are needed by XCMS::findPeaks-Methods. List-items with
      two values will be optimized. The first value defines the lower test value, the 
@@ -22,6 +26,7 @@ Optimisation of peak picking parameters by using natural, stable 13C isotopes
   }
 }
 \details{
+    This function provides optimisation of peak picking parameters by using natural, stable 13C isotopes.
 
 }
 \value{
@@ -57,12 +62,9 @@ Optimisation of peak picking parameters by using natural, stable 13C isotopes
 \author{
 Gunnar Libiseller
 }
-\note{
-
-}
 \seealso{
-  \code{\link{getDefaultStartingXcmsParams}}
-  \code{\link{calcPPS)}}
+  \code{\link{getDefaultXcmsSetStartingParams}}
+  \code{\link{calcPPS}}
 }
 \examples{
 \dontrun{

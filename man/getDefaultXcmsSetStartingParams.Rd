@@ -32,19 +32,8 @@ getDefaultXcmsSetStartingParams(method = "centWave")
   A List of parameters for the xcmsSet.findPeak-methods 
   'centWave' or 'matchedFilter'
 }
-\references{
-
-}
 \author{
 Gunnar Libiseller
-}
-\note{
-
-}
-
-
-
-\seealso{
 }
 \examples{
 params <- getDefaultXcmsSetStartingParams()

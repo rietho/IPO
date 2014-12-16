@@ -1,4 +1,4 @@
->\name{typeCastParams}
+\name{typeCastParams}
 \alias{typeCastParams}
 \title{
 	Splits parameters into those which should be optimized and those which are fixed.
@@ -17,21 +17,19 @@
 }
 }
 \details{
+	This method takes a list of parameters and returns a list consisting of another two lists;
+	one holding parameters ment for optimization and one holding fixed parameters.
 }
 \value{
 	A list of:
 	\item{to_optimize}{A LIST containing all parameters which should be optimized.} 
     \item{no_optimization}{A LIST containing all parameters which should not be optimized.} 
 }
-\references{
-}
 \author{
 Gunnar Libiseller
 }
-\note{
-}
-
 \seealso{
+\code{\link{optimizeXcmsSet}}, \code{\link{optimizeRetGroup}}
 }
 \examples{
 

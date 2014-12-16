@@ -167,7 +167,7 @@ function(task, xcmsSet_parameters, example_sample) {
 
 	  print(task)  
 
-	  library(xcms)
+	  #library(xcms)
 	  xset <- NULL
       print(sapply(xcmsSet_parameters, "[[", task))
       if(is.null(xcmsSet_parameters$step)) {     #centWave  	
@@ -438,7 +438,6 @@ function(example_sample, params, nSlaves=4) {
   tasks <- 1:nrow(design)  
   
   if(nSlaves > 1) {
-    library(parallel)
     cl <- makeCluster(nSlaves, type = "PSOCK")
     response <- matrix(0, nrow=length(design[[1]]), ncol=5)
  

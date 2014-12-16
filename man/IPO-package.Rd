@@ -20,7 +20,7 @@ Maintainer: gunnar.libiseller@joanneum.at
 }
 \references{
 
-  Lenth, R. V. (2009). Response-Surface Methods in R , Using rsm. Journal of Statistical Software, 32(7), 1–17. Retrieved from \link{http://www.jstatsoft.org/v32/i07}
+  Lenth, R. V. (2009). Response-Surface Methods in R , Using rsm. Journal of Statistical Software, 32(7), 1-17. Retrieved from \url{http://www.jstatsoft.org/v32/i07}
 
   Smith, C.A. and Want, E.J. and O'Maille, G. and Abagyan,R. and
   Siuzdak, G.: XCMS: Processing mass spectrometry data for metabolite
@@ -35,10 +35,10 @@ Maintainer: gunnar.libiseller@joanneum.at
   of mass calibration gaps in liquid chromatography-mass spectrometry
   metabolomics data Bioinformatics, 26:2488 (2010)
   
-  Yu, H. (2002). Rmpi: Parallel Statistical Computing in R. R News, 2(2), 10–14. Retrieved from \link{http://cran.r-project.org/doc/Rnews/Rnews_2002-2.pdf}
+  Yu, H. (2002). Rmpi: Parallel Statistical Computing in R. R News,
+  2(2), 10-14. 
+  Retrieved from \url{http://cran.r-project.org/doc/Rnews/Rnews_2002-2.pdf}
 
-}
-\keyword{
 }
 \seealso{
 \code{\link[xcms:xcmsSet]{xcms}}

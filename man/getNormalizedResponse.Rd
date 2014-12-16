@@ -27,8 +27,6 @@ getNormalizedResponse(response)
 \value{
 	A vector with RTGV values 
 }
-\references{
-}
 \author{
 Gunnar Libiseller
 }

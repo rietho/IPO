@@ -35,15 +35,8 @@ combineParams(params_1, params_2)
 	findPeaks.matchedFilter, retcor.obiwarp or group.density). Each list item has the 
 	same length which is equal to the number of experiments within the DoE.
 }
-\references{
-}
 \author{
 Gunnar Libiseller
-}
-\note{
-}
-
-\seealso{
 }
 \examples{
 

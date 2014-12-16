@@ -229,7 +229,7 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
 optimizeRetGroupSlaveCluster <-
 function(task, xset, parameters) {
 	#print(parameters)
-    library(xcms)
+    #library(xcms)
     #if (tag == 1) {
       exp_index <- task
 
@@ -379,7 +379,6 @@ function(params, xset, nSlaves=4) {
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
   if(nSlaves > 1) {
-    library(parallel)
     cl <- makeCluster(nSlaves, type = "PSOCK")#, outfile="log.txt")
   #exporting all functions to cluster but only calcRGTV is needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))

@@ -21,7 +21,7 @@ calcPPS(xset)
   \item{xset}{\code{xcmsSet} object}
 }
 \details{
-
+  Calculation of a peak picking score (PPS) by using natural, stable 13C isotopes
 }
 \value{
 	An array with 5 items:\cr
@@ -31,15 +31,8 @@ calcPPS(xset)
 	4. Reliable peaks (RP)\cr
 	5. Peak picking score (PPS)\cr
 }
-\references{
-
-}
 \author{
 	Gunnar Libiseller
-}
-\note{
-}
-\seealso{
 }
 \examples{
 
