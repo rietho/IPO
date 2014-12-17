@@ -3,7 +3,7 @@
 \alias{decode}
 \alias{decodeAll}
 \title{
-	Decodes values from ranges of -1 to 1 to ranges specified.
+	En-/decodes values to/from ranges of -1 to 1.
 }
 \description{
 	Encode and decode values that are in a range of -1 to 1 into a  
@@ -12,7 +12,7 @@
 \usage{
 	encode(value, bounds)
 	decode(value, bounds)
-    decodeAll(values, params)
+	decodeAll(values, params)
 }
 
 \arguments{
@@ -60,7 +60,7 @@
         ## Multiple values:
 	values <- c(-1, -0.25, 0, 0.75)
 	params <- getDefaultXcmsSetStartingParams()
-    type_params <- typeCastParams(params)
+	type_params <- typeCastParams(params)
 	
 	decodeAll(values, type_params$to_optimize)
 

@@ -198,60 +198,60 @@ function(task, xcmsSet_parameters, example_sample) {
   
 }
 
-optimizeSlave <-
-function() {
-  junk <- 0
-  done <- 0
+# optimizeSlave <-
+# function() {
+  # junk <- 0
+  # done <- 0
 
-  while (done != 1) {
-    # Signal being ready to receive a new task
-    mpi.send.Robj(junk,0,1)
+  # while (done != 1) {
+    # # Signal being ready to receive a new task
+    # mpi.send.Robj(junk,0,1)
 
-    # Receive a task
-    task <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag()) 
-    task_info <- mpi.get.sourcetag()
-    tag <- task_info[2]
+    # # Receive a task
+    # task <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag()) 
+    # task_info <- mpi.get.sourcetag()
+    # tag <- task_info[2]
     
-    if (tag == 1) {
-      exp_index <- task
-	  xset <- NULL
-      print(sapply(xcmsSet_parameters, "[[", exp_index))
-      if(is.null(xcmsSet_parameters$step)) {     #centWave  	
-        xset <- xcmsSet(files=example_sample, method="centWave", 
-                  peakwidth=c(xcmsSet_parameters$min_peakwidth[exp_index], xcmsSet_parameters$max_peakwidth[exp_index]),
-                  ppm=xcmsSet_parameters$ppm[exp_index], noise=xcmsSet_parameters$noise[exp_index], 
-				  snthresh=xcmsSet_parameters$snthresh[exp_index], mzdiff=xcmsSet_parameters$mzdiff[exp_index],
-				  prefilter=c(xcmsSet_parameters$prefilter[exp_index], xcmsSet_parameters$value_of_prefilter[exp_index]),
-				  mzCenterFun=xcmsSet_parameters$mzCenterFun[exp_index], integrate=xcmsSet_parameters$integrate[exp_index],
-				  fitgauss=xcmsSet_parameters$fitgauss[exp_index], verbose.columns=xcmsSet_parameters$verbose.columns[exp_index])
+    # if (tag == 1) {
+      # exp_index <- task
+	  # xset <- NULL
+      # print(sapply(xcmsSet_parameters, "[[", exp_index))
+      # if(is.null(xcmsSet_parameters$step)) {     #centWave  	
+        # xset <- xcmsSet(files=example_sample, method="centWave", 
+                  # peakwidth=c(xcmsSet_parameters$min_peakwidth[exp_index], xcmsSet_parameters$max_peakwidth[exp_index]),
+                  # ppm=xcmsSet_parameters$ppm[exp_index], noise=xcmsSet_parameters$noise[exp_index], 
+				  # snthresh=xcmsSet_parameters$snthresh[exp_index], mzdiff=xcmsSet_parameters$mzdiff[exp_index],
+				  # prefilter=c(xcmsSet_parameters$prefilter[exp_index], xcmsSet_parameters$value_of_prefilter[exp_index]),
+				  # mzCenterFun=xcmsSet_parameters$mzCenterFun[exp_index], integrate=xcmsSet_parameters$integrate[exp_index],
+				  # fitgauss=xcmsSet_parameters$fitgauss[exp_index], verbose.columns=xcmsSet_parameters$verbose.columns[exp_index])
                   
-      } else {
-      #matchedFilter  
-        try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
-                  fwhm=xcmsSet_parameters$fwhm[exp_index], snthresh=xcmsSet_parameters$snthresh[exp_index],
-                  step=xcmsSet_parameters$step[exp_index], steps=xcmsSet_parameters$steps[exp_index],
-                  sigma=xcmsSet_parameters$sigma[exp_index], max=xcmsSet_parameters$max[exp_index], 
-                  mzdiff=xcmsSet_parameters$mzdiff[exp_index], index=xcmsSet_parameters$index[exp_index]))   
+      # } else {
+      # #matchedFilter  
+        # try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
+                  # fwhm=xcmsSet_parameters$fwhm[exp_index], snthresh=xcmsSet_parameters$snthresh[exp_index],
+                  # step=xcmsSet_parameters$step[exp_index], steps=xcmsSet_parameters$steps[exp_index],
+                  # sigma=xcmsSet_parameters$sigma[exp_index], max=xcmsSet_parameters$max[exp_index], 
+                  # mzdiff=xcmsSet_parameters$mzdiff[exp_index], index=xcmsSet_parameters$index[exp_index]))   
 
-      }                   
+      # }                   
       
-      result <- calcPPS(xset) #, ppm, rt_diff)
-      result[1] <- exp_index
+      # result <- calcPPS(xset) #, ppm, rt_diff)
+      # result[1] <- exp_index
    
-      rm(xset)
-      mpi.send.Robj(result,0,2)
-      print("result sent")
-    } else if (tag == 2) {
-    # Master is saying all tasks are done.  Exit
-      done <- 1
-    }
-    # Else ignore the message or report an error
-  }
+      # rm(xset)
+      # mpi.send.Robj(result,0,2)
+      # print("result sent")
+    # } else if (tag == 2) {
+    # # Master is saying all tasks are done.  Exit
+      # done <- 1
+    # }
+    # # Else ignore the message or report an error
+  # }
 
-  # Tell master that this slave is exiting.  Send master an exiting message
-  mpi.send.Robj(junk,0,3) 
+  # # Tell master that this slave is exiting.  Send master an exiting message
+  # mpi.send.Robj(junk,0,3) 
   
-}
+# }
 
 
 optimizeXcmsSet <-
@@ -411,17 +411,17 @@ function(history) {
 }
 
 
-sendXcmsSetSlaveFunctions <-
-function(example_sample, xcmsSet_parameters) {#, ppm, rt_diff) {
-  mpi.bcast.Robj2slave(toMatrix) 
-  mpi.bcast.Robj2slave(calcPPS) 
-  mpi.bcast.cmd(slave <- mpi.comm.rank())
-  mpi.bcast.Robj2slave(example_sample)
-  mpi.bcast.Robj2slave(xcmsSet_parameters)
-  mpi.bcast.Robj2slave(optimizeSlave)
-  mpi.bcast.cmd("library(xcms)")
-  mpi.bcast.cmd(optimizeSlave())
-}
+# sendXcmsSetSlaveFunctions <-
+# function(example_sample, xcmsSet_parameters) {#, ppm, rt_diff) {
+  # mpi.bcast.Robj2slave(toMatrix) 
+  # mpi.bcast.Robj2slave(calcPPS) 
+  # mpi.bcast.cmd(slave <- mpi.comm.rank())
+  # mpi.bcast.Robj2slave(example_sample)
+  # mpi.bcast.Robj2slave(xcmsSet_parameters)
+  # mpi.bcast.Robj2slave(optimizeSlave)
+  # mpi.bcast.cmd("library(xcms)")
+  # mpi.bcast.cmd(optimizeSlave())
+# }
 
 xcmsSetExperimentsCluster <-
 function(example_sample, params, nSlaves=4) { 
@@ -463,69 +463,69 @@ function(example_sample, params, nSlaves=4) {
 
 }
 
-xcmsSetExperiments <-
-function(example_sample, params, nSlaves=4) { #ppm=5, rt_diff=0.01, nSlaves=4) {
+# xcmsSetExperiments <-
+# function(example_sample, params, nSlaves=4) { #ppm=5, rt_diff=0.01, nSlaves=4) {
     
-  junk <- 0
-  closed_slaves <- 0
-  #nSlaves <- min(mpi.comm.size()-1, nSlaves)  
+  # junk <- 0
+  # closed_slaves <- 0
+  # #nSlaves <- min(mpi.comm.size()-1, nSlaves)  
   
-  typ_params <- typeCastParams(params)
+  # typ_params <- typeCastParams(params)
   
-  if(length(typ_params[[1]])>2)
-    design <- getBbdParameter(typ_params$to_optimize) 
-  else
-    design <- getCcdParameter(typ_params$to_optimize)  	
-  xcms_design <- decode.data(design) 
+  # if(length(typ_params[[1]])>2)
+    # design <- getBbdParameter(typ_params$to_optimize) 
+  # else
+    # design <- getCcdParameter(typ_params$to_optimize)  	
+  # xcms_design <- decode.data(design) 
 
-  xcms_design <- combineParams(xcms_design, typ_params$no_optimization)  
-  tasks <- as.list(1:nrow(design))  
+  # xcms_design <- combineParams(xcms_design, typ_params$no_optimization)  
+  # tasks <- as.list(1:nrow(design))  
   
-#  startSlaves(nSlaves)
-  sendXcmsSetSlaveFunctions(example_sample, xcms_design) #,  ppm, rt_diff)
+# #  startSlaves(nSlaves)
+  # sendXcmsSetSlaveFunctions(example_sample, xcms_design) #,  ppm, rt_diff)
 
-  response <- matrix(0, nrow=length(design[[1]]), ncol=5)
-  colnames(response) <- c("exp", "num_peaks", "notLLOQP", "num_C13", "PPS")
-  finished <- 0
-  while(closed_slaves < nSlaves) {
-    # Receive a message from a slave
-    message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
-    message_info <- mpi.get.sourcetag()
-    slave_id <- message_info[1]
-    tag <- message_info[2]
+  # response <- matrix(0, nrow=length(design[[1]]), ncol=5)
+  # colnames(response) <- c("exp", "num_peaks", "notLLOQP", "num_C13", "PPS")
+  # finished <- 0
+  # while(closed_slaves < nSlaves) {
+    # # Receive a message from a slave
+    # message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
+    # message_info <- mpi.get.sourcetag()
+    # slave_id <- message_info[1]
+    # tag <- message_info[2]
       
-    if(tag == 1) {
-      # slave is ready for a task.  Give it the next task, or tell it tasks
-      # are done if there are none.
-      if(length(tasks) > 0) {
-        # Send a task, and then remove it from the task list
-        mpi.send.Robj(tasks[[1]], slave_id, 1);
-        tasks[[1]] <- NULL
-      } else {
-        mpi.send.Robj(junk, slave_id, 2)
-      }
-    } else if (tag == 2) {
-      response[message[1],] <- message
-      finished <- finished + 1    
-    } else if (tag == 3) {
-      # A slave has closed down. 
-      closed_slaves <- closed_slaves + 1
-    }
-    cat(paste("finished ", finished, " of ", nrow(design), " tasks\r", sep="")) 
-    flush.console()
-  }
-  cat("\n\r")  
-  print("done")
-  mpi.close.Rslaves()
+    # if(tag == 1) {
+      # # slave is ready for a task.  Give it the next task, or tell it tasks
+      # # are done if there are none.
+      # if(length(tasks) > 0) {
+        # # Send a task, and then remove it from the task list
+        # mpi.send.Robj(tasks[[1]], slave_id, 1);
+        # tasks[[1]] <- NULL
+      # } else {
+        # mpi.send.Robj(junk, slave_id, 2)
+      # }
+    # } else if (tag == 2) {
+      # response[message[1],] <- message
+      # finished <- finished + 1    
+    # } else if (tag == 3) {
+      # # A slave has closed down. 
+      # closed_slaves <- closed_slaves + 1
+    # }
+    # cat(paste("finished ", finished, " of ", nrow(design), " tasks\r", sep="")) 
+    # flush.console()
+  # }
+  # cat("\n\r")  
+  # print("done")
+  # mpi.close.Rslaves()
 
-  ret <- list()
-  ret$params <- typ_params
-  ret$design <- design
-  ret$response <- response
+  # ret <- list()
+  # ret$params <- typ_params
+  # ret$design <- design
+  # ret$response <- response
 
-  return(ret)
+  # return(ret)
 
-}
+# }
 
 
 xcmsSetStatistic <-
