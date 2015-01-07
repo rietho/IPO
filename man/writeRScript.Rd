@@ -4,7 +4,7 @@
 	Prints an R-script to the screen which can be used for xcms processing
 }
 \description{
-	This function that prints a script out of the optimized findPeaks, 
+	This function prints a script of the optimized findPeaks, 
 	retcor and grouping parameters to the screen.
 }
 \usage{

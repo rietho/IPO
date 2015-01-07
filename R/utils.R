@@ -360,3 +360,9 @@ function(peakPickingSettings, retCorGroupSettings, nSlaves) {
   cat(paste("xset <- fillPeaks(xset, nSlaves=", nSlaves, ")\n", sep=""))	
 	
 }
+
+
+writeParamsTable <- 
+function(peakPickingSettings, retCorGroupSettings, file, ...) {
+  write.table(combineParams(peakPickingSettings, retCorGroupSettings), file, ...)
+}
