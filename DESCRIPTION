@@ -1,7 +1,7 @@
 Package: IPO
 Type: Package
 Title: Automated Optimization of XCMS Data Processing parameters
-Version: 1.5.4.9
+Version: 1.5.5
 Date: 2014-01-19
 Author: "Libiseller, Gunnar" <Gunnar.Libiseller@joanneum.at>, "Magnes, Christoph" <christoph.magnes@joanneum.at>
 Maintainer: "Libiseller, Gunnar" <Gunnar.Libiseller@joanneum.at>
