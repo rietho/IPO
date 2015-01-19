@@ -119,9 +119,9 @@ function(xset) {
       ret[3] <- ret[3] + not_loq_peaks
       ret[4] <- length(unique(unlist(iso_list)))
 	  if(ret[3] == 0) {
-	    ret[5] <- (ret[4]+1)^1.5/(ret[3]+1)  
+	    ret[5] <- (ret[4]+1)^2/(ret[3]+1)  
 	  } else {	  
-        ret[5] <- ret[4]^1.5/ret[3]  
+        ret[5] <- ret[4]^2/ret[3]  
 	  }
 	  }    
   }#end_for_sample    

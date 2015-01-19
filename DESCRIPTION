@@ -1,8 +1,8 @@
 Package: IPO
 Type: Package
 Title: Automated Optimization of XCMS Data Processing parameters
-Version: 1.5.4.8
-Date: 2014-12-16
+Version: 1.5.4.9
+Date: 2014-01-19
 Author: "Libiseller, Gunnar" <Gunnar.Libiseller@joanneum.at>, "Magnes, Christoph" <christoph.magnes@joanneum.at>
 Maintainer: "Libiseller, Gunnar" <Gunnar.Libiseller@joanneum.at>
 Depends: xcms, rsm
@@ -21,5 +21,5 @@ Description: The outcome of XCMS data processing strongly depends on
  experiment. The resulting scores are evaluated using response surface
  models.
 License: GPL (>= 2)
-URL: https://health.joanneum.at/IPO
+URL: https://github.com/glibiseller/IPO
 biocViews: Metabolomics, MassSpectrometry
