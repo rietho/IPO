@@ -122,8 +122,9 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
   history <- list()  
   best_range <- 0.25
 
-  if(!is.null(subdir) & !file.exists(subdir))
-    dir.create(file.path(getwd(), subdir))
+  if(!is.null(subdir))
+    if(!file.exists(subdir))
+      dir.create(file.path(getwd(), subdir))
 	
   if(is.null(params$center))
     params$center <- getDefaultRetCorCenterSample(xset) 
@@ -368,11 +369,11 @@ function(params, xset, nSlaves=4) {
 
   typ_params <- typeCastParams(params)
   
-  if(length(typ_params$to_optimize) > 2) {
-    design <- getBbdParameter(typ_params$to_optimize) 
-  } else {
+  #if(length(typ_params$to_optimize) > 2) {
+  #  design <- getBbdParameter(typ_params$to_optimize) 
+  #} else {
     design <- getCcdParameter(typ_params$to_optimize) 
-  }	
+  #}	
  
   parameters <- decode.data(design)	
   tasks <- as.list(1:nrow(design))      

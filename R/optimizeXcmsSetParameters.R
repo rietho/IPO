@@ -270,8 +270,9 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
   iterator = 1 
   best_range <- 0.25
 
-  if(!is.null(subdir) & !file.exists(subdir))
-    dir.create(file.path(getwd(), subdir))
+  if(!is.null(subdir))
+    if(!file.exists(subdir))
+      dir.create(file.path(getwd(), subdir))
 
     
   while(iterator < 50) {
@@ -427,11 +428,11 @@ xcmsSetExperimentsCluster <-
 function(example_sample, params, nSlaves=4) { 
 
   typ_params <- typeCastParams(params)  
-  if(length(typ_params[[1]])>2) {
-    design <- getBbdParameter(typ_params$to_optimize) 
-  } else {
+  #if(length(typ_params[[1]])>2) {
+  #  design <- getBbdParameter(typ_params$to_optimize) 
+  #} else {
     design <- getCcdParameter(typ_params$to_optimize)  
-  }	
+  #}	
   xcms_design <- decode.data(design) 
 
   xcms_design <- combineParams(xcms_design, typ_params$no_optimization)   

@@ -1,3 +1,12 @@
+CHANGES IN VERSION 1.5.6
+--------------------------
+  o updated vignette
+  o generally using Central-Composite design instead of Box-Behnken design
+	o fixed bug when defining subdir=NULL in functions optimizeXcmsSet and optimizeRetGroup
+	o modified unit tests to handle versions > 1.5.6
+	o added function writeRScript to NAMESPACE export
+  o updated man for optimizeXcmsSet and optimizeRetGroup
+
 CHANGES IN VERSION 1.5.5
 --------------------------
     o increased recall of reliable peaks in calcPPS. Changed exponent for PPS calculation from 1.5 to 2
@@ -24,7 +33,7 @@ CHANGES IN VERSION 1.5.4.4
 
 USER VISIBLE CHANGES
 
-    o packaged script
+  o packaged script
 	o changed method name attachparams to attachList
 	o changed method name calculateRGTV to getRGTVValues
 	o changed method name getDefaultStartingXcmsParams to getDefaultXcmsSetStartingParams

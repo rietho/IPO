@@ -68,19 +68,24 @@ Gunnar Libiseller
 \examples{
 \dontrun{
 
-library(msdata)
 library(IPO)
  
-mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
- 
+# use this to get an xcmsSet-object with optimized settings or any other xset 
+mzdatafiles <- list.files(file.path(find.package("mtbls2"), "mzdata"), full.names=TRUE)[1:4] 
 paramsPP <- getDefaultXcmsSetStartingParams()
 paramsPP$mzdiff <- -0.001
 paramsPP$min_peakwidth <- c(7,14)
 paramsPP$max_peakwidth <- c(20,30)
-resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, subdir="microtofq")
+resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, nSlaves=4, subdir="mtbls2")
 
-#resultRG <- optimizeRetGroup(resultPP$best_settings$xset)
-#writeRScript(resultPP$best_settings$parameters, resultRG$best_settings, 4)
+#optimize the retention time correction and grouping parameters
+paramsRG <- getDefaultRetGroupStartingParams()
+paramsRG$profStep <- 1
+paramsRG$minfrac <- 0.75
+resultRG <- optimizeRetGroup(resultPP$best_settings$xset, params=paramsRG, nSlaves=4,subdir="mtbls2")
+
+writeRScript(resultPP$best_settings$parameters, resultRG$best_settings, 4)
+
 }
 }
 \keyword{method}
