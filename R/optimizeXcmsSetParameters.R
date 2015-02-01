@@ -272,7 +272,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
 
   if(!is.null(subdir))
     if(!file.exists(subdir))
-      dir.create(file.path(getwd(), subdir))
+      dir.create(subdir)
 
     
   while(iterator < 50) {

@@ -124,7 +124,7 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
 
   if(!is.null(subdir))
     if(!file.exists(subdir))
-      dir.create(file.path(getwd(), subdir))
+      dir.create(subdir)
 	
   if(is.null(params$center))
     params$center <- getDefaultRetCorCenterSample(xset) 
