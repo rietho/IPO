@@ -11,7 +11,7 @@ Calculation of a peak picking score (PPS) by using natural, stable 13C isotopes
 	and where the intensity of possible isotopes is below a cutoff are defined as 
 	'low intensity peaks' (LIP). PPS is then calculated by:
 	\cr
-	PPS = RP^1.5/(#all_peaks - LIP)
+	PPS = RP^2/(#all_peaks - LIP)
 }
 \usage{
 calcPPS(xset)
