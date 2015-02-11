@@ -165,37 +165,33 @@ function(method="centWave") {
 optimizeSlaveCluster <-
 function(task, xcmsSet_parameters, example_sample) {
 
-	  print(task)  
+  print(task)  
 
 	  #library(xcms)
-	  xset <- NULL
-      print(sapply(xcmsSet_parameters, "[[", task))
-      if(is.null(xcmsSet_parameters$step)) {     #centWave  	
-        xset <- xcmsSet(files=example_sample, method="centWave", 
-                  peakwidth=c(xcmsSet_parameters$min_peakwidth[task], xcmsSet_parameters$max_peakwidth[task]),
-                  ppm=xcmsSet_parameters$ppm[task], noise=xcmsSet_parameters$noise[task], 
+	xset <- NULL
+  print(sapply(xcmsSet_parameters, "[[", task))
+  if(is.null(xcmsSet_parameters$step)) {     #centWave  	
+     xset <- xcmsSet(files=example_sample, method="centWave", 
+          peakwidth=c(xcmsSet_parameters$min_peakwidth[task], xcmsSet_parameters$max_peakwidth[task]),
+          ppm=xcmsSet_parameters$ppm[task], noise=xcmsSet_parameters$noise[task], 
 				  snthresh=xcmsSet_parameters$snthresh[task], mzdiff=xcmsSet_parameters$mzdiff[task],
 				  prefilter=c(xcmsSet_parameters$prefilter[task], xcmsSet_parameters$value_of_prefilter[task]),
 				  mzCenterFun=xcmsSet_parameters$mzCenterFun[task], integrate=xcmsSet_parameters$integrate[task],
 				  fitgauss=xcmsSet_parameters$fitgauss[task], verbose.columns=xcmsSet_parameters$verbose.columns[task])
                   
-      } else {     #matchedFilter  
-        try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
+  } else {     #matchedFilter  
+    try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
                   fwhm=xcmsSet_parameters$fwhm[task], snthresh=xcmsSet_parameters$snthresh[task],
                   step=xcmsSet_parameters$step[task], steps=xcmsSet_parameters$steps[task],
                   sigma=xcmsSet_parameters$sigma[task], max=xcmsSet_parameters$max[task], 
                   mzdiff=xcmsSet_parameters$mzdiff[task], index=xcmsSet_parameters$index[task]))   
-
-      }  
-	  #val <- list()
-	  #val$xset <- xset
-      #result <- do.call(calcPPS, val) #, ppm, rt_diff)
-	  result <- calcPPS(xset)
-      result[1] <- task   
-      rm(xset)
-
- result
+  }
+  result <- calcPPS(xset)
+  result[1] <- task   
+  rm(xset)
   
+  result
+   
 }
 
 # optimizeSlave <-
@@ -302,7 +298,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
 		    }
 	    }
    
-        xcms_parameters <- as.list(decodeAll(history[[max_index]]$max_settings[-1], history[[max_index]]$params$to_optimize))      
+      xcms_parameters <- as.list(decodeAll(history[[max_index]]$max_settings[-1], history[[max_index]]$params$to_optimize))      
 	    xcms_parameters <- combineParams(xcms_parameters, params$no_optimization)
       
 	    if(!is.list(xcms_parameters))
@@ -330,7 +326,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
                 
       }
                 
-	  best_settings$xset <- xset
+	    best_settings$xset <- xset
       target_value <- calcPPS(xset)#, ppm, rt_diff)
       best_settings$result <- target_value
       history$best_settings <- best_settings
@@ -345,7 +341,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
       parameter_setting <- xcms_result$max_settings[i+1]
       bounds <- params$to_optimize[[i]] 
       fact <- names(params$to_optimize)[i]
-	  min_factor <- ifelse(fact=="min_peakwidth", 3, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), ifelse(fact=="step",0.0005,1)))
+	    min_factor <- ifelse(fact=="min_peakwidth", 3, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), ifelse(fact=="step",0.0005,1)))
 
       #if the parameter is NA, we increase the range by 20%, if it was within the inner 25% of the previous range or at the minimum value we decrease the range by 20%
       step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) < best_range), 0.8, ifelse(parameter_setting==-1 & decode(-1, params$to_optimize[[i]]) == min_factor,0.8,1)))
@@ -353,7 +349,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
       
       if(is.na(parameter_setting))
         parameter_setting <- 0
-      new_center <- decode(parameter_setting, bounds)
+        new_center <- decode(parameter_setting, bounds)
       
       if((new_center-min_factor) > step) {
         new_bounds <- c(new_center - step, new_center + step) 
@@ -361,7 +357,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
         new_bounds <- c(min_factor, 2*step+min_factor) 
       }      
 		  
-	  names(new_bounds) <- NULL         
+	    names(new_bounds) <- NULL         
           
       if(names(params$to_optimize)[i] != "mzdiff" & names(params$to_optimize)[i] != "step")
         params$to_optimize[[i]] <- round(new_bounds, 0)
@@ -371,21 +367,21 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
     
     if(centWave) {
     #checking peakwidths plausiability
-	  if(!is.null(params$to_optimize$min_peakwidth) | !is.null(params$to_optimize$max_peakwidth)) {
-	    pw_min <- ifelse(is.null(params$to_optimize$min_peakwidth), params$no_optimization$min_peakwidth, max(params$to_optimize$min_peakwidth))
-		  pw_max <- ifelse(is.null(params$to_optimize$max_peakwidth), params$no_optimization$max_peakwidth, min(params$to_optimize$max_peakwidth))
+	    if(!is.null(params$to_optimize$min_peakwidth) | !is.null(params$to_optimize$max_peakwidth)) {
+	      pw_min <- ifelse(is.null(params$to_optimize$min_peakwidth), params$no_optimization$min_peakwidth, max(params$to_optimize$min_peakwidth))
+		    pw_max <- ifelse(is.null(params$to_optimize$max_peakwidth), params$no_optimization$max_peakwidth, min(params$to_optimize$max_peakwidth))
         if(pw_min >= pw_max) {
           additional <- abs(pw_min-pw_max) + 1
           if(!is.null(params$to_optimize$max_peakwidth)) {		  
             params$to_optimize$max_peakwidth <- params$to_optimize$max_peakwidth + additional
           } else {
             params$no_optimization$max_peakwidth <- params$no_optimization$max_peakwidth + additional
-		  }
-		}
+		      }
+		    }
       }
     }
 	
-	params <- attachList(params$to_optimize, params$no_optimization)	    
+	  params <- attachList(params$to_optimize, params$no_optimization)	    
     iterator <- iterator + 1
                  
   }
