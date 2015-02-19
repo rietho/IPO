@@ -278,10 +278,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
     cat("starting new DoE with:\n")
     print(params)
         
-#    xcms_result <- xcmsSetExperiments(files, params, nSlaves) 
-#                       ppm, rt_diff, nSlaves)   
-    xcms_result <- xcmsSetExperimentsCluster(files, params, nSlaves) 
-                     
+    xcms_result <- xcmsSetExperimentsCluster(files, params, nSlaves)                      
                        
     xcms_result <- xcmsSetStatistic(xcms_result, subdir, iterator)
     history[[iterator]] <- xcms_result     
@@ -344,7 +341,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
 	    min_factor <- ifelse(fact=="min_peakwidth", 3, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), ifelse(fact=="step",0.0005,1)))
 
       #if the parameter is NA, we increase the range by 20%, if it was within the inner 25% of the previous range or at the minimum value we decrease the range by 20%
-      step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) < best_range), 0.8, ifelse(parameter_setting==-1 & decode(-1, params$to_optimize[[i]]) == min_factor,0.8,1)))
+      step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) <= best_range), 0.8, ifelse(parameter_setting==-1 & decode(-1, params$to_optimize[[i]]) == min_factor,0.8,1)))
       step <- (diff(bounds) / 2) * step_factor
       
       if(is.na(parameter_setting))
@@ -359,7 +356,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
 		  
 	    names(new_bounds) <- NULL         
           
-      if(names(params$to_optimize)[i] != "mzdiff" & names(params$to_optimize)[i] != "step")
+      if(names(params$to_optimize)[i] == "steps" | names(params$to_optimize)[i] == "prefilter")
         params$to_optimize[[i]] <- round(new_bounds, 0)
       else 
         params$to_optimize[[i]] <- new_bounds
@@ -424,12 +421,16 @@ xcmsSetExperimentsCluster <-
 function(example_sample, params, nSlaves=4) { 
 
   typ_params <- typeCastParams(params)  
-  #if(length(typ_params[[1]])>2) {
-  #  design <- getBbdParameter(typ_params$to_optimize) 
-  #} else {
-    design <- getCcdParameter(typ_params$to_optimize)  
-  #}	
-  xcms_design <- decode.data(design) 
+
+  if(length(typ_params$to_optimize)>1) {
+    design <- getCcdParameter(typ_params$to_optimize)  	
+    xcms_design <- decode.data(design) 
+  } else {
+    design <- data.frame(run.order=1:9, a=seq(-1,1,0.25))
+	  colnames(design)[2] <- names(typ_params$to_optimize)
+	  xcms_design <- design
+	  xcms_design[,2] <- seq(min(typ_params$to_optimize[[1]]), max(typ_params$to_optimize[[1]]), diff(typ_params$to_optimize[[1]])/8)
+  }
 
   xcms_design <- combineParams(xcms_design, typ_params$no_optimization)   
   tasks <- 1:nrow(design)  
@@ -530,15 +531,24 @@ function(xcms_result, subdir, iterator) {
 
   params <- xcms_result$params
   resp <- xcms_result$response[, "PPS"]
-  model <- createModel(xcms_result$design, params$to_optimize, resp)
-  xcms_result$model <- model                  
+  
+  if(length(params$to_optimize) > 1) {
+    model <- createModel(xcms_result$design, params$to_optimize, resp)
+    xcms_result$model <- model                  
      
-  max_settings <- getMaximumExperiment(xcms_result$model)
-  tmp <- max_settings[-1]
-  tmp[is.na(tmp)] <- 1
-  if(!is.null(subdir))
-    plotContours(xcms_result$model, tmp, paste(subdir,"/rsm_", iterator, sep=""))
-
+    max_settings <- getMaximumExperiment(xcms_result$model)
+    tmp <- max_settings[-1]
+    tmp[is.na(tmp)] <- 1
+    if(!is.null(subdir))
+      plotContours(xcms_result$model, tmp, paste(subdir,"/rsm_", iterator, sep=""))
+  } else {    
+    maximum <- xcms_result$design[which.max(resp),2]
+	  if(sum(c(-1,1) %in% maximum)==2)
+	    maximum <- NA
+    max_settings <- array(c(max(resp), maximum[1]), dim=c(1,2))
+	  colnames(max_settings) <- c("response", "x1")	
+  }	
+	
   xcms_result$max_settings <- max_settings
 
   return(xcms_result)

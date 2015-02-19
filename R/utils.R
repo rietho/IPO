@@ -11,6 +11,11 @@ function(params_1, params_2) {
 
 checkParams <-
 function(params, quantitative_parameters, qualitative_parameters, unsupported_parameters) { 
+
+  if(length(typeCastParams(params)$to_optimize)==0) {
+    stop("No parameters for optimization specified; stopping!")  
+  }
+
   for(i in 1:length(params)) {
 	param <- params[[i]]
 	name <- names(params)[i]
