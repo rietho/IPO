@@ -5,8 +5,7 @@ Calculation of a peak picking score (PPS) by using natural, stable 13C isotopes
 }
 \description{
 	This function calculates PPS by identifying natural, stable 13C isotopes within
-	an xcmsSet object. Isotopes have to be within a mass-, retentiontime- and intensity-
-	window to be recognized as isotopes. Peaks beeing part of an isotopologue are defined
+	an xcmsSet object. Peaks beeing part of an isotopologue are defined
 	as reliable peaks (RP). Peaks which are not part of an isotopologue
 	and where the intensity of possible isotopes is below a cutoff are defined as 
 	'low intensity peaks' (LIP). PPS is then calculated by:
@@ -14,11 +13,16 @@ Calculation of a peak picking score (PPS) by using natural, stable 13C isotopes
 	PPS = RP^2/(#all_peaks - LIP)
 }
 \usage{
-calcPPS(xset)
+calcPPS(xset, isotopeIdentification, ...)
 }
 
 \arguments{
   \item{xset}{\code{xcmsSet} object}
+  \item{isotopeIdentification}{This parameter defines the method for isotope 
+        identification. The method IPO was especially implemented for high resolution data. 
+        CAMERA is an established isotope and adduct annotation package.}
+  \item{...}{
+     Additional parameters to CAMERA's findIsotopes function.}
 }
 \details{
   Calculation of a peak picking score (PPS) by using natural, stable 13C isotopes
@@ -34,8 +38,11 @@ calcPPS(xset)
 \author{
 	Gunnar Libiseller
 }
+\seealso{
+  \code{\link{findIsotopes.IPO}}
+  \code{\link{findIsotopes.CAMERA}}
+}
 \examples{
-
 \dontrun{
 mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
 xset <- xcmsSet(mzmlfile, peakwidth=c(5,12), method="centWave")

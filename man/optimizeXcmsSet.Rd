@@ -8,7 +8,7 @@ Optimisation of peak picking parameters by using natural, stable 13C isotopes
 }
 \usage{
     optimizeXcmsSet(files, params = getDefaultXcmsSetStartingParams(),
-nSlaves = 4, subdir = "IPO")
+isotopeIdentification=c("IPO", "CAMERA"), nSlaves = 4, subdir = "IPO", ...)
 }
 \arguments{
   \item{files}{A directory or list of files, passed to xcmsSet(). If no
@@ -19,10 +19,17 @@ nSlaves = 4, subdir = "IPO")
      two values will be optimized. The first value defines the lower test value, the 
      second one the higher test value.
   }
+  \item{isotopeIdentification}{
+     This parameter defines the method for isotope identification. The method 'IPO' was especially implemented for 
+     high resolution data. CAMERA is an established isotope and adduct annotation package.
+  }
   \item{nSlaves}{Number of slaves the optimization process should spawn.}
   \item{subdir}{
      The name of the subdirectory which is created and where the figures of the response
      surface models will be saved to.
+  }
+  \item{...}{
+     Additional parameters to CAMERA's findIsotopes function
   }
 }
 \details{
@@ -54,9 +61,14 @@ nSlaves = 4, subdir = "IPO")
   sensitive feature detection for high resolution LC/MS BMC
   Bioinformatics, 9:504 (2008)
 
-  H. Paul Benton, Elizabeth J. Want and Timothy M. D. Ebbels Correction
+  H. Paul Benton, Elizabeth J. Want and Timothy M. D. Ebbels: Correction
   of mass calibration gaps in liquid chromatography-mass spectrometry
   metabolomics data Bioinformatics, 26:2488 (2010)
+  
+  C. Kuhl and R. Tautenhahn and C. Boettcher and T. R. Larson and S. Neumann: CAMERA: 
+  an integrated strategy for compound spectra extraction
+  and annotation of liquid chromatography/mass spectrometry data sets 
+  Analytical Chemistry 84:283 (2012)
 
 }
 \author{
@@ -65,6 +77,8 @@ Gunnar Libiseller
 \seealso{
   \code{\link{getDefaultXcmsSetStartingParams}}
   \code{\link{calcPPS}}
+  \code{\link{findIsotopes.IPO}}
+  \code{\link{findIsotopes.CAMERA}}
 }
 \examples{
 \dontrun{
@@ -76,7 +90,12 @@ paramsPP <- getDefaultXcmsSetStartingParams()
 paramsPP$mzdiff <- -0.001
 paramsPP$min_peakwidth <- c(7,14)
 paramsPP$max_peakwidth <- c(20,30)
+#example using IPO isotope identification
 resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, subdir="mtbls2")
+
+#example using CAMERA isotope identification
+resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, isotopeIdentification="CAMERA", subdir="mtbls2", ppm=15, maxcharge=2)
+
 }
 }
 \keyword{method}

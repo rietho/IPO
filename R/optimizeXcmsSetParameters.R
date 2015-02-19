@@ -1,135 +1,187 @@
 calcPPS <-
-function(xset) { 
-   
-  iso_list <- list()
-  ret <- array(0, dim=c(1,5))  
-  if(is.null(xset)) {
+  function(xset, isotopeIdentification=c("IPO", "CAMERA"), ...) {
+    
+    isotopeIdentification <- match.arg(isotopeIdentification)
+    
+    ret <- array(0, dim=c(1,5))  
+    if(is.null(xset)) {
+      return(ret)
+    } 
+    
+    peak_source <- toMatrix(xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax")])
+    if(nrow(peak_source) == 0) {
+      return(ret)
+    }
+    ret[2] <- nrow(peak_source)
+    
+    if(isotopeIdentification == "IPO")
+      iso_mat <- findIsotopes.IPO(xset)  
+    else
+      iso_mat <- findIsotopes.CAMERA(xset, ...)
+    
+    samples <- unique(peak_source[,"sample"])
+    isotope_abundance = 0.01108    
+    
+    #calculating low intensity peaks
+    for(sample in samples) {
+      non_isos_peaks <- peak_source
+      
+      if(nrow(iso_mat) > 0) {
+        non_isos_peaks <- toMatrix(peak_source[-unique(c(iso_mat)),])
+      } 
+      
+      speaks <- toMatrix(non_isos_peaks[non_isos_peaks[,"sample"]==sample,])
+      iso_int <- speaks[,"into"]
+      
+      tmp <- iso_int[order(iso_int)]      
+      int_cutoff <- mean(tmp[1:round((length(tmp)/33),0)])
+      
+      masses <- speaks[, "mz"]
+      maximum_carbon <- calcMaximumCarbon(masses)#floor((masses-2*CH3)/CH2) + 2
+      carbon_probabilty <- maximum_carbon*isotope_abundance
+      
+      iso_int <- iso_int * carbon_probabilty
+      
+      not_loq_peaks <- sum(iso_int>int_cutoff)
+      ret[3] <- ret[3] + not_loq_peaks
+      
+    }#end_for_sample    
+    
+    ret[4] <- length(unique(c(iso_mat)))
+    if(ret[3] == 0) {
+      ret[5] <- (ret[4]+1)^2/(ret[3]+1)  
+    } else {    
+      ret[5] <- ret[4]^2/ret[3]  
+    }
+    
     return(ret)
+    
   }
-  
+
+
+findIsotopes.IPO <- 
+  function(xset) {
+    
+  iso_mat <- matrix(0, nrow=0, ncol=2)  
   peak_source <- toMatrix(xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax")])
-  if(nrow(peak_source) == 0) {
-	  return(ret)
-  }
   
   for(i in 1:ncol(peak_source)) {
     peak_source <- toMatrix(peak_source[!is.na(peak_source[,i]),])
   }
-  
-  ret[2] <- nrow(peak_source)
-
+    
   peak_source <- cbind(1:nrow(peak_source), peak_source)
   colnames(peak_source)[1] <- "id"  
   
-  carbon = 12.0
-  hydrogen	= 1.0078250170
-  CH3 = carbon + 3 * hydrogen
-  CH2 = carbon + 2 * hydrogen
+  #carbon = 12.0
+  #hydrogen	= 1.0078250170
+  #CH3 = carbon + 3 * hydrogen
+  #CH2 = carbon + 2 * hydrogen
   isotope_mass = 1.0033548
+  isotope_abundance = 0.01108
+  
   samples <- max(peak_source[,"sample"])
-
+  
   #start_sample
   for(sample in 1:samples) { 
-    #only taking peaks from current sample   
-	  speaks <- toMatrix(peak_source[peak_source[,"sample"]==sample,])	
-	  found_isotope <- FALSE
+    #only looking into peaks from current sample   
+    speaks <- toMatrix(peak_source[peak_source[,"sample"]==sample,])	
     split <- 250
-    	
-	  if(nrow(speaks)>1) {  		      
-	    #speaks <- speaks[,-c("sample")]
-	    speaks <- speaks[order(speaks[,"mz"]),]
-		      
-	    while(!is.null(nrow(speaks)) & length(speaks) > 3) {
-	      part_peaks <- NULL
-	      #splitting the data into smaller pieces to improve speed    
-	      if(nrow(speaks) < split) {
-	        part_peaks <- speaks
-	      } else {          
-            upper_bound <- speaks[split,"mzmax"] + isotope_mass# + (speaks[split,"mz"] + isotope_mass) * ppm / 1000000          
-	        end_point <- sum(speaks[,"mz"] < upper_bound)
-	        part_peaks <- toMatrix(speaks[1:end_point,])
-	      }		
-
-		    rt <- part_peaks[,"rt"]
-		    rt_window <- rt * 0.005
-		    rt_lower <- part_peaks[,"rt"] - rt_window
-		    rt_upper <- part_peaks[,"rt"] + rt_window
-		    rt_matrix <-  t(matrix(rep(rt, nrow(part_peaks)), ncol=nrow(part_peaks)))
-		    rt_matrix_bool <- rt_matrix >= rt_lower & rt_matrix <= rt_upper
-
-		    mz <- part_peaks[,"mz"]
-		    mz_lower <- part_peaks[,"mzmin"] + isotope_mass #isotope_masses - mz_window
-		    mz_upper <- part_peaks[,"mzmax"] + isotope_mass #isotope_masses + mz_window
-		    mz_matrix <-  t(matrix(rep(mz, nrow(part_peaks)), ncol=nrow(part_peaks)))
-		    mz_matrix_bool <- mz_matrix >= mz_lower & mz_matrix <= mz_upper
-
-		    rt_mz_matrix_bool <- rt_matrix_bool & mz_matrix_bool
-		  
-		    rt_mz_peak_ids <- which(rowSums(rt_mz_matrix_bool)>0)
-		    calculations <- min(split, nrow(speaks))
-		    rt_mz_peak_ids <- rt_mz_peak_ids[rt_mz_peak_ids < calculations]
+    
+    if(nrow(speaks)>1) {  		      
+      #speaks <- speaks[,-c("sample")]
+      speaks <- speaks[order(speaks[,"mz"]),]
       
+      while(!is.null(nrow(speaks)) & length(speaks) > 3) {
+        part_peaks <- NULL
+        #splitting the data into smaller pieces to improve speed    
+        if(nrow(speaks) < split) {
+          part_peaks <- speaks
+        } else {          
+          upper_bound <- speaks[split,"mzmax"] + isotope_mass# + (speaks[split,"mz"] + isotope_mass) * ppm / 1000000          
+          end_point <- sum(speaks[,"mz"] < upper_bound)
+          part_peaks <- toMatrix(speaks[1:end_point,])
+        }		
+        
+        rt <- part_peaks[,"rt"]
+        rt_window <- rt * 0.005
+        rt_lower <- part_peaks[,"rt"] - rt_window
+        rt_upper <- part_peaks[,"rt"] + rt_window
+        rt_matrix <-  t(matrix(rep(rt, nrow(part_peaks)), ncol=nrow(part_peaks)))
+        rt_matrix_bool <- rt_matrix >= rt_lower & rt_matrix <= rt_upper
+        
+        mz <- part_peaks[,"mz"]
+        mz_lower <- part_peaks[,"mzmin"] + isotope_mass #isotope_masses - mz_window
+        mz_upper <- part_peaks[,"mzmax"] + isotope_mass #isotope_masses + mz_window
+        mz_matrix <-  t(matrix(rep(mz, nrow(part_peaks)), ncol=nrow(part_peaks)))
+        mz_matrix_bool <- mz_matrix >= mz_lower & mz_matrix <= mz_upper
+        
+        rt_mz_matrix_bool <- rt_matrix_bool & mz_matrix_bool
+        
+        rt_mz_peak_ids <- which(rowSums(rt_mz_matrix_bool)>0)
+        calculations <- min(split, nrow(speaks))
+        rt_mz_peak_ids <- rt_mz_peak_ids[rt_mz_peak_ids < calculations]
+        
         #if(length(rt_mz_peak_ids)>0) {
-		      for(i in rt_mz_peak_ids) {
-			      current <- part_peaks[i,]
-			      rt_mz_peaks <- toMatrix(part_peaks[rt_mz_matrix_bool[i,],])
-			      rt_difference <- abs(current["rt"] - rt_mz_peaks[, "rt"]) / current["rt"]
-			      rt_mz_peaks <- cbind(rt_mz_peaks, rt_difference)
-            #test intensity_window
-            maximum_carbon <- floor((current["mz"]-2*CH3)/CH2) + 2
-            carbon_probabilty <- c(1,maximum_carbon)*0.01108
-            iso_intensity <- current["into"] * carbon_probabilty
-
-            int_bools <- rt_mz_peaks[,"into"] >= iso_intensity[1] & rt_mz_peaks[,"into"] <= iso_intensity[2]
-            if(sum(int_bools) > 0) {
-              int_peaks <- toMatrix(rt_mz_peaks[int_bools,])
-              iso_id <- int_peaks[which.min(int_peaks[,"rt_difference"]), "id"]
-              iso_list[[length(iso_list)+1]] <- c(current["id"], iso_id)  
-              found_isotope <- TRUE              
-            }
-		      }
+        for(i in rt_mz_peak_ids) {
+          current <- part_peaks[i, ,drop=FALSE]
+          rt_mz_peaks <- toMatrix(part_peaks[rt_mz_matrix_bool[i,],])
+          rt_difference <- abs(current[,"rt"] - rt_mz_peaks[, "rt"]) / current[,"rt"]
+          rt_mz_peaks <- cbind(rt_mz_peaks, rt_difference)
+          #test intensity_window
+          maximum_carbon <- calcMaximumCarbon(current[,"mz"]) #floor((current["mz"]-2*CH3)/CH2) + 2
+          carbon_probabilty <- c(1,maximum_carbon)*isotope_abundance
+          iso_intensity <- current[,"into"] * carbon_probabilty
+          
+          int_bools <- rt_mz_peaks[,"into"] >= iso_intensity[1] & rt_mz_peaks[,"into"] <= iso_intensity[2]
+          if(sum(int_bools) > 0) {
+            int_peaks <- toMatrix(rt_mz_peaks[int_bools,])
+            iso_id <- int_peaks[which.min(int_peaks[,"rt_difference"]), "id"]
+            #iso_list[[length(iso_list)+1]] <- c(current[,"id"], iso_id)
+            
+            iso_mat <- rbind(iso_mat, c(current[,"id"], iso_id))
+          }
+        }
         #}
-		    speaks <- speaks[-(1:calculations),]		    
-	      
-      }#end_while_sample_peaks      
-
-      sample_isos_peaks <- peak_source
-      sample_non_isos_peaks <- peak_source
-      
-      if(found_isotope) {
-        sample_isos_peaks <- toMatrix(peak_source[unique(unlist(iso_list)),])
-        sample_non_isos_peaks <- toMatrix(peak_source[-unique(unlist(iso_list)),])
-      } 
-
-      speaks <- toMatrix(sample_non_isos_peaks[sample_non_isos_peaks[,"sample"]==sample,])
-      sample_isos_peaks <- toMatrix(sample_isos_peaks[sample_isos_peaks[,"sample"]==sample,])
-      int_cutoff = 0
-      iso_int <- speaks[,"into"]
-
-      tmp <- iso_int[order(iso_int)]      
-      int_cutoff <- mean(tmp[1:round((length(tmp)/33),0)])
-
-      masses <- speaks[, "mz"]
-      maximum_carbon <- floor((masses-2*CH3)/CH2) + 2
-      carbon_probabilty <- maximum_carbon*0.01108
-
-      iso_int <- iso_int * carbon_probabilty
-  
-      not_loq_peaks <- sum(iso_int>int_cutoff)
-      ret[3] <- ret[3] + not_loq_peaks
-      ret[4] <- length(unique(unlist(iso_list)))
-	  if(ret[3] == 0) {
-	    ret[5] <- (ret[4]+1)^2/(ret[3]+1)  
-	  } else {	  
-        ret[5] <- ret[4]^2/ret[3]  
-	  }
-	  }    
-  }#end_for_sample    
-  
-  
-  return(ret)
-
+        speaks <- speaks[-(1:calculations),]		    
+        
+      }#end_while_sample_peaks 
+    }
+  }
+  return(iso_mat)
 }
+
+findIsotopes.CAMERA <- 
+  function(xset, ...) {
+    
+    ids <- xset@peaks[,"sample", drop=FALSE]
+    ids <- cbind(1:length(ids), ids)
+    
+    iso_mat <- matrix(0, nrow=0, ncol=2)
+    
+    xsets <- split(xset, unique(xset@peaks[,"sample"]))
+    samples <- unique(xset@peaks[,"sample"])
+    for(sample in samples) {
+      an <- xsAnnotate(xset, sample=sample)
+      isos <- findIsotopes(an, ...)@isoID[,c("mpeak", "isopeak"), drop=FALSE]
+      #start_id <- ids[ids[,2]==sample,,drop=FALSE][1,1] - 1
+      iso_mat <- rbind(iso_mat, matrix(ids[ids[,2]==sample,1][isos], ncol=2))
+    }
+    
+    iso_mat
+  }
+
+    
+calcMaximumCarbon <- 
+  function(masses) {  
+  
+  carbon = 12.0
+  hydrogen  = 1.0078250170
+  CH3 = carbon + 3 * hydrogen
+  CH2 = carbon + 2 * hydrogen  
+  
+  maximum_carbon <- floor((masses-2*CH3)/CH2) + 2
+  
+}    
 
 
 checkXcmsSetParams <-
@@ -163,7 +215,7 @@ function(method="centWave") {
 
 
 optimizeSlaveCluster <-
-function(task, xcmsSet_parameters, example_sample) {
+function(task, xcmsSet_parameters, example_sample, isotopeIdentification, ...) {
 
   print(task)  
 
@@ -186,7 +238,7 @@ function(task, xcmsSet_parameters, example_sample) {
                   sigma=xcmsSet_parameters$sigma[task], max=xcmsSet_parameters$max[task], 
                   mzdiff=xcmsSet_parameters$mzdiff[task], index=xcmsSet_parameters$index[task]))   
   }
-  result <- calcPPS(xset)
+  result <- calcPPS(xset, isotopeIdentification, ...)
   result[1] <- task   
   rm(xset)
   
@@ -251,7 +303,7 @@ function(task, xcmsSet_parameters, example_sample) {
 
 
 optimizeXcmsSet <-
-function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir="IPO") { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
+function(files=NULL, params=getDefaultXcmsSetStartingParams(), isotopeIdentification=c("IPO", "CAMERA"), nSlaves=4, subdir="IPO", ...) { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
 
   checkXcmsSetParams(params)
 
@@ -259,6 +311,8 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
   if(is.null(files)) {
   	files <- getwd()
   }
+  
+  isotopeIdentification <- match.arg(isotopeIdentification)
 	
   centWave <- is.null(params$fwhm)  
   
@@ -280,7 +334,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
         
 #    xcms_result <- xcmsSetExperiments(files, params, nSlaves) 
 #                       ppm, rt_diff, nSlaves)   
-    xcms_result <- xcmsSetExperimentsCluster(files, params, nSlaves) 
+    xcms_result <- xcmsSetExperimentsCluster(files, params, isotopeIdentification, nSlaves, ...) 
                      
                        
     xcms_result <- xcmsSetStatistic(xcms_result, subdir, iterator)
@@ -327,7 +381,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
       }
                 
 	    best_settings$xset <- xset
-      target_value <- calcPPS(xset)#, ppm, rt_diff)
+      target_value <- calcPPS(xset, isotopeIdentification, ...)#, ppm, rt_diff)
       best_settings$result <- target_value
       history$best_settings <- best_settings
       
@@ -421,7 +475,7 @@ function(history) {
 # }
 
 xcmsSetExperimentsCluster <-
-function(example_sample, params, nSlaves=4) { 
+function(example_sample, params, isotopeIdentification, nSlaves=4, ...) { 
 
   typ_params <- typeCastParams(params)  
   #if(length(typ_params[[1]])>2) {
@@ -441,10 +495,12 @@ function(example_sample, params, nSlaves=4) {
     #exporting all functions to cluster but only calcPPS and toMatrix are needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
     clusterExport(cl, ex)
-    response <- parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, example_sample, USE.NAMES=FALSE)
+    response <- parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, example_sample, 
+                          isotopeIdentification, ..., USE.NAMES=FALSE)
     stopCluster(cl)
   } else {
-   response <- sapply(tasks, optimizeSlaveCluster, xcms_design, example_sample)
+   response <- sapply(tasks, optimizeSlaveCluster, xcms_design, example_sample, 
+                      isotopeIdentification, ...)
   }
   
   response <- t(response)

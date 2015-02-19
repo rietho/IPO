@@ -1,3 +1,10 @@
+CHANGES IN VERSION 1.5.8
+  o Added support of CAMERA isotope identification
+
+CHANGES IN VERSION 1.5.7
+  o Update documentation to match code
+  o Remove use of getwd() preventing absolute subdir paths
+
 CHANGES IN VERSION 1.5.6
 --------------------------
   o updated vignette
