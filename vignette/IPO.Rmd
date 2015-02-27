@@ -25,7 +25,7 @@ recommended. The optimization process looks as following:
 ## Raw data
 
 'xcms' handles the file processing hence all files can be used 
-that can be process by 'xcms'.
+that can be processed by 'xcms'.
 
 
 ```{r file_choosing}

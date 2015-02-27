@@ -7,6 +7,16 @@ test_ipo <- function() {
 	paramsPP$max_peakwidth <- c(20,30)
 	resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, subdir="microtofq")
 
-    	checkTrue(all(resultPP$best_settings$result[1:4]== c(0, 246, 83, 96)))
-        checkEqualsNumeric(resultPP$best_settings$result[5], 111.0361, tolerance=0.000001)
+  checkTrue(all(resultPP$best_settings$result[1:4]== c(0, 246, 83, 96)))
+  checkEqualsNumeric(resultPP$best_settings$result[5], 111.0361, tolerance=0.000001)
+  
+  #single parameter optimization test
+  
+	paramsPP$max_peakwidth <- c(15)
+	paramsPP$ppm <- 50
+	resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, subdir=NULL)
+  
+	checkTrue(all(resultPP$best_settings$result[1:5]== c(0, 218, 78, 78, 78)))
+
+  
 }

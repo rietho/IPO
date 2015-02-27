@@ -346,7 +346,7 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
       
       if(is.na(parameter_setting))
         parameter_setting <- 0
-        new_center <- decode(parameter_setting, bounds)
+      new_center <- decode(parameter_setting, bounds)
       
       if((new_center-min_factor) > step) {
         new_bounds <- c(new_center - step, new_center + step) 
@@ -356,10 +356,11 @@ function(files=NULL, params=getDefaultXcmsSetStartingParams(), nSlaves=4, subdir
 		  
 	    names(new_bounds) <- NULL         
           
-      if(names(params$to_optimize)[i] == "steps" | names(params$to_optimize)[i] == "prefilter")
+      if(names(params$to_optimize)[i] == "steps" | names(params$to_optimize)[i] == "prefilter") {
         params$to_optimize[[i]] <- round(new_bounds, 0)
-      else 
+      } else { 
         params$to_optimize[[i]] <- new_bounds
+      }
     } 
     
     if(centWave) {
@@ -532,22 +533,22 @@ function(xcms_result, subdir, iterator) {
   params <- xcms_result$params
   resp <- xcms_result$response[, "PPS"]
   
-  if(length(params$to_optimize) > 1) {
+ 
     model <- createModel(xcms_result$design, params$to_optimize, resp)
     xcms_result$model <- model                  
      
-    max_settings <- getMaximumExperiment(xcms_result$model)
-    tmp <- max_settings[-1]
+    max_settings <- getMaximumLevels(xcms_result$model)
+    tmp <- max_settings[1,-1]
     tmp[is.na(tmp)] <- 1
-    if(!is.null(subdir))
+    if(!is.null(subdir) & length(tmp) > 1)
       plotContours(xcms_result$model, tmp, paste(subdir,"/rsm_", iterator, sep=""))
-  } else {    
-    maximum <- xcms_result$design[which.max(resp),2]
-	  if(sum(c(-1,1) %in% maximum)==2)
-	    maximum <- NA
-    max_settings <- array(c(max(resp), maximum[1]), dim=c(1,2))
-	  colnames(max_settings) <- c("response", "x1")	
-  }	
+  #} else {    
+  #  maximum <- xcms_result$design[which.max(resp),2]
+	#  if(sum(c(-1,1) %in% maximum)==2)
+	#    maximum <- NA
+  #  max_settings <- array(c(max(resp), maximum[1]), dim=c(1,2))
+	#  colnames(max_settings) <- c("response", "x1")	
+  #}	
 	
   xcms_result$max_settings <- max_settings
 

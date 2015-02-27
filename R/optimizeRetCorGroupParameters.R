@@ -477,24 +477,15 @@ function(retcor_result, subdir, iterator, xset) {
   params <- retcor_result$params
   resp <- getNormalizedResponse(retcor_result$response)
   
-  if(length(params$to_optimize) > 1) {
-    model <- createModel(retcor_result$design, params$to_optimize, resp)  
-    retcor_result$model <- model                  
-    max_settings <- getMaximumExperiment(retcor_result$model)
-    tmp <- max_settings[-1]
-    tmp[is.na(tmp)] <- 1
-
-    if(!is.null(subdir))
-      plotContours(retcor_result$model, tmp, paste(subdir, "/retgroup_rsm_", iterator, sep="")) 
-  } else {
-    maximum <- xcms_result$design[which.max(resp),2]
-    if(sum(c(-1,1) %in% maximum)==2)
-      maximum <- NA
-    max_settings <- array(c(max(resp), maximum[1]), dim=c(1,2))
-    colnames(max_settings) <- c("response", "x1")    
-    
-  }
-    
+  model <- createModel(retcor_result$design, params$to_optimize, resp)
+  retcor_result$model <- model                  
+  
+  max_settings <- getMaximumLevels(retcor_result$model)
+  tmp <- max_settings[1,-1]
+  tmp[is.na(tmp)] <- 1
+  if(!is.null(subdir) & length(tmp) > 1)
+    plotContours(retcor_result$model, tmp, paste(subdir,"/retgroup_rsm_", iterator, sep=""))
+      
   parameters <- as.list(decodeAll(max_settings[-1], params$to_optimize)) 
   parameters <- combineParams(parameters, params$no_optimization)
   xset_tmp <- xset
