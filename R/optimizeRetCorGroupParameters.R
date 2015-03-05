@@ -164,7 +164,7 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
 		
 	    min_bound <- ifelse(names(params)[i] == "profStep",0.3, ifelse(names(params)[i] == "mzwid",0.0001,ifelse(names(params)[i] == "bw",0.25,0)))		
       
-      step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) < best_range), 0.8, 1))
+      step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) <= best_range), 0.8, 1))
       step <- (diff(bounds) / 2) * step_factor
       
       if(is.na(parameter_setting)) {      
@@ -369,13 +369,16 @@ function(params, xset, nSlaves=4) {
 
   typ_params <- typeCastParams(params)
   
-  #if(length(typ_params$to_optimize) > 2) {
-  #  design <- getBbdParameter(typ_params$to_optimize) 
-  #} else {
-    design <- getCcdParameter(typ_params$to_optimize) 
-  #}	
- 
-  parameters <- decode.data(design)	
+  if(length(typ_params$to_optimize)>1) {
+    design <- getCcdParameter(typ_params$to_optimize)    
+    parameters <- decode.data(design) 
+  } else {
+    design <- data.frame(run.order=1:9, a=seq(-1,1,0.25))
+    colnames(design)[2] <- names(typ_params$to_optimize)
+    parameters <- design
+    parameters[,2] <- seq(min(typ_params$to_optimize[[1]]), max(typ_params$to_optimize[[1]]), diff(typ_params$to_optimize[[1]])/8)
+  }  
+  
   tasks <- as.list(1:nrow(design))      
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
@@ -473,16 +476,16 @@ function(retcor_result, subdir, iterator, xset) {
 
   params <- retcor_result$params
   resp <- getNormalizedResponse(retcor_result$response)
-  model <- createModel(retcor_result$design, params$to_optimize, resp)
   
+  model <- createModel(retcor_result$design, params$to_optimize, resp)
   retcor_result$model <- model                  
-  max_settings <- getMaximumExperiment(retcor_result$model)
-  tmp <- max_settings[-1]
+  
+  max_settings <- getMaximumLevels(retcor_result$model)
+  tmp <- max_settings[1,-1]
   tmp[is.na(tmp)] <- 1
-
-  if(!is.null(subdir))
-    plotContours(retcor_result$model, tmp, paste(subdir, "/retgroup_rsm_", iterator, sep=""))  
-    
+  if(!is.null(subdir) & length(tmp) > 1)
+    plotContours(retcor_result$model, tmp, paste(subdir,"/retgroup_rsm_", iterator, sep=""))
+      
   parameters <- as.list(decodeAll(max_settings[-1], params$to_optimize)) 
   parameters <- combineParams(parameters, params$no_optimization)
   xset_tmp <- xset

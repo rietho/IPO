@@ -11,6 +11,11 @@ function(params_1, params_2) {
 
 checkParams <-
 function(params, quantitative_parameters, qualitative_parameters, unsupported_parameters) { 
+
+  if(length(typeCastParams(params)$to_optimize)==0) {
+    stop("No parameters for optimization specified; stopping!")  
+  }
+
   for(i in 1:length(params)) {
 	param <- params[[i]]
 	name <- names(params)[i]
@@ -91,20 +96,34 @@ function(params_1, params_2) {
 }
 
 
-getResponses <-
-function(slices, model) {
+getMaxSettings <-
+function(testdata, model) {
 
-   if(is.null(slices)) {
-     slices= matrix(nrow=1, ncol=0)
-   }
-   add_col <- array(0, dim=c(nrow(slices), 2))
-   slices <- cbind(add_col, slices)
+   #if(is.null(slices)) {
+  #   slices= matrix(nrow=1, ncol=0)
+   #}
+   #add_col <- array(0, dim=c(nrow(slices), 2))
+   #slices <- cbind(add_col, slices)
    
-   colnames(slices) <- paste("x", 1:ncol(slices), sep="")
-   values <- apply(X=slices, MARGIN=1, FUN=getMaxima, model) 
-    
-   ret <- cbind(t(values), slices[,-c(1,2)]) 
-   colnames(ret) <- c("response", paste("x", 1:ncol(slices), sep=""))
+   #colnames(slices) <- paste("x", 1:ncol(slices), sep="")
+   #values <- apply(X=slices, MARGIN=1, FUN=getMaxima, model) 
+  
+  
+   #ret <- cbind(t(values), slices[,-c(1,2)])
+   
+   response <- predict(model, testdata)
+   max_response <- max(response)
+   max_settings <- testdata[response==max_response,,drop=FALSE]
+   ret <- max_response
+   for(i in 1:ncol(testdata)) {
+     levels <- max_settings[,i]
+     if(sum(c(-1,1) %in% levels)==2)
+       ret <- cbind(ret, NA)
+     else
+       ret <- cbind(ret,levels[1])
+   }
+  
+   colnames(ret) <- c("response", paste("x", 1:ncol(testdata), sep=""))
     
    return(ret)
 }
@@ -113,8 +132,18 @@ function(slices, model) {
 createModel <-
 function(design, params, resp) {
   design$resp <- resp
-  formula <- as.formula(paste("resp ~ SO(", paste("x", 1:length(params), sep="", collapse=","), ")", sep="")) 
-  return(rsm(formula, data=design)) 
+  if(length(params) > 1) {
+    formula <- as.formula(paste("resp ~ SO(", paste("x", 1:length(params), sep="", collapse=","), ")", sep="")) 
+    model <- rsm(formula, data=design) 
+  } else {
+    param_name <- names(params)[1]
+    formula <- as.formula(paste("resp ~ ", param_name, " + ", param_name, " ^ 2", sep="")) #no interaction needed for one parameter
+    model <- lm(formula, data=design) 
+    model$coding <- list(x1=as.formula(paste(param_name, "~ x1"))) #attr(design, "codings")
+    names(model$coding) <- param_name
+    #attr(model, "class") <- c("rsm", "lm")
+  }
+  return(model)  
 }
 
 
@@ -189,53 +218,70 @@ function(params) {
 }
 
 
-getMaxima <-
-function(slice, model) {
-  values <- contour(model, ~ x1 * x2, at=slice, plot.it=FALSE, decode=FALSE) 
-    
-  z_values <- values[[1]]$z
-  max_z <- max(z_values)
-  maxima <- which(z_values==max_z, arr.ind=T)
-  ret <- c(max_z, 0,0)
-  if(length(maxima)==2){
-    ret[2] <- values[[1]]$x[maxima[1]]
-    ret[3] <- values[[1]]$y[maxima[2]]     
-  } else {
-    for(i in 1:2) {
-      col_max <- maxima[,i]
-	    if(sum(col_max==1) > 0 && sum(col_max==length(values[[1]][[i]])) > 0) 
-	      ret[(i+1)] <- NA
-      else
-   	    ret[(i+1)] <- values[[1]][[i]][max(col_max)]
-	  }
-  }
-  
-  return(ret)
-}
+#getMaxima <-
+#function(slice, model) {
+#  values <- contour(model, ~ x1 * x2, at=slice, plot.it=FALSE, decode=FALSE) 
+#    
+#  z_values <- values[[1]]$z
+#  max_z <- max(z_values)
+#  maxima <- which(z_values==max_z, arr.ind=T)
+#  ret <- c(max_z, 0,0)
+#  if(length(maxima)==2){
+#    ret[2] <- values[[1]]$x[maxima[1]]
+#    ret[3] <- values[[1]]$y[maxima[2]]     
+#  } else {
+#    for(i in 1:2) {
+#      col_max <- maxima[,i]
+#	    if(sum(col_max==1) > 0 && sum(col_max==length(values[[1]][[i]])) > 0) 
+#	      ret[(i+1)] <- NA
+#      else
+#   	    ret[(i+1)] <- values[[1]][[i]][max(col_max)]
+#	  }
+#  }
+#  
+#  return(ret)
+#}
 
 
-getMaximumExperiment <-
+getMaximumLevels <-
 function(model) {  
   dimensions <- length(model$coding)   
-  slices <- getSlices(dimensions-2)
-  mat <- getResponses(slices, model)  
-  return(mat[which.max(mat[,1]),])
-}
-
-
-getSlices <-
-function(dimensions, slice=NULL) {
-  ret <- c()
-  if(length(slice) == dimensions) {
-    return(slice)
-  } else {
-    values <- seq(-1,1,0.2)
-    for(val in values)
-      ret <- rbind(ret, getSlices(dimensions, c(slice, val)))
-  }
+  #slices <- getSlices(dimensions-2)
+  #mat <- getResponses(slices, model)
+  testdata <- getTestData(dimensions)
+  if(dimensions==1)
+    names(testdata) <- names(model$coding)
   
-  return(ret)
+  return(getMaxSettings(testdata, model))
 }
+
+
+getTestData <- function(parameters) {
+  step=0.1
+  if(parameters < 2)
+    step <- 0.05
+  if(parameters > 5)
+    step <- 0.2
+
+  m <- matrix(rep(seq(-1,1,step),parameters), byrow=FALSE, ncol=parameters) 
+  colnames(m) <-  paste("x", 1:parameters,  sep="")
+  
+  return(expand.grid(data.frame(m)))
+}
+
+#getSlices <-
+#function(dimensions, slice=NULL) {
+#  ret <- c()
+#  if(length(slice) == dimensions) {
+#    return(slice)
+#  } else {
+#    values <- seq(-1,1,0.2)
+#    for(val in values)
+#      ret <- rbind(ret, getSlices(dimensions, c(slice, val)))
+#  }
+#  
+#  return(ret)
+#}
 
 
 plotContours <-

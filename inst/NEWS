@@ -1,4 +1,5 @@
 CHANGES IN VERSION 1.6
+--------------------------
   o Added support of CAMERA isotope identification (findIsotopes.CAMERA)
   o selectivity of findIsotopes.IPO may be increased if checkBorderIntensity 
     is set to TRUE: 'maxo' of each peak of an isotopologue must be three 
@@ -6,12 +7,18 @@ CHANGES IN VERSION 1.6
   o simplified return value of calcPPS() to vector with meaningful names
   o changed getDefaultXcmsSetStartingParams() for min_peakdwidth = c(12, 28) 
     and for ppm to c(17, 32)
+CHANGES IN VERSION 1.5.7.1
+--------------------------
+  o using predict() to identify best levels and expand.grid to generate testdata for model
 
 CHANGES IN VERSION 1.5.7
+--------------------------
+  o supporting single parameter optimization. Only basic version with
+    redundant levels in consecutive DoEs
+  o removed integer-rounding in maximum focusing for all findPeaks 
+    parameters except prefilter(I) and steps
   o Update documentation to match code
-  o Remove use of getwd() preventing absolute subdir paths
-
-CHANGES IN VERSION 1.5.6
+  o Remove use of getwd() preventing absolute subdir pathsCHANGES IN VERSION 1.5.6
 --------------------------
   o updated vignette
   o generally using Central-Composite design instead of Box-Behnken design
