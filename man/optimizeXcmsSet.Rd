@@ -29,7 +29,7 @@ isotopeIdentification=c("IPO", "CAMERA"), nSlaves = 4, subdir = "IPO", ...)
      surface models will be saved to.
   }
   \item{...}{
-     Additional parameters to CAMERA's findIsotopes function
+     Additional parameters to CAMERA's or IPO's findIsotopes functions
   }
 }
 \details{

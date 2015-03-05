@@ -6,14 +6,17 @@ Calculation of a peak picking score (PPS) by using natural, stable 13C isotopes
 \description{
 	This function identifies natural, stable 13C isotopes within an xcmsSet object of
 	LC-HRMS data. Isotopes have to be within a mass-, retentiontime- and intensity-
-	window to be recognized as isotopes. 	
+	window to be recognized as isotopes. If checkBorderIntensity is TRUE the maximum 
+  intensity of each peaks has to be at least three times the intensity at rtmin and rtmax. 
 }
 \usage{
-findIsotopes.IPO(xset)
+findIsotopes.IPO(xset, checkBorderIntensity=FALSE)
 }
 
 \arguments{
   \item{xset}{\code{xcmsSet} object}
+  \item{checkBorderIntensity}{logical whether the peaks 'maxo' value has to be at 
+                              least three times the intensities at 'rtmin' and 'rtmax'}
 }
 \details{
   Identification of 13C isotopes
@@ -33,7 +36,7 @@ findIsotopes.IPO(xset)
 \dontrun{
 mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
 xset <- xcmsSet(mzmlfile, peakwidth=c(5,12), method="centWave")
-isotopes <- findIsotopes.IPO(xset)
+isotopes <- findIsotopes.IPO(xset, TRUE)
 }
 }
 
