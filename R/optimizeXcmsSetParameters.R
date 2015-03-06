@@ -520,7 +520,7 @@ resultIncreased <-
 # }
 
 xcmsSetExperimentsCluster <-
-function(example_sample, params, nSlaves=4) { 
+function(example_sample, params, isotopeIdentification, nSlaves=4, ...) { 
 
   typ_params <- typeCastParams(params)  
 
@@ -544,10 +544,12 @@ function(example_sample, params, nSlaves=4) {
     #exporting all functions to cluster but only calcPPS and toMatrix are needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
     clusterExport(cl, ex)
-    response <- parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, example_sample, USE.NAMES=FALSE)
+    response <- parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, example_sample, 
+                          isotopeIdentification, ..., USE.NAMES=FALSE)
     stopCluster(cl)
   } else {
-   response <- sapply(tasks, optimizeSlaveCluster, xcms_design, example_sample)
+    response <- sapply(tasks, optimizeSlaveCluster, xcms_design, example_sample, 
+                       isotopeIdentification, ...)
   }
   
   response <- t(response)
