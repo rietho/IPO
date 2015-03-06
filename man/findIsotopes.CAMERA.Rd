@@ -1,7 +1,7 @@
 \name{findIsotopes.CAMERA}
 \alias{findIsotopes.CAMERA}
 \title{
-Calculation of a peak picking score (PPS) by using natural, stable 13C isotopes
+Identification of Isotopes using the package CAMERA.
 }
 \description{
 	This function finds isotopes using CAMERA's find peak function. Isotopes are 

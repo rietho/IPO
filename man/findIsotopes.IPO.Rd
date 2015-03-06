@@ -1,7 +1,7 @@
 \name{findIsotopes.IPO}
 \alias{findIsotopes.IPO}
 \title{
-Calculation of a peak picking score (PPS) by using natural, stable 13C isotopes
+Identification of 13C isotopes
 }
 \description{
 	This function identifies natural, stable 13C isotopes within an xcmsSet object of
