@@ -10,7 +10,8 @@
 	have exactly one peak per sample.
 }
 \usage{
-optimizeRetGroup(xset, params = getDefaultRetGroupStartingParams(), nSlaves = 4, subdir = "IPO")
+  optimizeRetGroup(xset, params = getDefaultRetGroupStartingParams(),
+                   nSlaves = 4, subdir = "IPO")
 }
 
 \arguments{
@@ -18,9 +19,9 @@ optimizeRetGroup(xset, params = getDefaultRetGroupStartingParams(), nSlaves = 4,
 	\code{xcmsSet} object
 }
   \item{params}{
-     A list of parameters which are needed by xcms-methods retcor.obiwarp and group.density. 
-	 List-items with two values will be optimized. The first value defines the lower test value, the 
-     second one the higher test value.
+     A list of parameters which are needed by xcms-methods retcor.obiwarp and 
+     group.density. List-items with two values will be optimized. The first value 
+     defines the lower test value, the second one the higher test value.
   }
   \item{nSlaves}{
 Number of slaves the optimization process should spawn.
@@ -40,12 +41,14 @@ The name of the subdirectory which is created and where the figures of the respo
     A LIST of length n+1 with n beeing the optimization runs needed
 
   \item{comp1-comp(n) }{A LIST containing:\cr 
-    1. Parameters used for the nth optimization run\cr 
+  1. Parameters used for the nth optimization run\cr 
 	2. Box-Behnken or Central Composite Design used for optimization run\cr 
 	3. Responses from calculateRGTV for every experiment in the design\cr 
 	4. Response surface model for the design\cr 
-	5. The normalized parameter settings giving the best Retention time and Grouping Target Value (RGTV) (values between -1 and 1)
-	6. Response from calculateRGTV for xcmsSet-object created with best parameters in this run
+	5. The normalized parameter settings giving the best Retention time and 
+     Grouping Target Value (RGTV) (values between -1 and 1)
+	6. Response from calculateRGTV for xcmsSet-object created with best parameters 
+     in this run
 	7. xcmsSet-object created with best parameters in this run
   }
   \item{comp(n+1) }{A LIST containing:\cr   
@@ -55,7 +58,9 @@ The name of the subdirectory which is created and where the figures of the respo
 \references{
 
 Obiwarp
-  \code{Prince, J. T., & Marcotte, E. M. (2006). Chromatographic alignment of ESI-LC-MS proteomics data sets by ordered bijective interpolated warping. Analytical chemistry, 78(17), 6140-52. doi:10.1021/ac0605344}
+  \code{Prince, J. T., & Marcotte, E. M. (2006). Chromatographic alignment of 
+  ESI-LC-MS proteomics data sets by ordered bijective interpolated warping. 
+  Analytical chemistry, 78(17), 6140-52. doi:10.1021/ac0605344}
 
 }
 \author{
@@ -71,7 +76,8 @@ Gunnar Libiseller
 library(IPO)
  
 # use this to get an xcmsSet-object with optimized settings or any other xset 
-mzdatafiles <- list.files(file.path(find.package("mtbls2"), "mzdata"), full.names=TRUE)[1:4] 
+mzdatafiles <- list.files(file.path(find.package("mtbls2"), "mzdata"), 
+                          full.names=TRUE)[1:4] 
 paramsPP <- getDefaultXcmsSetStartingParams()
 paramsPP$mzdiff <- -0.001
 paramsPP$min_peakwidth <- c(7,14)
@@ -82,7 +88,8 @@ resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, nSlaves=4, subdir="mtbls2")
 paramsRG <- getDefaultRetGroupStartingParams()
 paramsRG$profStep <- 1
 paramsRG$minfrac <- 0.75
-resultRG <- optimizeRetGroup(resultPP$best_settings$xset, params=paramsRG, nSlaves=4,subdir="mtbls2")
+resultRG <- optimizeRetGroup(resultPP$best_settings$xset, params=paramsRG, 
+                             nSlaves=4,subdir="mtbls2")
 
 writeRScript(resultPP$best_settings$parameters, resultRG$best_settings, 4)
 

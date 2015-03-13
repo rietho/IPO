@@ -22,6 +22,54 @@ recommended. The optimization process looks as following:
 <b>IPO optimization process</b>
 <p><img src="FlowChart.jpg"" width="695" height="745"</p>
 
+## Installation
+
+<b>Install all dependencies for IPO</b>
+
+```{r install_IPO_dependencies, eval=FALSE}
+
+source("http://bioconductor.org/biocLite.R")
+biocLite("CAMERA")
+biocLite("xcms")
+install.packages("rsm")
+
+```
+
+
+<b>Install RTools</b><br><br>
+  For windows:<br>
+    Download and install RTools from [http://cran.r-project.org/bin/windows/Rtools/](http://cran.r-project.org/bin/windows/Rtools/)<br>
+  For Unix: <br>
+    Install the R-development-packages (r-devel or r-base-dev)<br>
+<br>
+<b>Install packages needed for installation from github</b>
+
+```{r install_devtools, eval=FALSE}
+
+install.packages("devtools")
+
+```
+
+<b>Install IPO</b>
+
+```{r install_IPO, eval=FALSE}
+
+library("devtools")
+install_github("glibiseller/IPO") 
+
+```
+
+<b>Installing suggested packages</b>
+
+```{r install_IPO_suggestions, eval=FALSE}
+#installing suggested packages
+biocLite("msdata") #for examples of peak picking parameter optimization
+install_github("sneumann/mtbls2") #for examples of optimization of retention time correction and grouping parameters
+install.packages("RUnit") #needed for Unittest when checking the package
+
+```
+
+
 ## Raw data
 
 'xcms' handles the file processing hence all files can be used 

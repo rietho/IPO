@@ -1,3 +1,7 @@
+CHANGES IN VERSION 1.6.1
+--------------------------
+  o Added installation script and installation description in vignette
+
 CHANGES IN VERSION 1.6
 --------------------------
   o Added support of CAMERA isotope identification (findIsotopes.CAMERA)

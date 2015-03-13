@@ -4,7 +4,8 @@
 Optimisation of peak picking parameters by using natural, stable 13C isotopes
 }
 \description{
-    This function provides optimisation of peak picking parameters by using natural, stable 13C isotopes.
+    This function provides optimisation of peak picking parameters by using natural, 
+    stable 13C isotopes.
 }
 \usage{
     optimizeXcmsSet(files, params = getDefaultXcmsSetStartingParams(),
@@ -20,8 +21,9 @@ isotopeIdentification=c("IPO", "CAMERA"), nSlaves = 4, subdir = "IPO", ...)
      second one the higher test value.
   }
   \item{isotopeIdentification}{
-     This parameter defines the method for isotope identification. The method 'IPO' was especially implemented for 
-     high resolution data. CAMERA is an established isotope and adduct annotation package.
+     This parameter defines the method for isotope identification. The method 'IPO' 
+     was especially implemented for high resolution data. CAMERA is an established 
+     isotope and adduct annotation package.
   }
   \item{nSlaves}{Number of slaves the optimization process should spawn.}
   \item{subdir}{
@@ -33,7 +35,8 @@ isotopeIdentification=c("IPO", "CAMERA"), nSlaves = 4, subdir = "IPO", ...)
   }
 }
 \details{
-    This function provides optimisation of peak picking parameters by using natural, stable 13C isotopes.
+    This function provides optimisation of peak picking parameters by using natural, 
+    stable 13C isotopes.
 
 }
 \value{
@@ -84,7 +87,8 @@ Gunnar Libiseller
 \dontrun{
 library(IPO)
  
-mzdatafiles <- list.files(file.path(find.package("mtbls2"), "mzdata"), full.names=TRUE)[1:4]
+mzdatafiles <- list.files(file.path(find.package("mtbls2"), "mzdata"), 
+                          full.names=TRUE)[1:4]
  
 paramsPP <- getDefaultXcmsSetStartingParams()
 paramsPP$mzdiff <- -0.001
@@ -94,7 +98,8 @@ paramsPP$max_peakwidth <- c(20,30)
 resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, subdir="mtbls2")
 
 #example using CAMERA isotope identification
-resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, isotopeIdentification="CAMERA", subdir="mtbls2", ppm=15, maxcharge=2)
+resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, isotopeIdentification="CAMERA", 
+                            subdir="mtbls2", ppm=15, maxcharge=2)
 
 }
 }
