@@ -78,8 +78,10 @@ function(response) {
   ARTS <- ARTS/ARTS_penalty
   
   #normalize
-  norm_group_ratio <- (group_ratio - min(group_ratio)) / (max(group_ratio) - min(group_ratio))
+  norm_group_ratio <- (group_ratio - min(group_ratio)) / (max(group_ratio) - min(group_ratio))  
   norm_ARTS <- (ARTS - min(ARTS)) / (max(ARTS) - min(ARTS))
+  norm_group_ratio[is.na(norm_group_ratio)] <- 0
+  norm_ARTS[is.na(norm_ARTS)] <- 0
   
   return(norm_group_ratio+norm_ARTS)
 
@@ -88,11 +90,6 @@ function(response) {
 
 getRGTVValues <-
 function(xset, exp_index=1, retcor_penalty=1) {
-  features <- nrow(xset@groups)
-
-  good_groups <- sum(unlist(lapply(X=xset@groupidx, FUN=function(x, xset) {ifelse(length(unique(xset@peaks[x,"sample"]))==length(xset@filepaths) & 
-                                   length(xset@peaks[x,"sample"])==length(xset@filepaths),1,0)}, xset)))
-  bad_groups <- nrow(xset@groups) - good_groups
 
   relative_rt_diff <- c()
   
@@ -101,8 +98,13 @@ function(xset, exp_index=1, retcor_penalty=1) {
       feature_rtmed <- xset@groups[i, "rtmed"]
 	    relative_rt_diff <- c(relative_rt_diff, mean(abs(feature_rtmed - xset@peaks[xset@groupidx[[i]], "rt"])/feature_rtmed))
     }
+    good_groups <- sum(unlist(lapply(X=xset@groupidx, FUN=function(x, xset) {ifelse(length(unique(xset@peaks[x,"sample"]))==length(xset@filepaths) & 
+                                                                                      length(xset@peaks[x,"sample"])==length(xset@filepaths),1,0)}, xset)))
+    bad_groups <- nrow(xset@groups) - good_groups
   } else {
     relative_rt_diff <- 1
+    good_groups <- 0
+    bad_groups <- 0
   }
   
   ARTS <- (mean(relative_rt_diff)) * retcor_penalty

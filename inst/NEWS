@@ -1,3 +1,7 @@
+CHANGES IN VERSION 1.6.2
+--------------------------
+  o Updated the function getNormalizedResponse() to prevent NAs
+
 CHANGES IN VERSION 1.6.1
 --------------------------
   o Added installation script and installation description in vignette
