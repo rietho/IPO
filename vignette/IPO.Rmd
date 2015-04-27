@@ -1,6 +1,6 @@
 ---
 title: "XCMS Parameter Optimization with IPO"
-author: "Gunnar Libiseller"
+author: "Gunnar Libiseller<br>Joanneum Research Forschungsgesellschaft m.b.H., Graz, Austria"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -15,8 +15,8 @@ vignette: >
 This document describes how to use the R-package 'IPO' 
 to optimize 'xcms' parameters. Code examples on how to
 use 'IPO' are provided. Additional to 'IPO' the R-packages
-'xcms' and 'rsm' are required. The R-package 'mtbls2' is 
-recommended. The optimization process looks as following:
+'xcms' and 'rsm' are required. The R-package 'msdata' and'mtbls2' 
+are recommended. The optimization process looks as following:
 
 <br>
 <b>IPO optimization process</b>

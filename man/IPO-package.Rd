@@ -5,9 +5,10 @@
 \title{Automated Optimization of Untargeted Metabolomics LC-MS Data Processing}
 \description{
 IPO provides a framework for parameter optimization for the software package XCMS.
-It provides optimisation of peak picking parameters by using natural, stable 13C isotopes. Retention time correction is optimized by minimizing the relative retention time differences 
-within features and grouping parameters are optimized by maximizing the number of features 
-showing exactly one peak from each injection of a pooled sample.
+It provides optimisation of peak picking parameters by using natural, stable 13C 
+isotopes. Retention time correction is optimized by minimizing the relative retention
+time differences within features and grouping parameters are optimized by maximizing
+the number of features showing exactly one peak from each injection of a pooled sample.
 }
 \details{
 An overview of how to use the package, including the most important functions
@@ -16,7 +17,6 @@ An overview of how to use the package, including the most important functions
 Gunnar Libiseller
 
 Maintainer: gunnar.libiseller@joanneum.at
-
 }
 \references{
 

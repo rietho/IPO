@@ -1,14 +1,13 @@
-citHeader("To cite the IPB package in publications use:")
+citHeader("To cite the IPO package in publications use:")
 
 citEntry(entry="article",
-   author="Gunnar Libiseller, Michaela Dvorzak, Ulrike Kleb, Edgar Gander, Tobias Eisenberg, Frank Madeo, Gert Trausinger, Frank Sinner, Thomas Pieber, Christoph Magnes",
-   title="IPO: A Tool for automated Optimization of Untargeted Metabolomics LC-MS Data Processing",
+   author="Gunnar Libiseller, Michaela Dvorzak, Ulrike Kleb, Edgar Gander, Tobias Eisenberg, Frank Madeo, Steffen Neumann, Gert Trausinger, Frank Sinner, Thomas Pieber, Christoph Magnes",
+   title="IPO: a tool for automated optimization of XCMS parameters",
    journal="BMC Bioinformatics",
-   year="(submitted)",
-   volume="",
-   pages="",
-   textVersion = paste("Libiseller, Dvorzak, Kleb, Gander, Eisenberg, Madeo, Trausinger, Sinner, Pieber, Magnes",
-       "IPO: A Tool for automated Optimization of Untargeted Metabolomics LC-MS Data Processing",
-       "BMC Bioinformatics (submitted)"))
+   year="(2015)",
+   volume="16",
+   pages="118",
+   textVersion = paste("Libiseller, Dvorzak, Kleb, Gander, Eisenberg, Madeo, Neumann, Trausinger, Sinner, Pieber, Magnes",
+       "IPO: A Tool for automated Optimization of XCMS Parameters", "BMC Bioinformatics (accepted)"))
 
 citFooter("")
