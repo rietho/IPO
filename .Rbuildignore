@@ -1,3 +1,4 @@
 ^.*\.Rproj$
+^.*\.pdf$
 ^\.Rproj\.user$
 ^install\.R$

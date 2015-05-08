@@ -9,10 +9,11 @@ calcPPS <-
       return(ret)
     } 
     
-    peak_source <- toMatrix(xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax")])
-    if(nrow(peak_source) == 0) {
+    if(nrow(xset@peaks) == 0) {
       return(ret)
     }
+    
+    peak_source <- xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax"),drop=FALSE]
     ret[2] <- nrow(peak_source)
     
     if(isotopeIdentification == "IPO")
@@ -58,6 +59,8 @@ calcPPS <-
     return(ret)
     
   }
+
+
 
 
 findIsotopes.IPO <- 
@@ -224,13 +227,39 @@ calcMaximumCarbon <-
     
   }    
 
+calculateXcmsSet <- function(example_sample, xcmsSetParameters, scanrange, task=1, nSlaves=1) {
+  xset <- NULL  
+  
+  if(is.null(xcmsSetParameters$step)) {     #centWave    
+    xset <- xcmsSet(files=example_sample, method="centWave", 
+                    peakwidth=c(xcmsSetParameters$min_peakwidth[task], xcmsSetParameters$max_peakwidth[task]),
+                    ppm=xcmsSetParameters$ppm[task], noise=xcmsSetParameters$noise[task], 
+                    snthresh=xcmsSetParameters$snthresh[task], mzdiff=xcmsSetParameters$mzdiff[task],
+                    prefilter=c(xcmsSetParameters$prefilter[task], xcmsSetParameters$value_of_prefilter[task]),
+                    mzCenterFun=xcmsSetParameters$mzCenterFun[task], integrate=xcmsSetParameters$integrate[task],
+                    fitgauss=xcmsSetParameters$fitgauss[task], verbose.columns=xcmsSetParameters$verbose.columns[task],
+                    scanrange=scanrange, nSlaves=nSlaves)
+    
+  } else {     #matchedFilter  
+    try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
+                        fwhm=xcmsSetParameters$fwhm[task], snthresh=xcmsSetParameters$snthresh[task],
+                        step=xcmsSetParameters$step[task], steps=xcmsSetParameters$steps[task],
+                        sigma=xcmsSetParameters$sigma[task], max=xcmsSetParameters$max[task], 
+                        mzdiff=xcmsSetParameters$mzdiff[task], index=xcmsSetParameters$index[task],
+                        scanrange=scanrange, nSlaves=nSlaves))   
+  }
+  
+  return(xset)
+  
+}
+
 
 checkXcmsSetParams <-
   function(params) {
     if(is.null(params$step)) {     #centWave   
       quantitative_parameters <- c("ppm", "min_peakwidth", "max_peakwidth", "snthresh", "mzdiff", "noise", "prefilter", "value_of_prefilter")
       qualitative_parameters <- c("integrate", "fitgauss", "verbose.columns", "mzCenterFun")
-      unsupported_parameters <- c("scanrange", "sleep", "ROI.list")
+      unsupported_parameters <- c("sleep", "ROI.list") #"scanrange" can only be set, but not optimized
     } else {    
       quantitative_parameters <- c("fwhm", "sigma", "max", "snthresh", "step", "steps", "mzdiff")
       qualitative_parameters <- c("index")
@@ -241,7 +270,10 @@ checkXcmsSetParams <-
 
 
 getDefaultXcmsSetStartingParams <-
-  function(method="centWave") {
+  function(method=c("centWave", "matchedFilter")) {
+    
+    method <- match.arg(method)
+    
     if(method=="centWave")
       return(list(min_peakwidth=c(12,28), max_peakwidth=c(35,65), ppm=c(17,32),
                   mzdiff=c(-0.001, 0.01), snthresh=10, noise=0, prefilter=3, 
@@ -256,29 +288,33 @@ getDefaultXcmsSetStartingParams <-
 
 
 optimizeSlaveCluster <-
-  function(task, xcmsSet_parameters, example_sample, isotopeIdentification, ...) {
+  function(task, xcmsSet_parameters, files, scanrange, isotopeIdentification, ...) {
     
     print(task)  
     
     #library(xcms)
     xset <- NULL
     print(sapply(xcmsSet_parameters, "[[", task))
-    if(is.null(xcmsSet_parameters$step)) {     #centWave  	
-      xset <- xcmsSet(files=example_sample, method="centWave", 
-                      peakwidth=c(xcmsSet_parameters$min_peakwidth[task], xcmsSet_parameters$max_peakwidth[task]),
-                      ppm=xcmsSet_parameters$ppm[task], noise=xcmsSet_parameters$noise[task], 
-                      snthresh=xcmsSet_parameters$snthresh[task], mzdiff=xcmsSet_parameters$mzdiff[task],
-                      prefilter=c(xcmsSet_parameters$prefilter[task], xcmsSet_parameters$value_of_prefilter[task]),
-                      mzCenterFun=xcmsSet_parameters$mzCenterFun[task], integrate=xcmsSet_parameters$integrate[task],
-                      fitgauss=xcmsSet_parameters$fitgauss[task], verbose.columns=xcmsSet_parameters$verbose.columns[task])
-      
-    } else {     #matchedFilter  
-      try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
-                          fwhm=xcmsSet_parameters$fwhm[task], snthresh=xcmsSet_parameters$snthresh[task],
-                          step=xcmsSet_parameters$step[task], steps=xcmsSet_parameters$steps[task],
-                          sigma=xcmsSet_parameters$sigma[task], max=xcmsSet_parameters$max[task], 
-                          mzdiff=xcmsSet_parameters$mzdiff[task], index=xcmsSet_parameters$index[task]))   
-    }
+    
+    
+    xset <- calculateXcmsSet(files, xcmsSet_parameters, scanrange, task)
+    
+#     if(is.null(xcmsSet_parameters$step)) {     #centWave  	
+#       xset <- xcmsSet(files=example_sample, method="centWave", 
+#                       peakwidth=c(xcmsSet_parameters$min_peakwidth[task], xcmsSet_parameters$max_peakwidth[task]),
+#                       ppm=xcmsSet_parameters$ppm[task], noise=xcmsSet_parameters$noise[task], 
+#                       snthresh=xcmsSet_parameters$snthresh[task], mzdiff=xcmsSet_parameters$mzdiff[task],
+#                       prefilter=c(xcmsSet_parameters$prefilter[task], xcmsSet_parameters$value_of_prefilter[task]),
+#                       mzCenterFun=xcmsSet_parameters$mzCenterFun[task], integrate=xcmsSet_parameters$integrate[task],
+#                       fitgauss=xcmsSet_parameters$fitgauss[task], verbose.columns=xcmsSet_parameters$verbose.columns[task])
+#       
+#     } else {     #matchedFilter  
+#       try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
+#                           fwhm=xcmsSet_parameters$fwhm[task], snthresh=xcmsSet_parameters$snthresh[task],
+#                           step=xcmsSet_parameters$step[task], steps=xcmsSet_parameters$steps[task],
+#                           sigma=xcmsSet_parameters$sigma[task], max=xcmsSet_parameters$max[task], 
+#                           mzdiff=xcmsSet_parameters$mzdiff[task], index=xcmsSet_parameters$index[task]))   
+#     }
     result <- calcPPS(xset, isotopeIdentification, ...)
     result[1] <- task   
     rm(xset)
@@ -287,68 +323,15 @@ optimizeSlaveCluster <-
     
   }
 
-# optimizeSlave <-
-# function() {
-# junk <- 0
-# done <- 0
-
-# while (done != 1) {
-# # Signal being ready to receive a new task
-# mpi.send.Robj(junk,0,1)
-
-# # Receive a task
-# task <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag()) 
-# task_info <- mpi.get.sourcetag()
-# tag <- task_info[2]
-
-# if (tag == 1) {
-# exp_index <- task
-# xset <- NULL
-# print(sapply(xcmsSet_parameters, "[[", exp_index))
-# if(is.null(xcmsSet_parameters$step)) {     #centWave  	
-# xset <- xcmsSet(files=example_sample, method="centWave", 
-# peakwidth=c(xcmsSet_parameters$min_peakwidth[exp_index], xcmsSet_parameters$max_peakwidth[exp_index]),
-# ppm=xcmsSet_parameters$ppm[exp_index], noise=xcmsSet_parameters$noise[exp_index], 
-# snthresh=xcmsSet_parameters$snthresh[exp_index], mzdiff=xcmsSet_parameters$mzdiff[exp_index],
-# prefilter=c(xcmsSet_parameters$prefilter[exp_index], xcmsSet_parameters$value_of_prefilter[exp_index]),
-# mzCenterFun=xcmsSet_parameters$mzCenterFun[exp_index], integrate=xcmsSet_parameters$integrate[exp_index],
-# fitgauss=xcmsSet_parameters$fitgauss[exp_index], verbose.columns=xcmsSet_parameters$verbose.columns[exp_index])
-
-# } else {
-# #matchedFilter  
-# try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
-# fwhm=xcmsSet_parameters$fwhm[exp_index], snthresh=xcmsSet_parameters$snthresh[exp_index],
-# step=xcmsSet_parameters$step[exp_index], steps=xcmsSet_parameters$steps[exp_index],
-# sigma=xcmsSet_parameters$sigma[exp_index], max=xcmsSet_parameters$max[exp_index], 
-# mzdiff=xcmsSet_parameters$mzdiff[exp_index], index=xcmsSet_parameters$index[exp_index]))   
-
-# }                   
-
-# result <- calcPPS(xset) #, ppm, rt_diff)
-# result[1] <- exp_index
-
-# rm(xset)
-# mpi.send.Robj(result,0,2)
-# print("result sent")
-# } else if (tag == 2) {
-# # Master is saying all tasks are done.  Exit
-# done <- 1
-# }
-# # Else ignore the message or report an error
-# }
-
-# # Tell master that this slave is exiting.  Send master an exiting message
-# mpi.send.Robj(junk,0,3) 
-
-# }
-
 
 optimizeXcmsSet <-
-  function(files=NULL, params=getDefaultXcmsSetStartingParams(), isotopeIdentification=c("IPO", "CAMERA"), nSlaves=4, subdir="IPO", ...) { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
+  function(files=NULL, params=getDefaultXcmsSetStartingParams(), isotopeIdentification=
+             c("IPO", "CAMERA"), nSlaves=4, subdir="IPO", ...) { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
     
+    scanrange <- params$scanrange
+    params$scanrange <- NULL    
     checkXcmsSetParams(params)
 
-    
     
     if(is.null(files)) {
       files <- getwd()
@@ -367,7 +350,7 @@ optimizeXcmsSet <-
         dir.create(subdir)
     
     
-    while(iterator < 50) {
+    while(iterator < 50) { #dummy stop :-)
       cat("\n")
       cat("\n")
       cat("\n")
@@ -376,7 +359,7 @@ optimizeXcmsSet <-
       
       #    xcms_result <- xcmsSetExperiments(files, params, nSlaves) 
       #                       ppm, rt_diff, nSlaves)   
-      xcms_result <- xcmsSetExperimentsCluster(files, params, isotopeIdentification, nSlaves, ...) 
+      xcms_result <- xcmsSetExperimentsCluster(files, params, scanrange, isotopeIdentification, nSlaves, ...) 
       
       
       xcms_result <- xcmsSetStatistic(xcms_result, subdir, iterator)
@@ -403,24 +386,26 @@ optimizeXcmsSet <-
         best_settings <- list()
         best_settings$parameters <- xcms_parameters
         
-        if(centWave) {		
-          xset <- xcmsSet(files=files, method="centWave", 
-                          peakwidth=c(xcms_parameters$min_peakwidth, xcms_parameters$max_peakwidth),
-                          ppm=xcms_parameters$ppm, noise=xcms_parameters$noise, 
-                          snthresh=xcms_parameters$snthresh, mzdiff=xcms_parameters$mzdiff,
-                          prefilter=c(xcms_parameters$prefilter, xcms_parameters$value_of_prefilter),
-                          mzCenterFun=xcms_parameters$mzCenterFun, integrate=xcms_parameters$integrate,
-                          fitgauss=xcms_parameters$fitgauss, verbose.columns=xcms_parameters$verbose.columns, 
-                          nSlaves=nSlaves)
-        } else {
-          xset <- xcmsSet(files=files, method="matchedFilter", 
-                          fwhm=xcms_parameters$fwhm, snthresh=xcms_parameters$snthresh,
-                          step=xcms_parameters$step, steps=xcms_parameters$steps,
-                          sigma=xcms_parameters$sigma, max=xcms_parameters$max, 
-                          mzdiff=xcms_parameters$mzdiff, index=xcms_parameters$index) 
-          
-          
-        }
+#         if(centWave) {		
+#           xset <- xcmsSet(files=files, method="centWave", 
+#                           peakwidth=c(xcms_parameters$min_peakwidth, xcms_parameters$max_peakwidth),
+#                           ppm=xcms_parameters$ppm, noise=xcms_parameters$noise, 
+#                           snthresh=xcms_parameters$snthresh, mzdiff=xcms_parameters$mzdiff,
+#                           prefilter=c(xcms_parameters$prefilter, xcms_parameters$value_of_prefilter),
+#                           mzCenterFun=xcms_parameters$mzCenterFun, integrate=xcms_parameters$integrate,
+#                           fitgauss=xcms_parameters$fitgauss, verbose.columns=xcms_parameters$verbose.columns, 
+#                           scanrange=xcms_parameters$scanrange, nSlaves=nSlaves)
+#         } else {
+#           xset <- xcmsSet(files=files, method="matchedFilter", 
+#                           fwhm=xcms_parameters$fwhm, snthresh=xcms_parameters$snthresh,
+#                           step=xcms_parameters$step, steps=xcms_parameters$steps,
+#                           sigma=xcms_parameters$sigma, max=xcms_parameters$max, 
+#                           mzdiff=xcms_parameters$mzdiff, index=xcms_parameters$index,
+#                           scanrange=xcms_parameters$scanrange, nSlaves=nSlaves) 
+#           
+#           
+#         }
+        xset <- calculateXcmsSet(files, xcms_parameters, scanrange, 1, nSlaves)
         
         best_settings$xset <- xset
         target_value <- calcPPS(xset, isotopeIdentification, ...)#, ppm, rt_diff)
@@ -507,22 +492,11 @@ resultIncreased <-
   }
 
 
-# sendXcmsSetSlaveFunctions <-
-# function(example_sample, xcmsSet_parameters) {#, ppm, rt_diff) {
-# mpi.bcast.Robj2slave(toMatrix) 
-# mpi.bcast.Robj2slave(calcPPS) 
-# mpi.bcast.cmd(slave <- mpi.comm.rank())
-# mpi.bcast.Robj2slave(example_sample)
-# mpi.bcast.Robj2slave(xcmsSet_parameters)
-# mpi.bcast.Robj2slave(optimizeSlave)
-# mpi.bcast.cmd("library(xcms)")
-# mpi.bcast.cmd(optimizeSlave())
-# }
 
 xcmsSetExperimentsCluster <-
-function(example_sample, params, isotopeIdentification, nSlaves=4, ...) { 
+function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ...) { 
 
-  typ_params <- typeCastParams(params)  
+  typ_params <- typeCastParams(params) 
 
   if(length(typ_params$to_optimize)>1) {
     design <- getCcdParameter(typ_params$to_optimize)  	
@@ -545,11 +519,11 @@ function(example_sample, params, isotopeIdentification, nSlaves=4, ...) {
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
     clusterExport(cl, ex)
     response <- parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, example_sample, 
-                          isotopeIdentification, ..., USE.NAMES=FALSE)
+                          scanrange, isotopeIdentification, ..., USE.NAMES=FALSE)
     stopCluster(cl)
   } else {
     response <- sapply(tasks, optimizeSlaveCluster, xcms_design, example_sample, 
-                       isotopeIdentification, ...)
+                       scanrange, isotopeIdentification, ...)
   }
   
   response <- t(response)
@@ -564,61 +538,6 @@ function(example_sample, params, isotopeIdentification, nSlaves=4, ...) {
   return(ret)
 
 }
-
-# if(length(typ_params[[1]])>2)
-# design <- getBbdParameter(typ_params$to_optimize) 
-# else
-# design <- getCcdParameter(typ_params$to_optimize)  	
-# xcms_design <- decode.data(design) 
-
-# xcms_design <- combineParams(xcms_design, typ_params$no_optimization)  
-# tasks <- as.list(1:nrow(design))  
-
-# #  startSlaves(nSlaves)
-# sendXcmsSetSlaveFunctions(example_sample, xcms_design) #,  ppm, rt_diff)
-
-# response <- matrix(0, nrow=length(design[[1]]), ncol=5)
-# colnames(response) <- c("exp", "num_peaks", "notLLOQP", "num_C13", "PPS")
-# finished <- 0
-# while(closed_slaves < nSlaves) {
-# # Receive a message from a slave
-# message <- mpi.recv.Robj(mpi.any.source(),mpi.any.tag())
-# message_info <- mpi.get.sourcetag()
-# slave_id <- message_info[1]
-# tag <- message_info[2]
-
-# if(tag == 1) {
-# # slave is ready for a task.  Give it the next task, or tell it tasks
-# # are done if there are none.
-# if(length(tasks) > 0) {
-# # Send a task, and then remove it from the task list
-# mpi.send.Robj(tasks[[1]], slave_id, 1);
-# tasks[[1]] <- NULL
-# } else {
-# mpi.send.Robj(junk, slave_id, 2)
-# }
-# } else if (tag == 2) {
-# response[message[1],] <- message
-# finished <- finished + 1    
-# } else if (tag == 3) {
-# # A slave has closed down. 
-# closed_slaves <- closed_slaves + 1
-# }
-# cat(paste("finished ", finished, " of ", nrow(design), " tasks\r", sep="")) 
-# flush.console()
-# }
-# cat("\n\r")  
-# print("done")
-# mpi.close.Rslaves()
-
-# ret <- list()
-# ret$params <- typ_params
-# ret$design <- design
-# ret$response <- response
-
-# return(ret)
-
-# }
 
 
 xcmsSetStatistic <-
@@ -636,13 +555,6 @@ function(xcms_result, subdir, iterator) {
     tmp[is.na(tmp)] <- 1
     if(!is.null(subdir) & length(tmp) > 1)
       plotContours(xcms_result$model, tmp, paste(subdir,"/rsm_", iterator, sep=""))
-  #} else {    
-  #  maximum <- xcms_result$design[which.max(resp),2]
-	#  if(sum(c(-1,1) %in% maximum)==2)
-	#    maximum <- NA
-  #  max_settings <- array(c(max(resp), maximum[1]), dim=c(1,2))
-	#  colnames(max_settings) <- c("response", "x1")	
-  #}	
 	
   xcms_result$max_settings <- max_settings
 

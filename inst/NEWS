@@ -1,3 +1,12 @@
+CHANGES IN VERSION 1.7.0
+--------------------------
+  o added support for XCMS-method retcor.loess
+  o updated help files
+  o changed return value of getRGTVValues
+  o adapted unit tests
+  o parameter scanrange for XCMS-methods findPeaks can be set
+    but not optimized
+
 CHANGES IN VERSION 1.6.2
 --------------------------
   o Updated the function getNormalizedResponse() to prevent NAs

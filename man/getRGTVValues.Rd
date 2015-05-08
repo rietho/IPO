@@ -4,7 +4,7 @@
 	Calculation of values used for a Retention time correction and Grouping Target Value (RGTV)
 }
 \description{
-	This function calculates the Average Retention Time Shifts (ARTS) of all features within
+	This function calculates the Retention time Correction Score (RCS) of all features within
 	an xcmsSet-object. Also features having exactly one peak from each sample are defined as
 	'good groups', all others a 'bad groups'.
 }
@@ -24,12 +24,13 @@ getRGTVValues(xset, exp_index = 1, retcor_penalty = 1)
 }
 }
 \details{
-	This function calculates the Average Retention Time Shifts (ARTS) of all features within
+	This function calculates the Retention time Correction Score (RCS) of all features within
 	an xcmsSet-object. Also features having exactly one peak from each sample are defined as
-	'good groups', all others a 'bad groups'.
+	'good groups', all others a 'bad groups' which leads to a Grouping Score (GS) by calculating
+  'good groups'^2/'bad groups'.
 }
 \value{
-  something.
+  a list containing the items exp_index, good_groups, bad_groups, GS and RCS.
 }
 \author{
 Gunnar Libiseller

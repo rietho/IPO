@@ -17,31 +17,32 @@ function(params, quantitative_parameters, qualitative_parameters, unsupported_pa
   }
 
   for(i in 1:length(params)) {
-	param <- params[[i]]
-	name <- names(params)[i]
-	if(name %in% unsupported_parameters) {
-	  stop(paste("The parameter", name, "is not supported! Please remove from parameters; stopping!"))
-	}
-	if(name %in% qualitative_parameters) {
-	  if(length(param) == 0) {
-	    stop(paste("The parameter", name, "has no value set! Please specify; stopping!"))
+	  param <- params[[i]]
+	  name <- names(params)[i]
+	  if(name %in% unsupported_parameters) {
+	    stop(paste("The parameter", name, "is not supported! Please remove from parameters; stopping!"))
 	  }
-	  if(length(param) > 1) {
-	    stop(paste("Optimization of parameter", name, "no supported! Please specify only one value; stopping!"))
+	  if(name %in% qualitative_parameters) {
+	    if(length(param) == 0) {
+	      stop(paste("The parameter", name, "has no value set! Please specify; stopping!"))
+	    }
+	    if(length(param) > 1) {
+	      stop(paste("Optimization of parameter", name, "not supported! Please specify only one value; stopping!"))
+	    }
 	  }
-	}
-    if(name %in% quantitative_parameters) {
-	  if(length(param) == 0) {
-	    stop(paste("The parameter", name, "has no value set! Please specify between one and two; stopping!"))
-	  }
-	  if(length(param) > 2) {
-	    stop(paste("Too many values for parameter", name, "! Please specify only one or two; stopping!"))
-	  }
-	}
+      if(name %in% quantitative_parameters) {
+	      if(length(param) == 0) {
+	        stop(paste("The parameter", name, "has no value set! Please specify between one and two; stopping!"))
+	      } 
+	      if(length(param) > 2) {
+	        stop(paste("Too many values for parameter", name, "! Please specify only one or two; stopping!"))
+	      }
+	    }
   } 
   missing_params <- which(!(c(quantitative_parameters, qualitative_parameters) %in% names(params)))
   if(length(missing_params > 0)) {
-   stop(paste("The parameter(s)", paste(c(quantitative_parameters, qualitative_parameters)[missing_params], collapse=", "), "are missing! Please specify; stopping!"))
+    stop(paste("The parameter(s)", paste(c(quantitative_parameters, qualitative_parameters)[missing_params], collapse=", "), 
+               "is/are missing! Please specify; stopping!"))
   }
   
 }
@@ -57,37 +58,37 @@ function(params_1, params_2) {
   
   for(i in 1:length(params_2)) {
     new_index <- length(params_1) + 1
-	fact <- params_2[[i]]
-	params_1[[new_index]] <- fact
-	if(matchedFilter) {
-	  if(p_names[new_index] == "sigma" && fact == 0) { #update values for sigma if zero
-	    if("fwhm" %in% names(params_1)) {
-	      params_1[[new_index]][1:len] <- params_1$fwhm/2.3548
-	    } else {
-	      params_1[[new_index]][1:len] <- params_2$fwhm/2.3548
-	    }	
-	  } else {
-	    if(p_names[new_index] == "mzdiff" && fact == 0) { #update values for mzdiff if zero		
-		  if("step" %in% names(params_1)) {
-	        if("steps"  %in% names(params_1)) {
-	          params_1[[new_index]][1:len] <- 0.8-params_1$step*params_1$steps
-	        } else {
-	          params_1[[new_index]][1:len] <- 0.8-params_1$step*params_2$steps
-	        }	
+	  fact <- params_2[[i]]
+	  params_1[[new_index]] <- fact
+	  if(matchedFilter) {
+	    if(p_names[new_index] == "sigma" && fact == 0) { #update values for sigma if zero
+	      if("fwhm" %in% names(params_1)) {
+	        params_1[[new_index]][1:len] <- params_1$fwhm/2.3548
 	      } else {
-	        if("steps"  %in% names(params_1)) {
-	          params_1[[new_index]][1:len] <- 0.8-params_2$step*params_1$steps
+	        params_1[[new_index]][1:len] <- params_2$fwhm/2.3548
+	      }	
+	    } else {
+	      if(p_names[new_index] == "mzdiff" && fact == 0) { #update values for mzdiff if zero		
+		      if("step" %in% names(params_1)) {
+	          if("steps"  %in% names(params_1)) {
+	            params_1[[new_index]][1:len] <- 0.8-params_1$step*params_1$steps
+	          } else {
+	            params_1[[new_index]][1:len] <- 0.8-params_1$step*params_2$steps
+	          }	
 	        } else {
-	          params_1[[new_index]][1:len] <- 0.8-params_2$step*params_2$steps
-	        }	
-	      }		  
-		} else {          
+	          if("steps"  %in% names(params_1)) {
+	            params_1[[new_index]][1:len] <- 0.8-params_2$step*params_1$steps
+	          } else {
+	            params_1[[new_index]][1:len] <- 0.8-params_2$step*params_2$steps
+	          }	
+	        }		  
+		    } else {          
           params_1[[new_index]][1:len] <- fact
-		}
-	  }
-	} else {
+		    }
+	    }
+	  } else {
       params_1[[new_index]][1:len] <- fact
-	}
+	  }
   } 
 
   names(params_1) <- p_names   
@@ -98,18 +99,6 @@ function(params_1, params_2) {
 
 getMaxSettings <-
 function(testdata, model) {
-
-   #if(is.null(slices)) {
-  #   slices= matrix(nrow=1, ncol=0)
-   #}
-   #add_col <- array(0, dim=c(nrow(slices), 2))
-   #slices <- cbind(add_col, slices)
-   
-   #colnames(slices) <- paste("x", 1:ncol(slices), sep="")
-   #values <- apply(X=slices, MARGIN=1, FUN=getMaxima, model) 
-  
-  
-   #ret <- cbind(t(values), slices[,-c(1,2)])
    
    response <- predict(model, testdata)
    max_response <- max(response)
@@ -218,30 +207,6 @@ function(params) {
 }
 
 
-#getMaxima <-
-#function(slice, model) {
-#  values <- contour(model, ~ x1 * x2, at=slice, plot.it=FALSE, decode=FALSE) 
-#    
-#  z_values <- values[[1]]$z
-#  max_z <- max(z_values)
-#  maxima <- which(z_values==max_z, arr.ind=T)
-#  ret <- c(max_z, 0,0)
-#  if(length(maxima)==2){
-#    ret[2] <- values[[1]]$x[maxima[1]]
-#    ret[3] <- values[[1]]$y[maxima[2]]     
-#  } else {
-#    for(i in 1:2) {
-#      col_max <- maxima[,i]
-#	    if(sum(col_max==1) > 0 && sum(col_max==length(values[[1]][[i]])) > 0) 
-#	      ret[(i+1)] <- NA
-#      else
-#   	    ret[(i+1)] <- values[[1]][[i]][max(col_max)]
-#	  }
-#  }
-#  
-#  return(ret)
-#}
-
 
 getMaximumLevels <-
 function(model) {  
@@ -268,20 +233,6 @@ getTestData <- function(parameters) {
   
   return(expand.grid(data.frame(m)))
 }
-
-#getSlices <-
-#function(dimensions, slice=NULL) {
-#  ret <- c()
-#  if(length(slice) == dimensions) {
-#    return(slice)
-#  } else {
-#    values <- seq(-1,1,0.2)
-#    for(val in values)
-#      ret <- rbind(ret, getSlices(dimensions, c(slice, val)))
-#  }
-#  
-#  return(ret)
-#}
 
 
 plotContours <-
@@ -326,24 +277,6 @@ function(data) {
 }
 
 
-## Removed after switching away from MPI
-## startSlaves <-
-## function(nSlaves) {
-##   mpi.spawn.Rslaves(nslaves=nSlaves)
-                                                                                
-##   .Last <- function() {
-##     if (is.loaded("mpi_initialize")) {
-##       if (mpi.comm.size(1) > 0) {
-## 	    print("Please use mpi.close.Rslaves() to close slaves.")
-## 	    mpi.close.Rslaves()
-## 	  }
-##       print("Please use mpi.quit() to quit R")
-##       .Call("mpi_finalize", PACKAGE="Rmpi")
-##     }
-##   }
-## }
-
-
 typeCastParams <-
 function(params) {
   ret_1 <- list()
@@ -352,12 +285,12 @@ function(params) {
   for(i in  1:length(params)) {
     factor <- params[[i]]
     if(length(factor) == 2) {
-	  ret_1[[(length(ret_1)+1)]] <- factor
-	  names(ret_1)[length(ret_1)] <- names(params)[i]
-	} else {	
-	  ret_2[[(length(ret_2)+1)]] <- factor
-	  names(ret_2)[length(ret_2)] <- names(params)[i]
-	}
+	    ret_1[[(length(ret_1)+1)]] <- factor
+	    names(ret_1)[length(ret_1)] <- names(params)[i]
+	  } else {	
+	    ret_2[[(length(ret_2)+1)]] <- factor
+	    names(ret_2)[length(ret_2)] <- names(params)[i]
+	  }
   }	
   ret$to_optimize <- ret_1
   ret$no_optimization <- ret_2
@@ -384,24 +317,39 @@ function(peakPickingSettings, retCorGroupSettings, nSlaves) {
   } else { #matchedFilter  
     cat(paste("xset <- xcmsSet(method=\"matchedFilter\", fwhm=", 
 	         peakPickingSettings$fwhm, ", snthresh=",peakPickingSettings$snthresh,
-             ", step=", peakPickingSettings$step, ", steps=", peakPickingSettings$steps,
-             ", sigma=", peakPickingSettings$sigma, ", max=", peakPickingSettings$max, 
+             ", step=", peakPickingSettings$step, ", steps=", round(peakPickingSettings$steps),
+             ", sigma=", peakPickingSettings$sigma, ", max=", round(peakPickingSettings$max), 
              ", mzdiff=", peakPickingSettings$mzdiff, ", index=", peakPickingSettings$index,
-	         ")\n", sep=""))   
+	           ", nSlaves=", nSlaves, ")\n", sep=""))   
   }
 	  
-	  
-  cat(paste("xset <- retcor(xset, method=\"obiwarp\", plottype=\"", retCorGroupSettings$plottype, 
+  if(retCorGroupSettings$retcorMethod == "loess")	{
+    
+    cat(paste("xset <- group(xset, method=\"density\", bw=", retCorGroupSettings$bw, 
+              ", mzwid=", retCorGroupSettings$mzwid, ", minfrac=", retCorGroupSettings$minfrac, 
+              ", minsamp=", round(retCorGroupSettings$minsamp), ", max=", round(retCorGroupSettings$max),
+              ")\n", sep=""))	 
+    
+    cat(paste("xset <- retcor(xset, method=\"loess\", missing=", round(retCorGroupSettings$missing), 
+              ", extra=", round(retCorGroupSettings$extra), ", span=", retCorGroupSettings$span, 
+              ", smooth=\"", retCorGroupSettings$smooth, ", family=\"", retCorGroupSettings$family,
+              ", plottype=\"", retCorGroupSettings$plottype,
+              ")\n", sep=""))	 
+  }  
+  
+  if(retCorGroupSettings$retcorMethod == "obiwarp") {
+    cat(paste("xset <- retcor(xset, method=\"obiwarp\", plottype=\"", retCorGroupSettings$plottype, 
             "\", distFunc=\"", retCorGroupSettings$distFunc, "\", profStep=", retCorGroupSettings$profStep, 
-			", center=", retCorGroupSettings$center, ", response=", retCorGroupSettings$response, 
-		    ", gapInit=", retCorGroupSettings$gapInit, ", gapExtend=", retCorGroupSettings$gapExtend,
-		    ", factorDiag=", retCorGroupSettings$factorDiag, ", factorGap=", retCorGroupSettings$factorGap, 
-			", localAlignment=", retCorGroupSettings$localAlignment, ")\n", sep=""))
+			      ", center=", retCorGroupSettings$center, ", response=", retCorGroupSettings$response, 
+		        ", gapInit=", retCorGroupSettings$gapInit, ", gapExtend=", retCorGroupSettings$gapExtend,
+		        ", factorDiag=", retCorGroupSettings$factorDiag, ", factorGap=", retCorGroupSettings$factorGap, 
+			      ", localAlignment=", retCorGroupSettings$localAlignment, ")\n", sep=""))
+  }
   	   
   cat(paste("xset <- group(xset, method=\"density\", bw=", retCorGroupSettings$bw, 
             ", mzwid=", retCorGroupSettings$mzwid, ", minfrac=", retCorGroupSettings$minfrac, 
             ", minsamp=", retCorGroupSettings$minsamp, ", max=", retCorGroupSettings$max,
-	        ")\n", sep=""))	 
+	          ")\n", sep=""))	 
 	  
   cat(paste("xset <- fillPeaks(xset, nSlaves=", nSlaves, ")\n", sep=""))	
 	

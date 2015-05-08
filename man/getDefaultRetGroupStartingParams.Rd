@@ -2,8 +2,8 @@
 \alias{getDefaultRetGroupStartingParams}
 
 \title{
-	Gives a List parameters for xcms-methods retcor.obiwarp and group.density 
-	which are optimized by default
+	Gives a List of parameters for xcms-methods retcor.obiwarp or retcor.loess
+  and group.density which are optimized by default
 }
 \description{
   This function creates a list of parameters used in the xcms-methods 
@@ -13,13 +13,18 @@
   group.density parameters: 'bw', 'minfrac', 'mzwid'\cr  
 }
 \usage{
-getDefaultRetGroupStartingParams(distfunc = "cor_opt", high_resolution = TRUE)
+  getDefaultRetGroupStartingParams(retcorMethod=c("obiwarp", "loess", "none"), distfunc=c("cor_opt", "cor", "cov", "prd", "euc"), high_resolution=TRUE)
 }
 
 \arguments{
+  \item{retcorMethod}{
+  The name of the retention time correction method that should be used.
+  The XCMS methods retcor.obiwarp and retcor.loess are supported. If
+  no retention time correction should be done use "none".
+  }
   \item{distfunc}{
 	The name of the distance function used by retcor.obiwarp
-}
+  }
   \item{high_resolution}{
 	If high_resolution = TRUE starting values for mzwid are set to 0.015 and 0.035;
 	if high_resolution = FALSE to 0.15, 0.35
@@ -34,7 +39,7 @@ getDefaultRetGroupStartingParams(distfunc = "cor_opt", high_resolution = TRUE)
   (e.g. params$max <- 10)
 }
 \value{
-  A List of parameters used in the xcms-methods retcor.obiwarp and group.density
+  A List of parameters used in the xcms-methods retcor.obiwarp or retcor.loess and group.density
 }
 \author{
 Gunnar Libiseller
