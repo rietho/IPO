@@ -40,7 +40,7 @@ test_ipo <- function() {
 
   TV <- resultRG[[4]]$target_value
   checkTrue(all(unlist(TV)[-c(5)]== c(1, 2656, 1, 7054336, 1)))
-  checkEqualsNumeric(unlist(TV)[5], 1593.865, tolerance=1e-3)
+  checkEqualsNumeric(unlist(TV)[5], 1593.865, tolerance=1e-2)
 
   
   #checking single parameter retention time correction and grouping optimization
@@ -51,7 +51,7 @@ test_ipo <- function() {
   
   TV <- resultRG[[4]]$target_value
   checkTrue(all(unlist(TV)[-c(5)]== c(1, 2652, 1, 7033104, 1)))
-  checkEqualsNumeric(unlist(TV)[5], 1586.247, tolerance=1e-3)
+  checkEqualsNumeric(unlist(TV)[5], 1586.247, tolerance=1e-2)
   
   #checking loess
   paramsRG <- getDefaultRetGroupStartingParams("loess")
@@ -61,6 +61,6 @@ test_ipo <- function() {
   
   TV <- resultRG[[3]]$target_value
   checkTrue(all(unlist(TV)[-c(5)]== c(1, 2664, 1, 7096896, 1)))
-  checkEqualsNumeric(unlist(TV)[5], 1547.593, tolerance=1e-3)
+  checkEqualsNumeric(unlist(TV)[5], 1547.593, tolerance=1e-2)
   
 }
