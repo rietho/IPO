@@ -10,13 +10,12 @@ Identification of 13C isotopes
   intensity of each peaks has to be at least three times the intensity at rtmin and rtmax. 
 }
 \usage{
-findIsotopes.IPO(xset, checkBorderIntensity=FALSE)
+findIsotopes.IPO(xset, checkPeakShape=c("none", "borderIntensity", "sinusCurve", "normalDistr"))
 }
 
 \arguments{
   \item{xset}{\code{xcmsSet} object}
-  \item{checkBorderIntensity}{logical whether the peaks 'maxo' value has to be at 
-                              least three times the intensities at 'rtmin' and 'rtmax'}
+  \item{checkPeakShape}{character to choose if the peakshape should be checked and if so how}
 }
 \details{
   Identification of 13C isotopes
@@ -36,7 +35,7 @@ findIsotopes.IPO(xset, checkBorderIntensity=FALSE)
 \dontrun{
 mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
 xset <- xcmsSet(mzmlfile, peakwidth=c(5,12), method="centWave")
-isotopes <- findIsotopes.IPO(xset, TRUE)
+isotopes <- findIsotopes.IPO(xset, "borderIntensity")
 }
 }
 

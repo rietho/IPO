@@ -4,6 +4,7 @@ import("CAMERA")
 
 export("attachList")
 export("calcPPS")
+export("calculateXcmsSet")
 ## export("checkParams")
 ## export("checkRetGroupSetParams")
 ## export("checkXcmsSetParams")

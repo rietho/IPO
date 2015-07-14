@@ -1,3 +1,12 @@
+CHANGES IN VERSION 1.7.1
+--------------------------
+  o checking correlation of peak-shape with sinus curve (-pi/2 to pi*1.5), normal distribution or checkBorderIntensity
+  o findIsotopes.IPO renamed parameter checkBorderIntensity to checkPeakShape
+  o performance improvement calcPPS for checkPeakShape=FALSE
+  o calculating xcmsSet-object and respective PPS for each DoE. (PPS is not estimated from rsm anymore)
+  o additionally forwarding nSlaves for xcmsSet-function (also see getDefaultXcmsSetStartingParams())
+
+
 CHANGES IN VERSION 1.7.0
 --------------------------
   o added support for XCMS-method retcor.loess

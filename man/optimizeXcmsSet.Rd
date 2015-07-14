@@ -40,14 +40,16 @@ isotopeIdentification=c("IPO", "CAMERA"), nSlaves = 4, subdir = "IPO", ...)
 
 }
 \value{
-    A LIST of length n+1 with n beeing the optimization runs needed
+    A LIST of length n+1 with n beeing the optimization runs (DoEs) needed
 
   \item{comp1-comp(n) }{A LIST containing:\cr 
     1. Parameters used for the nth optimization run\cr 
 	2. Box-Behnken or Central Composite Design used for optimization run\cr 
 	3. Responses from calcPPS for every experiment in the design\cr 
 	4. Response surface model for the design\cr 
-	5. The normalized parameter settings giving the best PPS (values between -1 and 1)}
+	5. The normalized parameter settings giving the best PPS (values between -1 and 1)
+  6. an xcmsSet-object calculated with the best settings from the response surface model
+  7. PPS calculated from the xcmsSet}
   \item{comp(n+1) }{A LIST containing:\cr   
     1. Parameters giving the best PPS\cr 
 	2. An xcmsSet-object created with the optimized parameters\cr 
