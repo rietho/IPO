@@ -1,13 +1,14 @@
 Package: IPO
 Type: Package
 Title: Automated Optimization of XCMS Data Processing parameters
-Version: 1.7.1
-Date: 2015-06-08
+Version: 1.7.2
+Date: 2015-08-06
 Author: Libiseller, Gunnar <Gunnar.Libiseller@joanneum.at> 
         Magnes, Christoph <christoph.magnes@joanneum.at>
 Maintainer: Libiseller, Gunnar <Gunnar.Libiseller@joanneum.at>
 Depends: xcms, rsm, CAMERA
 Suggests: RUnit, BiocGenerics, msdata, mtbls2
+Enhances: parallel
 Description: The outcome of XCMS data processing strongly depends on the parameter settings. IPO 
   (`Isotopologue Parameter Optimization`) is a parameter optimization tool that is applicable for 
   different kinds of samples and liquid chromatography coupled to high resolution mass spectro-
@@ -19,4 +20,5 @@ Description: The outcome of XCMS data processing strongly depends on the paramet
   response surface models.
 License: GPL (>= 2) + file LICENSE
 URL: https://github.com/glibiseller/IPO
+BugReports: https://github.com/glibiseller/IPOs/issues/new
 biocViews: Metabolomics, MassSpectrometry

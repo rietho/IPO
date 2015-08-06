@@ -13,7 +13,8 @@ calcPPS <-
       return(ret)
     }
     
-    peak_source <- xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", "mzmax", "rtmin", "rtmax"),drop=FALSE]
+    peak_source <- xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", 
+                                 "mzmax", "rtmin", "rtmax"),drop=FALSE]
     ret[2] <- nrow(peak_source)
     
     if(isotopeIdentification == "IPO")
@@ -29,24 +30,27 @@ calcPPS <-
       non_isos_peaks <- peak_source
       
       if(nrow(iso_mat) > 0) {
-        non_isos_peaks <- peak_source[-unique(c(iso_mat)),,drop=FALSE] #toMatrix(peak_source[-unique(c(iso_mat)),])
+        non_isos_peaks <- peak_source[-unique(c(iso_mat)),,drop=FALSE] 
       } 
+	  
+      speaks <- non_isos_peaks[non_isos_peaks[,"sample"]==sample,,drop=FALSE]
+      intensities <- speaks[,"into"]
+	    na_int <- is.na(intensities)
+	    intensities <- intensities[!na_int]
       
-      speaks <- non_isos_peaks[non_isos_peaks[,"sample"]==sample,,drop=FALSE]#toMatrix(non_isos_peaks[non_isos_peaks[,"sample"]==sample,])
-      iso_int <- speaks[,"into"]
+	    if(length(intensities)>0) {
+        tmp <- intensities[order(intensities)]
+        int_cutoff <- mean(tmp[1:max(round((length(tmp)/33),0),1)])
       
-      tmp <- iso_int[order(iso_int)]      
-      int_cutoff <- mean(tmp[1:round((length(tmp)/33),0)])
+        masses <- speaks[!na_int, "mz"]
+        maximum_carbon <- calcMaximumCarbon(masses)#floor((masses-2*CH3)/CH2) + 2
+        carbon_probabilty <- maximum_carbon*isotope_abundance
       
-      masses <- speaks[, "mz"]
-      maximum_carbon <- calcMaximumCarbon(masses)#floor((masses-2*CH3)/CH2) + 2
-      carbon_probabilty <- maximum_carbon*isotope_abundance
+        iso_int <- intensities * carbon_probabilty
       
-      iso_int <- iso_int * carbon_probabilty
-      
-      not_loq_peaks <- sum(iso_int>int_cutoff)
-      ret[3] <- ret[3] + not_loq_peaks
-      
+        not_loq_peaks <- sum(iso_int>int_cutoff)
+        ret[3] <- ret[3] + not_loq_peaks
+      }
     }#end_for_sample    
     
     ret[4] <- length(unique(c(iso_mat)))
@@ -74,7 +78,8 @@ findIsotopes.IPO <-
     }
     
     colnames(iso_mat) <- c("12C", "13C")
-    peak_source <- xset@peaks[,c("mz", "rt", "sample", "into", "maxo", "mzmin", "mzmax", "rtmin", "rtmax"), drop=FALSE]
+    peak_source <- xset@peaks[,c("mz", "rt", "sample", "into", "maxo", "mzmin",
+                                 "mzmax", "rtmin", "rtmax"), drop=FALSE]
     
     for(i in 1:ncol(peak_source)) {
       peak_source <- peak_source[!is.na(peak_source[,i]),,drop=FALSE]
@@ -95,7 +100,7 @@ findIsotopes.IPO <-
     #start_sample
     for(sample in 1:samples) { 
       #only looking into peaks from current sample   
-      speaks <- peak_source[peak_source[,"sample"]==sample,,drop=FALSE]#toMatrix(peak_source[peak_source[,"sample"]==sample,])	
+      speaks <- peak_source[peak_source[,"sample"]==sample,,drop=FALSE]
       split <- 250
 	  if(!(checkPeakShape=="none"))
         rawdata <- loadRaw(xcmsSource(xset@filepaths[sample]))
@@ -110,7 +115,7 @@ findIsotopes.IPO <-
           if(nrow(speaks) < split) {
             part_peaks <- speaks
           } else {          
-            upper_bound <- speaks[split,"mzmax"] + isotope_mass# + (speaks[split,"mz"] + isotope_mass) * ppm / 1000000          
+            upper_bound <- speaks[split,"mzmax"] + isotope_mass          
             end_point <- sum(speaks[,"mz"] < upper_bound)
             part_peaks <- speaks[1:end_point,,drop=FALSE] #toMatrix(speaks[1:end_point,])
           }		
@@ -151,12 +156,15 @@ findIsotopes.IPO <-
               boundary_bool <- rep(TRUE, (nrow(int_peaks)+1))
               if(!(checkPeakShape=="none")) {
                 if(checkPeakShape=="borderIntensity") {
-                  boundary_bool <- checkIntensitiesAtRtBoundaries(rawdata, rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
+                  boundary_bool <- checkIntensitiesAtRtBoundaries(rawdata, 
+                                          rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
                 } else {
                   if(checkPeakShape=="sinusCurve") {                
-                    boundary_bool <- checkSinusDistribution(rawdata, rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
+                    boundary_bool <- checkSinusDistribution(rawdata, 
+                                          rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
                   } else {                  
-                    boundary_bool <- checkNormalDistribution(rawdata, rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
+                    boundary_bool <- checkNormalDistribution(rawdata, 
+                                          rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
                   }
                 }
               } #else {
@@ -229,11 +237,7 @@ checkNormalDistribution <- function(rawdata, peaks) {
 
 getIntensitiesFromRawdata <- function(rawdata, peak) {
   rt <- rawdata$rt >= peak[,"rtmin"] & rawdata$rt <= peak[,"rtmax"]
-  #x <- rawdata$rt[rt]
-  #
-  #if(length(x) < 3)
-  #  return(FALSE)
-  
+
   rtRange <- c(min(which(rt)), max(which(rt))+1)  
   scanIndices <- rawdata$scanindex[rtRange[1]:min(rtRange[2], length(rawdata$scanindex))]
   #  scanIndices <- scanIndices[!is.na(scanIndices)]
@@ -248,7 +252,8 @@ getIntensitiesFromRawdata <- function(rawdata, peak) {
   for(i in 1:(length(scanIndices)-1)) {
     scanRange <- c(scanIndices[i]+1, scanIndices[i+1])
     mz <- rawdata$mz[scanRange[1]:scanRange[2]]
-    y <- c(y, max(0, (rawdata$intensity[scanRange[1]:scanRange[2]][mz >= peak[,"mzmin"] & mz <= peak[,"mzmax"]])))  
+    y <- c(y, max(0, (rawdata$intensity[scanRange[1]:scanRange[2]][mz >= peak[,"mzmin"] & 
+                                                                     mz <= peak[,"mzmax"]])))  
   }
   
   y
@@ -273,7 +278,6 @@ testNormalDistribution <- function(rawdata, peak) {
   seqModel <- seq(-4,4,length=length(normY))*sd + mean
   yModel <- dnorm(seqModel,mean,sd)
   yModel = yModel* (1/max(yModel))
-
   correlation <- cor(yModel, normY)
 
   correlation > 0.7
@@ -292,14 +296,9 @@ testSinusDistribution <- function(rawdata, peak) {
   }
 
   normY <- (y-min(y))/(max(y)-min(y))
-
   sinCurve <- (sin(seq(-pi/2,pi+1.5,length=length(normY))) + 1) / 2
-
-  #plot(x, sinCurve)
-  #points(x, normY, type="l", col = "blue", lwd = 2)  
   correlation <- cor(sinCurve, normY)
-  
-  #print(correlation)
+
   correlation > 0.7
   
 }
@@ -380,7 +379,8 @@ calculateXcmsSet <- function(files, xcmsSetParameters, scanrange=NULL, task=1, n
 checkXcmsSetParams <-
   function(params) {
     if(is.null(params$step)) {     #centWave   
-      quantitative_parameters <- c("ppm", "min_peakwidth", "max_peakwidth", "snthresh", "mzdiff", "noise", "prefilter", "value_of_prefilter")
+      quantitative_parameters <- c("ppm", "min_peakwidth", "max_peakwidth", "snthresh", "mzdiff", "noise", 
+                                   "prefilter", "value_of_prefilter")
       qualitative_parameters <- c("integrate", "fitgauss", "verbose.columns", "mzCenterFun", "nSlaves")
       unsupported_parameters <- c("sleep", "ROI.list") #"scanrange" can only be set, but not optimized
     } else {    
@@ -413,31 +413,15 @@ getDefaultXcmsSetStartingParams <-
 optimizeSlaveCluster <-
   function(task, xcmsSet_parameters, files, scanrange, isotopeIdentification, ...) {
     
-    print(task)  
+    message(task)  
     
     #library(xcms)
     xset <- NULL
-    print(sapply(xcmsSet_parameters, "[[", task))
+    message(sapply(xcmsSet_parameters, "[[", task))
     
     
     xset <- calculateXcmsSet(files, xcmsSet_parameters, scanrange, task)
     
-#     if(is.null(xcmsSet_parameters$step)) {     #centWave  	
-#       xset <- xcmsSet(files=example_sample, method="centWave", 
-#                       peakwidth=c(xcmsSet_parameters$min_peakwidth[task], xcmsSet_parameters$max_peakwidth[task]),
-#                       ppm=xcmsSet_parameters$ppm[task], noise=xcmsSet_parameters$noise[task], 
-#                       snthresh=xcmsSet_parameters$snthresh[task], mzdiff=xcmsSet_parameters$mzdiff[task],
-#                       prefilter=c(xcmsSet_parameters$prefilter[task], xcmsSet_parameters$value_of_prefilter[task]),
-#                       mzCenterFun=xcmsSet_parameters$mzCenterFun[task], integrate=xcmsSet_parameters$integrate[task],
-#                       fitgauss=xcmsSet_parameters$fitgauss[task], verbose.columns=xcmsSet_parameters$verbose.columns[task])
-#       
-#     } else {     #matchedFilter  
-#       try(xset <- xcmsSet(files=example_sample, method="matchedFilter", 
-#                           fwhm=xcmsSet_parameters$fwhm[task], snthresh=xcmsSet_parameters$snthresh[task],
-#                           step=xcmsSet_parameters$step[task], steps=xcmsSet_parameters$steps[task],
-#                           sigma=xcmsSet_parameters$sigma[task], max=xcmsSet_parameters$max[task], 
-#                           mzdiff=xcmsSet_parameters$mzdiff[task], index=xcmsSet_parameters$index[task]))   
-#     }
     result <- calcPPS(xset, isotopeIdentification, ...)
     result[1] <- task   
     rm(xset)
@@ -449,7 +433,7 @@ optimizeSlaveCluster <-
 
 optimizeXcmsSet <-
   function(files=NULL, params=getDefaultXcmsSetStartingParams(), isotopeIdentification=
-             c("IPO", "CAMERA"), nSlaves=4, subdir="IPO", ...) { #ppm=5, rt_diff=0.02, nSlaves=4, subdir="IPO") {
+             c("IPO", "CAMERA"), nSlaves=4, subdir="IPO", ...) { 
     
     scanrange <- params$scanrange
     params$scanrange <- NULL    
@@ -474,20 +458,20 @@ optimizeXcmsSet <-
     
     
     while(iterator < 50) { #dummy stop :-)
-      cat("\n")
-      cat("\n")
-      cat("\n")
-      cat("starting new DoE with:\n")
-      print(params)
+      message("\n\n")
+      message("starting new DoE with:")
+      message(paste(rbind(paste(names(params), sep="", ":"), paste(params, sep="")), sep="", "\t"))
       
-      xcms_result <- xcmsSetExperimentsCluster(files, params, scanrange, isotopeIdentification, nSlaves, ...) 
+      xcms_result <- xcmsSetExperimentsCluster(files, params, scanrange, isotopeIdentification, 
+                                               nSlaves, ...) 
 	  
-      xcms_result <- xcmsSetStatistic(files, scanrange, isotopeIdentification, xcms_result, subdir, iterator, nSlaves, ...)
+      xcms_result <- xcmsSetStatistic(files, scanrange, isotopeIdentification, xcms_result, 
+                                      subdir, iterator, nSlaves, ...)
       history[[iterator]] <- xcms_result     
       params <- xcms_result$params 
       
       if(!resultIncreased(history)) {
-        cat("no increase, stopping")
+        message("no increase, stopping")
         maxima <- 0
         max_index <- 1
         for(i in 1:length(history)) {
@@ -507,33 +491,12 @@ optimizeXcmsSet <-
         best_settings <- list()
         best_settings$parameters <- xcms_parameters
         
-#         if(centWave) {		
-#           xset <- xcmsSet(files=files, method="centWave", 
-#                           peakwidth=c(xcms_parameters$min_peakwidth, xcms_parameters$max_peakwidth),
-#                           ppm=xcms_parameters$ppm, noise=xcms_parameters$noise, 
-#                           snthresh=xcms_parameters$snthresh, mzdiff=xcms_parameters$mzdiff,
-#                           prefilter=c(xcms_parameters$prefilter, xcms_parameters$value_of_prefilter),
-#                           mzCenterFun=xcms_parameters$mzCenterFun, integrate=xcms_parameters$integrate,
-#                           fitgauss=xcms_parameters$fitgauss, verbose.columns=xcms_parameters$verbose.columns, 
-#                           scanrange=xcms_parameters$scanrange, nSlaves=nSlaves)
-#         } else {
-#           xset <- xcmsSet(files=files, method="matchedFilter", 
-#                           fwhm=xcms_parameters$fwhm, snthresh=xcms_parameters$snthresh,
-#                           step=xcms_parameters$step, steps=xcms_parameters$steps,
-#                           sigma=xcms_parameters$sigma, max=xcms_parameters$max, 
-#                           mzdiff=xcms_parameters$mzdiff, index=xcms_parameters$index,
-#                           scanrange=xcms_parameters$scanrange, nSlaves=nSlaves) 
-#           
-#           
-#         }
-#        xset <- calculateXcmsSet(files, xcms_parameters, scanrange, 1, nSlaves)
-        
         best_settings$xset <- history[[max_index]]$xset
         target_value <- history[[max_index]]$PPS #calcPPS(xset, isotopeIdentification, ...)#, ppm, rt_diff)
         best_settings$result <- target_value
         history$best_settings <- best_settings
         
-        print(best_settings)
+        message(best_settings)
         
         return(history)   
       }
@@ -543,10 +506,14 @@ optimizeXcmsSet <-
         parameter_setting <- xcms_result$max_settings[i+1]
         bounds <- params$to_optimize[[i]] 
         fact <- names(params$to_optimize)[i]
-        min_factor <- ifelse(fact=="min_peakwidth", 3, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), ifelse(fact=="step",0.0005,1)))
+        min_factor <- ifelse(fact=="min_peakwidth", 3, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), 
+                             ifelse(fact=="step",0.0005,1)))
         
-        #if the parameter is NA, we increase the range by 20%, if it was within the inner 25% of the previous range or at the minimum value we decrease the range by 20%
-        step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) < best_range), 0.8, ifelse(parameter_setting==-1 & decode(-1, params$to_optimize[[i]]) == min_factor,0.8,1)))
+        #if the parameter is NA, we increase the range by 20%, if it was within the inner 
+        #25% of the previous range or at the minimum value we decrease the range by 20%
+        step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) < best_range), 
+                              0.8, ifelse(parameter_setting==-1 & decode(-1, params$to_optimize[[i]]) ==
+                              min_factor,0.8,1)))
         step <- (diff(bounds) / 2) * step_factor
         
         if(is.na(parameter_setting))
@@ -572,8 +539,10 @@ optimizeXcmsSet <-
       if(centWave) {
         #checking peakwidths plausiability
         if(!is.null(params$to_optimize$min_peakwidth) | !is.null(params$to_optimize$max_peakwidth)) {
-          pw_min <- ifelse(is.null(params$to_optimize$min_peakwidth), params$no_optimization$min_peakwidth, max(params$to_optimize$min_peakwidth))
-          pw_max <- ifelse(is.null(params$to_optimize$max_peakwidth), params$no_optimization$max_peakwidth, min(params$to_optimize$max_peakwidth))
+          pw_min <- ifelse(is.null(params$to_optimize$min_peakwidth), params$no_optimization$min_peakwidth, 
+                           max(params$to_optimize$min_peakwidth))
+          pw_max <- ifelse(is.null(params$to_optimize$max_peakwidth), params$no_optimization$max_peakwidth, 
+                           min(params$to_optimize$max_peakwidth))
           if(pw_min >= pw_max) {
             additional <- abs(pw_min-pw_max) + 1
             if(!is.null(params$to_optimize$max_peakwidth)) {		  
@@ -626,7 +595,8 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
     design <- data.frame(run.order=1:9, a=seq(-1,1,0.25))
       colnames(design)[2] <- names(typ_params$to_optimize)
       xcms_design <- design
-      xcms_design[,2] <- seq(min(typ_params$to_optimize[[1]]), max(typ_params$to_optimize[[1]]), diff(typ_params$to_optimize[[1]])/8)
+      xcms_design[,2] <- seq(min(typ_params$to_optimize[[1]]), max(typ_params$to_optimize[[1]]), 
+                             diff(typ_params$to_optimize[[1]])/8)
   }
 
   xcms_design <- combineParams(xcms_design, typ_params$no_optimization)   

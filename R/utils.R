@@ -301,57 +301,57 @@ function(params) {
 
 writeRScript <-
 function(peakPickingSettings, retCorGroupSettings, nSlaves) {
-  cat("library(xcms)\n")
-  cat("library(Rmpi)\n")
+  message("library(xcms)\n")
+  message("library(Rmpi)\n")
 
   if(is.null(peakPickingSettings$step)) {     #centWave     		
-    cat(paste("xset <- xcmsSet(method=\"centWave\", peakwidth=c(", 
+    message(paste("xset <- xcmsSet(method=\"centWave\", peakwidth=c(", 
               peakPickingSettings$min_peakwidth, ", ", peakPickingSettings$max_peakwidth,
               "), ppm=", peakPickingSettings$ppm, ", noise=", peakPickingSettings$noise, 
 			  ", snthresh=", peakPickingSettings$snthresh, ", mzdiff=", peakPickingSettings$mzdiff,
 			  ", prefilter=c(", peakPickingSettings$prefilter, ", ", peakPickingSettings$value_of_prefilter,
 			  "), mzCenterFun=\"", peakPickingSettings$mzCenterFun, "\", integrate=", peakPickingSettings$integrate,
 			  ", fitgauss=", peakPickingSettings$fitgauss, ", verbose.columns=", peakPickingSettings$verbose.columns,
-			  ", nSlaves=", nSlaves, ")\n", sep=""))
+			  ", nSlaves=", nSlaves, ")", sep=""))
                   
   } else { #matchedFilter  
-    cat(paste("xset <- xcmsSet(method=\"matchedFilter\", fwhm=", 
+    message(paste("xset <- xcmsSet(method=\"matchedFilter\", fwhm=", 
 	         peakPickingSettings$fwhm, ", snthresh=",peakPickingSettings$snthresh,
              ", step=", peakPickingSettings$step, ", steps=", round(peakPickingSettings$steps),
              ", sigma=", peakPickingSettings$sigma, ", max=", round(peakPickingSettings$max), 
              ", mzdiff=", peakPickingSettings$mzdiff, ", index=", peakPickingSettings$index,
-	           ", nSlaves=", nSlaves, ")\n", sep=""))   
+	           ", nSlaves=", nSlaves, ")", sep=""))   
   }
 	  
   if(retCorGroupSettings$retcorMethod == "loess")	{
     
-    cat(paste("xset <- group(xset, method=\"density\", bw=", retCorGroupSettings$bw, 
+    message(paste("xset <- group(xset, method=\"density\", bw=", retCorGroupSettings$bw, 
               ", mzwid=", retCorGroupSettings$mzwid, ", minfrac=", retCorGroupSettings$minfrac, 
               ", minsamp=", round(retCorGroupSettings$minsamp), ", max=", round(retCorGroupSettings$max),
-              ")\n", sep=""))	 
+              ")", sep=""))	 
     
-    cat(paste("xset <- retcor(xset, method=\"loess\", missing=", round(retCorGroupSettings$missing), 
+    message(paste("xset <- retcor(xset, method=\"loess\", missing=", round(retCorGroupSettings$missing), 
               ", extra=", round(retCorGroupSettings$extra), ", span=", retCorGroupSettings$span, 
               ", smooth=\"", retCorGroupSettings$smooth, ", family=\"", retCorGroupSettings$family,
               ", plottype=\"", retCorGroupSettings$plottype,
-              ")\n", sep=""))	 
+              ")", sep=""))	 
   }  
   
   if(retCorGroupSettings$retcorMethod == "obiwarp") {
-    cat(paste("xset <- retcor(xset, method=\"obiwarp\", plottype=\"", retCorGroupSettings$plottype, 
+    message(paste("xset <- retcor(xset, method=\"obiwarp\", plottype=\"", retCorGroupSettings$plottype, 
             "\", distFunc=\"", retCorGroupSettings$distFunc, "\", profStep=", retCorGroupSettings$profStep, 
 			      ", center=", retCorGroupSettings$center, ", response=", retCorGroupSettings$response, 
 		        ", gapInit=", retCorGroupSettings$gapInit, ", gapExtend=", retCorGroupSettings$gapExtend,
 		        ", factorDiag=", retCorGroupSettings$factorDiag, ", factorGap=", retCorGroupSettings$factorGap, 
-			      ", localAlignment=", retCorGroupSettings$localAlignment, ")\n", sep=""))
+			      ", localAlignment=", retCorGroupSettings$localAlignment, ")", sep=""))
   }
   	   
-  cat(paste("xset <- group(xset, method=\"density\", bw=", retCorGroupSettings$bw, 
+  message(paste("xset <- group(xset, method=\"density\", bw=", retCorGroupSettings$bw, 
             ", mzwid=", retCorGroupSettings$mzwid, ", minfrac=", retCorGroupSettings$minfrac, 
             ", minsamp=", retCorGroupSettings$minsamp, ", max=", retCorGroupSettings$max,
 	          ")\n", sep=""))	 
 	  
-  cat(paste("xset <- fillPeaks(xset, nSlaves=", nSlaves, ")\n", sep=""))	
+  message(paste("xset <- fillPeaks(xset, nSlaves=", nSlaves, ")", sep=""))	
 	
 }
 

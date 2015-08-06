@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.7.2
+--------------------------
+  o bugfix: try to prevent error in calcPPS possibly caused by NAs
+  o replaced cat() and print() calls with message()
+
 CHANGES IN VERSION 1.7.1
 --------------------------
   o checking correlation of peak-shape with sinus curve (-pi/2 to pi*1.5), normal distribution or checkBorderIntensity
@@ -5,7 +10,6 @@ CHANGES IN VERSION 1.7.1
   o performance improvement calcPPS for checkPeakShape=FALSE
   o calculating xcmsSet-object and respective PPS for each DoE. (PPS is not estimated from rsm anymore)
   o additionally forwarding nSlaves for xcmsSet-function (also see getDefaultXcmsSetStartingParams())
-
 
 CHANGES IN VERSION 1.7.0
 --------------------------
@@ -33,6 +37,7 @@ CHANGES IN VERSION 1.6
   o simplified return value of calcPPS() to vector with meaningful names
   o changed getDefaultXcmsSetStartingParams() for min_peakdwidth = c(12, 28) 
     and for ppm to c(17, 32)
+	
 CHANGES IN VERSION 1.5.7.1
 --------------------------
   o using predict() to identify best levels and expand.grid to generate testdata for model
@@ -44,7 +49,9 @@ CHANGES IN VERSION 1.5.7
   o removed integer-rounding in maximum focusing for all findPeaks 
     parameters except prefilter(I) and steps
   o Update documentation to match code
-  o Remove use of getwd() preventing absolute subdir pathsCHANGES IN VERSION 1.5.6
+  o Remove use of getwd() preventing absolute subdir paths
+  
+CHANGES IN VERSION 1.5.6
 --------------------------
   o updated vignette
   o generally using Central-Composite design instead of Box-Behnken design
