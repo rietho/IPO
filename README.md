@@ -5,7 +5,7 @@ see https://github.com/glibiseller/IPO/blob/master/vignette/IPO.Rmd for help on 
 
 publication available from http://www.biomedcentral.com/1471-2105/16/118
 
-Conformed working version:
+Confirmed working version:
 
 
 Windows:  
