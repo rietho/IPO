@@ -9,5 +9,5 @@ Confirmed working version:
 
 
 Windows:  
-1) Windows XP, R version 3.0.3,  Rtools31.exe, latest IPO  
-2) Windows 7, R version 3.1.2, Rtools32.exe, latest IPO 
+1) Windows XP, R 3.0.3, Rtools31.exe, latest IPO  
+2) Windows  7, R 3.1.2, Rtools32.exe, latest IPO 
