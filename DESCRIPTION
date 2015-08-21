@@ -9,6 +9,7 @@ Maintainer: Libiseller, Gunnar <Gunnar.Libiseller@joanneum.at>
 Depends: xcms, rsm, CAMERA
 Suggests: RUnit, BiocGenerics, msdata, mtbls2
 Enhances: parallel
+VignetteBuilder: knitr
 Description: The outcome of XCMS data processing strongly depends on the parameter settings. IPO 
   (`Isotopologue Parameter Optimization`) is a parameter optimization tool that is applicable for 
   different kinds of samples and liquid chromatography coupled to high resolution mass spectro-
