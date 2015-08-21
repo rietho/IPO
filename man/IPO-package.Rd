@@ -45,7 +45,6 @@ Maintainer: gunnar.libiseller@joanneum.at
 }
 \examples{
 library(msdata)
-library(IPO)
  
 mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
  
