@@ -45,16 +45,15 @@ calculateXcmsSet(files, xcmsSetParameters, scanrange=NULL, task=1, nSlaves=1)
 \code{\link[xcms]{findPeaks}}
 }
 \examples{
-\dontrun{
 mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
-params <- getDefaultXcmsSetStartingParams()
-params$min_peakwidth <- 5
-params$max_peakwidth <- 12
-params$ppm <- 58
-params$mzdiff <- -0.001
+
+params <- list(min_peakwidth=5, max_peakwidth=12, ppm=58,
+                  mzdiff=-0.001, snthresh=10, noise=0, prefilter=3, 
+                  value_of_prefilter=100,  mzCenterFun="wMean", integrate=1, 
+                  fitgauss=FALSE, verbose.columns=FALSE, nSlaves=1)
+
 xset <- calculateXcmsSet(mzmlfile, params)
 
-}
 }
 
 \keyword{method}

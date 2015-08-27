@@ -25,8 +25,8 @@ function(params) {
 getDefaultRetCorCenterSample <-
 function(xset) {
   ret <- NULL
-  for(i in 1:length(xset@filepaths)) {
-    ret <- c(ret, sum(xset@peaks[,"sample"] == i))
+  for(i in 1:length(filepaths(xset))) {
+    ret <- c(ret, sum(peaks(xset)[,"sample"] == i))
   }
   return(which.max(ret))
 }
@@ -125,16 +125,16 @@ function(xset, exp_index=1, retcor_penalty=1) {
 
   relative_rt_diff <- c()
   
-  if(nrow(xset@groups) > 0) {
-    for(i in 1:nrow(xset@groups)) {
-      feature_rtmed <- xset@groups[i, "rtmed"]
+  if(nrow(xcms::groups(xset)) > 0) {
+    for(i in 1:nrow(xcms::groups(xset))) {
+      feature_rtmed <- xcms::groups(xset)[i, "rtmed"]
 	    relative_rt_diff <- c(relative_rt_diff, mean(abs(feature_rtmed - 
-	                                                 xset@peaks[xset@groupidx[[i]], "rt"])/feature_rtmed))
+	                                                 peaks(xset)[groupidx(xset)[[i]], "rt"])/feature_rtmed))
     }
-    good_groups <- sum(unlist(lapply(X=xset@groupidx, FUN=function(x, xset) {
-      ifelse(length(unique(xset@peaks[x,"sample"]))==length(xset@filepaths) & 
-               length(xset@peaks[x,"sample"])==length(xset@filepaths),1,0)}, xset)))
-    bad_groups <- nrow(xset@groups) - good_groups
+    good_groups <- sum(unlist(lapply(X=groupidx(xset), FUN=function(x, xset) {
+      ifelse(length(unique(peaks(xset)[x,"sample"]))==length(filepaths(xset)) & 
+               length(peaks(xset)[x,"sample"])==length(filepaths(xset)),1,0)}, xset)))
+    bad_groups <- nrow(xcms::groups(xset)) - good_groups
   } else {
     relative_rt_diff <- 1
     good_groups <- 0
@@ -174,7 +174,7 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
   while(iterator < 50) {
     message("\n\n")
     message("starting new DoE with:\n")
-    message(paste(rbind(paste(names(params), sep="", ":"), paste(params, sep="")), sep="", "\t"))
+    message(paste(rbind(paste(names(params), sep="", ": "), paste(params, sep="", "\n")),sep=""))
         
     retcor_result <- retGroupCalcExperimentsCluster(params, xset, nSlaves)  
                        

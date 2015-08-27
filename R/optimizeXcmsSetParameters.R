@@ -9,11 +9,11 @@ calcPPS <-
       return(ret)
     } 
     
-    if(nrow(xset@peaks) == 0) {
+    if(nrow(peaks(xset)) == 0) {
       return(ret)
     }
     
-    peak_source <- xset@peaks[,c("mz", "rt", "sample", "into", "mzmin", 
+    peak_source <- peaks(xset)[,c("mz", "rt", "sample", "into", "mzmin", 
                                  "mzmax", "rtmin", "rtmax"),drop=FALSE]
     ret[2] <- nrow(peak_source)
     
@@ -78,7 +78,7 @@ findIsotopes.IPO <-
     }
     
     colnames(iso_mat) <- c("12C", "13C")
-    peak_source <- xset@peaks[,c("mz", "rt", "sample", "into", "maxo", "mzmin",
+    peak_source <- peaks(xset)[,c("mz", "rt", "sample", "into", "maxo", "mzmin",
                                  "mzmax", "rtmin", "rtmax"), drop=FALSE]
     
     for(i in 1:ncol(peak_source)) {
@@ -103,7 +103,7 @@ findIsotopes.IPO <-
       speaks <- peak_source[peak_source[,"sample"]==sample,,drop=FALSE]
       split <- 250
 	  if(!(checkPeakShape=="none"))
-        rawdata <- loadRaw(xcmsSource(xset@filepaths[sample]))
+        rawdata <- loadRaw(xcmsSource(filepaths(xset)[sample]))
       
       if(nrow(speaks)>1) {  		      
         #speaks <- speaks[,-c("sample")]
@@ -311,11 +311,11 @@ findIsotopes.CAMERA <-
       return(iso_mat)
     }
     
-    ids <- xset@peaks[,"sample", drop=FALSE]
+    ids <- peaks(xset)[,"sample", drop=FALSE]
     ids <- cbind(1:length(ids), ids)
     
-    xsets <- split(xset, unique(xset@peaks[,"sample"]))
-    samples <- unique(xset@peaks[,"sample"])
+    xsets <- split(xset, unique(peaks(xset)[,"sample"]))
+    samples <- unique(peaks(xset)[,"sample"])
     for(sample in samples) {
       an <- xsAnnotate(xset, sample=sample)
       isos <- findIsotopes(an, ...)@isoID[,c("mpeak", "isopeak"), drop=FALSE]
@@ -417,7 +417,7 @@ optimizeSlaveCluster <-
     
     #library(xcms)
     xset <- NULL
-    message(sapply(xcmsSet_parameters, "[[", task))
+    #message(sapply(xcmsSet_parameters, "[[", task))
     
     
     xset <- calculateXcmsSet(files, xcmsSet_parameters, scanrange, task)
@@ -460,7 +460,7 @@ optimizeXcmsSet <-
     while(iterator < 50) { #dummy stop :-)
       message("\n\n")
       message("starting new DoE with:")
-      message(paste(rbind(paste(names(params), sep="", ":"), paste(params, sep="")), sep="", "\t"))
+      message(paste(rbind(paste(names(params), sep="", ": "), paste(params, sep="", "\n")),sep=""))
       
       xcms_result <- xcmsSetExperimentsCluster(files, params, scanrange, isotopeIdentification, 
                                                nSlaves, ...) 
@@ -496,7 +496,8 @@ optimizeXcmsSet <-
         best_settings$result <- target_value
         history$best_settings <- best_settings
         
-        message(best_settings)
+        message("best parameter settings:")
+        message(paste(rbind(paste(names(xcms_parameters), sep="", ": "), paste(xcms_parameters, sep="", "\n")),sep=""))
         
         return(history)   
       }

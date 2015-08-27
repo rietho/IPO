@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.7.3
+--------------------------
+  o added runnable examples
+  o decreased size of pictures in vignettes/rsmDirectory
+  o decreased runtime for unit-tests
+  o replaces expand.grid with expand.grid.subset (in utils.R)
+
+
 CHANGES IN VERSION 1.7.2
 --------------------------
   o bugfix: try to prevent error in calcPPS possibly caused by NAs

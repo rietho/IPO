@@ -31,12 +31,11 @@ Gunnar Libiseller
 function (xset) 
 {
     ret <- NULL
-    for (i in 1:length(xset@filepaths)) {
-        ret <- c(ret, sum(xset@peaks[, "sample"] == i))
+    for (i in 1:length(filepaths(xset))) {
+        ret <- c(ret, sum(peaks(xset)[, "sample"] == i))
     }
     return(which.max(ret))
   }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+
 \keyword{method}

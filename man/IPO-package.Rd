@@ -44,16 +44,26 @@ Maintainer: gunnar.libiseller@joanneum.at
 \code{\link[xcms:xcmsSet]{xcms}}
 }
 \examples{
-library(msdata)
- 
-mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
+\dontrun{
+mtbls2files <- list.files(file.path(find.package("mtbls2"), "mzData"), 
+                          full.names=TRUE)
+
  
 paramsPP <- getDefaultXcmsSetStartingParams()
 paramsPP$mzdiff <- -0.001
+#paramsPP$ppm <- 25
 paramsPP$min_peakwidth <- c(7,14)
 paramsPP$max_peakwidth <- c(20,30)
-resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, subdir="microtofq")
-#resultRG <- optimizeRetGroup(resultPP$best_settings$xset)
+paramsPP$noise <- 10000
+resultPP <- optimizeXcmsSet(mtbls2files[1:2], paramsPP, subdir="mtbls2")
 
-#writeRScript(resultPP$best_settings$parameters, resultRG$best_settings, 4)
+
+paramsRG <- getDefaultRetGroupStartingParams()
+paramsRG$gapInit <- 0.2
+paramsRG$profStep <- 1
+paramsRG$minfrac <- 0.75
+resultRG <- optimizeRetGroup(resultPP$best_settings$xset, paramsRG, nSlaves=2)
+
+writeRScript(resultPP$best_settings$parameters, resultRG$best_settings, subdir="mtbls2", 4)
+}
 }

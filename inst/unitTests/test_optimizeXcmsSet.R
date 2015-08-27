@@ -45,7 +45,7 @@ test_ipo <- function() {
   #checking retention time correction and grouping optimization
   mtbls2files <- list.files(paste(find.package("mtbls2"), "/mzData", sep=""), 
                             full.names=TRUE)
-  xset <- xcmsSet(mtbls2files[1:3], method="centWave", peakwidth=(c(12, 30)), ppm=30)
+  xset <- xcmsSet(mtbls2files[1:2], method="centWave", peakwidth=(c(12, 30)), ppm=30, noise=10000, nSlaves=2)
   
   
   #checking obiwarp
@@ -54,9 +54,9 @@ test_ipo <- function() {
   paramsRG$profStep <- 1
   resultRG <- optimizeRetGroup(xset, paramsRG, subdir="mtbls2Obiwarp")
 
-  TV <- resultRG[[4]]$target_value
-  checkTrue(all(unlist(TV)[-c(5)]== c(1, 2656, 1, 7054336, 1)))
-  checkEqualsNumeric(unlist(TV)[5], 1593.865, tolerance=1e-2)
+  TV <- unlist(resultRG[[2]]$target_value)
+  checkTrue(all(TV[-c(5)]== c(1, 185, 0, 34596, 1)))
+  checkEqualsNumeric(TV[5], 1784.002, tolerance=1e-2)
 
   
   #checking single parameter retention time correction and grouping optimization
@@ -65,9 +65,9 @@ test_ipo <- function() {
   paramsRG$mzwid <- 0.01 
   resultRG <- optimizeRetGroup(xset, paramsRG, subdir="mtbls2")
   
-  TV <- resultRG[[4]]$target_value
-  checkTrue(all(unlist(TV)[-c(5)]== c(1, 2652, 1, 7033104, 1)))
-  checkEqualsNumeric(unlist(TV)[5], 1586.247, tolerance=1e-2)
+  TV <- unlist(resultRG[[2]]$target_value)
+  checkTrue(all(TV[-c(5)]== c(1, 185, 0, 34596, 1)))
+  checkEqualsNumeric(TV[5], 1723.209, tolerance=1e-2)
   
   #checking loess
   paramsRG <- getDefaultRetGroupStartingParams("loess")
@@ -75,8 +75,8 @@ test_ipo <- function() {
   paramsRG$missing <- 0
   resultRG <- optimizeRetGroup(xset, paramsRG, subdir="mtbls2Loess")
   
-  TV <- resultRG[[3]]$target_value
-  checkTrue(all(unlist(TV)[-c(5)]== c(1, 2664, 1, 7096896, 1)))
-  checkEqualsNumeric(unlist(TV)[5], 1547.593, tolerance=3e-2)
+  TV <- unlist(resultRG[[2]]$target_value)
+  checkTrue(all(TV[-c(5)]== c(1, 185, 0, 34596, 1)))
+  checkEqualsNumeric(TV[5], 2355.035, tolerance=3e-2)
   
 }

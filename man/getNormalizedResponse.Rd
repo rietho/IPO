@@ -39,29 +39,22 @@ Gunnar Libiseller
   \code{\link{getRGTVValues}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (response) 
-{
-    good_groups <- sapply(response, "[[", "good_groups")
-    bad_groups <- sapply(response, "[[", "bad_groups")
-    bad_groups_bool <- bad_groups == 0
-    bad_groups[bad_groups_bool] <- 1
-    good_groups[bad_groups_bool] <- good_groups[bad_groups_bool] + 
-        1
-    group_ratio <- good_groups^2/bad_groups
-    ARTS <- 1/sapply(response, "[[", "mean_rel_rt_diff")
-    ARTS_penalty <- 1/sapply(response, "[[", "retcor_done")
-    ARTS <- ARTS/ARTS_penalty
-    norm_group_ratio <- (group_ratio - min(group_ratio))/(max(group_ratio) - 
-        min(group_ratio))
-    norm_ARTS <- (ARTS - min(ARTS))/(max(ARTS) - min(ARTS))
-    return(norm_group_ratio + norm_ARTS)
-  }
+mtbls2files <- list.files(file.path(find.package("mtbls2"), "mzData"), 
+                          full.names=TRUE)
+
+params <- list(min_peakwidth=12, max_peakwidth=30, ppm=30,
+                  mzdiff=-0.001, snthresh=10, noise=10000, prefilter=3, 
+                  value_of_prefilter=100,  mzCenterFun="wMean", integrate=1, 
+                  fitgauss=FALSE, verbose.columns=FALSE, nSlaves=2)
+
+xset <- calculateXcmsSet(mtbls2files[1:2], params)
+xset <- retcor(xset, method="obiwarp")
+xset <- group(xset)
+
+result <- getRGTVValues(xset)
+result
+
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+
 \keyword{method}

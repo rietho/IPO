@@ -34,4 +34,25 @@ writeRScript(peakPickingSettings, retCorGroupSettings, nSlaves)
 Gunnar Libiseller
 }
 
+\examples{
+
+#creating list of peak picking parameters
+paramsPP <- list(min_peakwidth=5, max_peakwidth=12, ppm=58,
+                  mzdiff=-0.001, snthresh=10, noise=0, prefilter=3, 
+                  value_of_prefilter=100,  mzCenterFun="wMean", integrate=1, 
+                  fitgauss=FALSE, verbose.columns=FALSE, nSlaves=1)
+                  
+
+#creating list of retention time correction and grouping parameters
+paramsRTCGroup <- list(retcorMethod="obiwarp", distFunc="cor", gapInit=0.2, 
+                       gapExtend=2.4, profStep=1, plottype="none", response=1,  
+                       factorDiag=2, factorGap=1, localAlignment=0, initPenalty=0,
+                       bw=30, minfrac=0.5, minsamp=1, mzwid=0.25, max=50)
+
+#outputting an xcms-script to the display
+writeRScript(paramsPP, paramsRTCGroup, 4)
+
+
+}
+
 \keyword{method}

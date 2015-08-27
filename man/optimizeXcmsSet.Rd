@@ -87,20 +87,20 @@ Gunnar Libiseller
 }
 \examples{
 \dontrun{
-library(IPO)
+
+#library(IPO)
  
-mzdatafiles <- list.files(file.path(find.package("mtbls2"), "mzdata"), 
-                          full.names=TRUE)[1:4]
+mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
  
 paramsPP <- getDefaultXcmsSetStartingParams()
 paramsPP$mzdiff <- -0.001
 paramsPP$min_peakwidth <- c(7,14)
 paramsPP$max_peakwidth <- c(20,30)
 #example using IPO isotope identification
-resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, subdir="mtbls2")
+resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, subdir="mtbls2")
 
 #example using CAMERA isotope identification
-resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, isotopeIdentification="CAMERA", 
+resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, isotopeIdentification="CAMERA", 
                             subdir="mtbls2", ppm=15, maxcharge=2)
 
 }

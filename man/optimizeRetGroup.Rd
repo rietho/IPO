@@ -71,27 +71,29 @@ Gunnar Libiseller
 %  \code{\link{calculateRGTV}}
 }
 \examples{
-\dontrun{
 
-library(IPO)
+\dontrun{
  
-# use this to get an xcmsSet-object with optimized settings or any other xset 
-mzdatafiles <- list.files(file.path(find.package("mtbls2"), "mzdata"), 
-                          full.names=TRUE)[1:4] 
-paramsPP <- getDefaultXcmsSetStartingParams()
-paramsPP$mzdiff <- -0.001
-paramsPP$min_peakwidth <- c(7,14)
-paramsPP$max_peakwidth <- c(20,30)
-resultPP <- optimizeXcmsSet(mzdatafiles, paramsPP, nSlaves=4, subdir="mtbls2")
+
+mtbls2files <- list.files(file.path(find.package("mtbls2"), "mzData"), 
+                          full.names=TRUE)
+
+params <- list(min_peakwidth=12, max_peakwidth=30, ppm=30,
+                  mzdiff=-0.001, snthresh=10, noise=10000, prefilter=3, 
+                  value_of_prefilter=100,  mzCenterFun="wMean", integrate=1, 
+                  fitgauss=FALSE, verbose.columns=FALSE, nSlaves=2)
+
+xset <- calculateXcmsSet(mtbls2files[1:2], params)
+
 
 #optimize the retention time correction and grouping parameters
 paramsRG <- getDefaultRetGroupStartingParams()
 paramsRG$profStep <- 1
 paramsRG$minfrac <- 0.75
-resultRG <- optimizeRetGroup(resultPP$best_settings$xset, params=paramsRG, 
+resultRG <- optimizeRetGroup(xset, params=paramsRG, 
                              nSlaves=4,subdir="mtbls2")
 
-writeRScript(resultPP$best_settings$parameters, resultRG$best_settings, 4)
+writeRScript(params, resultRG$best_settings, 4)
 
 }
 }

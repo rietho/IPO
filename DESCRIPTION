@@ -1,13 +1,13 @@
 Package: IPO
 Type: Package
 Title: Automated Optimization of XCMS Data Processing parameters
-Version: 1.7.2
-Date: 2015-08-06
+Version: 1.7.3
+Date: 2015-08-27
 Author: Libiseller, Gunnar <Gunnar.Libiseller@joanneum.at> 
         Magnes, Christoph <christoph.magnes@joanneum.at>
 Maintainer: Libiseller, Gunnar <Gunnar.Libiseller@joanneum.at>
 Depends: xcms, rsm, CAMERA
-Suggests: RUnit, BiocGenerics, msdata, mtbls2
+Suggests: RUnit, BiocGenerics, msdata, mtbls2, knitr
 Enhances: parallel
 VignetteBuilder: knitr
 Description: The outcome of XCMS data processing strongly depends on the parameter settings. IPO 
