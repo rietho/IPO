@@ -86,7 +86,7 @@ Gunnar Libiseller
   \code{\link{findIsotopes.CAMERA}}
 }
 \examples{
-\dontrun{
+\donttest{
 
 #library(IPO)
  

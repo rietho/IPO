@@ -43,9 +43,11 @@ calcPPS(xset, isotopeIdentification, ...)
   \code{\link{findIsotopes.CAMERA}}
 }
 \examples{
+
 mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
 xset <- xcmsSet(mzmlfile, peakwidth=c(5,12), method="centWave")
 calcPPS(xset)
+
 }
 
 \keyword{method}

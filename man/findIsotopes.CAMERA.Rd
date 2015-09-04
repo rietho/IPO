@@ -35,9 +35,10 @@ findIsotopes.CAMERA(xset, ...)
   \code{\link{findIsotopes.IPO}}
 }
 \examples{
+
 mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
 xset <- xcmsSet(mzmlfile, peakwidth=c(5,12), method="centWave")
-isotopes <- findIsotopes.CAMERA(xset, ppm=15, maxcharge=2)
+isotopes <- findIsotopes.CAMERA(xset, ppm=15, maxcharge=1)
 
 }
 

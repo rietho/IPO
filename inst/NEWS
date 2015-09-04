@@ -1,3 +1,10 @@
+CHANGES IN VERSION 1.7.4
+--------------------------
+  o preceded parallel-functions with 'parallel::' to use right package
+  o fixed bug in function writeRScript using 'loess' retention time cor.
+  o decreased runtime for R CMD check IPO
+
+
 CHANGES IN VERSION 1.7.3
 --------------------------
   o added runnable examples

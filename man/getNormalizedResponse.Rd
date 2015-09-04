@@ -39,6 +39,7 @@ Gunnar Libiseller
   \code{\link{getRGTVValues}}
 }
 \examples{
+\donttest{
 
 mtbls2files <- list.files(file.path(find.package("mtbls2"), "mzData"), 
                           full.names=TRUE)
@@ -54,7 +55,7 @@ xset <- group(xset)
 
 result <- getRGTVValues(xset)
 result
-
+}
 }
 
 \keyword{method}

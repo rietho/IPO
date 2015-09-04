@@ -72,7 +72,7 @@ Gunnar Libiseller
 }
 \examples{
 
-\dontrun{
+\donttest{
  
 
 mtbls2files <- list.files(file.path(find.package("mtbls2"), "mzData"), 

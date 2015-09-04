@@ -604,15 +604,16 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
   tasks <- 1:nrow(design)  
   
   if(nSlaves > 1) {
-    cl <- makeCluster(nSlaves, type = "PSOCK")
+    cl <- parallel::makeCluster(nSlaves, type = "PSOCK")
     response <- matrix(0, nrow=length(design[[1]]), ncol=5)
  
     #exporting all functions to cluster but only calcPPS and toMatrix are needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
-    clusterExport(cl, ex)
-    response <- parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, example_sample, 
-                          scanrange, isotopeIdentification, ..., USE.NAMES=FALSE)
-    stopCluster(cl)
+    parallel::clusterExport(cl, ex)
+    response <- parallel::parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, 
+                                    example_sample, scanrange, isotopeIdentification,
+                                    ..., USE.NAMES=FALSE)
+    parallel::stopCluster(cl)
   } else {
     response <- sapply(tasks, optimizeSlaveCluster, xcms_design, example_sample, 
                        scanrange, isotopeIdentification, ...)

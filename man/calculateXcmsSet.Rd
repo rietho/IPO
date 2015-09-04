@@ -45,6 +45,7 @@ calculateXcmsSet(files, xcmsSetParameters, scanrange=NULL, task=1, nSlaves=1)
 \code{\link[xcms]{findPeaks}}
 }
 \examples{
+
 mzmlfile <- file.path(find.package("msdata"), "microtofq/MM14.mzML")
 
 params <- list(min_peakwidth=5, max_peakwidth=12, ppm=58,

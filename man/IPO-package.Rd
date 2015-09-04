@@ -64,6 +64,7 @@ paramsRG$profStep <- 1
 paramsRG$minfrac <- 0.75
 resultRG <- optimizeRetGroup(resultPP$best_settings$xset, paramsRG, nSlaves=2)
 
-writeRScript(resultPP$best_settings$parameters, resultRG$best_settings, subdir="mtbls2", 4)
+writeRScript(resultPP$best_settings$parameters, resultRG$best_settings, 
+             subdir="mtbls2", 4)
 }
 }

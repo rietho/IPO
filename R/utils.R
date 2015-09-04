@@ -405,14 +405,14 @@ function(peakPickingSettings, retCorGroupSettings, nSlaves) {
                   ", minsamp=", round(retCorGroupSettings$minsamp), 
                   ", max=", round(retCorGroupSettings$max), ")", sep=""))	 
     
-    message(paste("xset <- retcor(xset, method=\"loess\", missing=", 
-                  round(retCorGroupSettings$missing), 
+    message(paste("xset <- retcor(xset", 
+                  ", missing=", round(retCorGroupSettings$missing), 
                   ", extra=", round(retCorGroupSettings$extra),
                   ", span=", retCorGroupSettings$span, 
                   ", smooth=\"", retCorGroupSettings$smooth, 
-                  ", family=\"", retCorGroupSettings$family,         
-                  ", plottype=\"", retCorGroupSettings$plottype,
-                  ")", sep=""))	 
+                  "\", family=\"", retCorGroupSettings$family,         
+                  "\", plottype=\"", retCorGroupSettings$plottype,
+                  "\")", sep=""))	 
   }  
   
   if(retCorGroupSettings$retcorMethod == "obiwarp") {

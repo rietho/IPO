@@ -36,13 +36,14 @@ getRGTVValues(xset, exp_index = 1, retcor_penalty = 1)
 Gunnar Libiseller
 }
 \examples{
-
-mtbls2files <- list.files(paste(find.package("mtbls2"), "/mzData", sep=""), 
+\donttest{
+  mtbls2files <- list.files(paste(find.package("mtbls2"), "/mzData", sep=""), 
                             full.names=TRUE)
-xset <- xcmsSet(mtbls2files[1:3], method="centWave", peakwidth=(c(12, 30)), ppm=30)
-xset <- retcor(xset, method="obiwarp")
-xset <- group(xset)
-getRGTVValues(xset)
-
+  xset <- xcmsSet(mtbls2files[1:2], method="centWave", peakwidth=(c(12, 30)), 
+                  ppm=30, noise=10000)
+  xset <- retcor(xset, method="obiwarp")
+  xset <- group(xset)
+  getRGTVValues(xset)
+}
 }
 \keyword{method}

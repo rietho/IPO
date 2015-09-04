@@ -13,7 +13,8 @@
   group.density parameters: 'bw', 'minfrac', 'mzwid'\cr  
 }
 \usage{
-  getDefaultRetGroupStartingParams(retcorMethod=c("obiwarp", "loess", "none"), distfunc=c("cor_opt", "cor", "cov", "prd", "euc"), high_resolution=TRUE)
+  getDefaultRetGroupStartingParams(retcorMethod=c("obiwarp", "loess", "none"), 
+  distfunc=c("cor_opt", "cor", "cov", "prd", "euc"), high_resolution=TRUE)
 }
 
 \arguments{
@@ -39,7 +40,8 @@
   (e.g. params$max <- 10)
 }
 \value{
-  A List of parameters used in the xcms-methods retcor.obiwarp or retcor.loess and group.density
+  A List of parameters used in the xcms-methods retcor.obiwarp or 
+  retcor.loess and group.density
 }
 \author{
 Gunnar Libiseller
