@@ -604,7 +604,7 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
   tasks <- 1:nrow(design)  
   
   if(nSlaves > 1) {
-    cl <- parallel::makeCluster(nSlaves, type = "PSOCK")
+    cl <- parallel::makeCluster(nSlaves, type = getClusterType())
     response <- matrix(0, nrow=length(design[[1]]), ncol=5)
  
     #exporting all functions to cluster but only calcPPS and toMatrix are needed
