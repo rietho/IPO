@@ -609,7 +609,9 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
  
     #exporting all functions to cluster but only calcPPS and toMatrix are needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
-    parallel::clusterExport(cl, ex)
+    if(identical(getClusterType(),"PSOCK")) {
+      parallel::clusterExport(cl, ex)
+    }
     response <- parallel::parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, 
                                     example_sample, scanrange, isotopeIdentification,
                                     ..., USE.NAMES=FALSE)

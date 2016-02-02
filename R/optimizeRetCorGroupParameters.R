@@ -331,7 +331,9 @@ function(params, xset, nSlaves=4) {
     cl <- parallel::makeCluster(nSlaves, type = getClusterType(), outfile="log_ret.txt")
   #exporting all functions to cluster but only calcRGTV is needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
-    parallel::clusterExport(cl, ex)
+    if(identical(getClusterType(),"PSOCK")) {
+      parallel::clusterExport(cl, ex)
+    }
     result <- parallel::parLapply(cl, tasks, optimizeRetGroupSlaveCluster, xset, 
                                   parameters)
     parallel::stopCluster(cl)
