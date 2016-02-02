@@ -328,7 +328,7 @@ function(params, xset, nSlaves=4) {
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
   if(nSlaves > 1) {
-    cl <- parallel::makeCluster(nSlaves, type = getClusterType())  #, outfile="log.txt")
+    cl <- parallel::makeCluster(nSlaves, type = getClusterType(), outfile="log_ret.txt")
   #exporting all functions to cluster but only calcRGTV is needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
     parallel::clusterExport(cl, ex)
