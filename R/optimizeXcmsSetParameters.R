@@ -611,7 +611,9 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
     #exporting all functions to cluster but only calcPPS and toMatrix are needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
     if(identical(cl_type,"PSOCK")) {
-      print("Exporting variables to cluster...")
+      message("Using PSOCK type cluster, this increases memory requirements.")
+      message("Reduce number of slaves if your have out of memory errors.")
+      message("Exporting variables to cluster...")
       parallel::clusterExport(cl, ex)
     }
     response <- parallel::parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, 
