@@ -604,12 +604,14 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
   tasks <- 1:nrow(design)  
   
   if(nSlaves > 1) {
-    cl <- parallel::makeCluster(nSlaves, type = getClusterType())
+    cl_type<-getClusterType()
+    cl <- parallel::makeCluster(nSlaves, type = cl_type)
     response <- matrix(0, nrow=length(design[[1]]), ncol=5)
  
     #exporting all functions to cluster but only calcPPS and toMatrix are needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
-    if(identical(getClusterType(),"PSOCK")) {
+    if(identical(cl_type,"PSOCK")) {
+      print("Exporting variables to cluster...")
       parallel::clusterExport(cl, ex)
     }
     response <- parallel::parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, 
