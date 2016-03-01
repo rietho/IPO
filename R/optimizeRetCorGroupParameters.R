@@ -328,10 +328,16 @@ function(params, xset, nSlaves=4) {
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
   if(nSlaves > 1) {
-    cl <- parallel::makeCluster(nSlaves, type = "PSOCK")  #, outfile="log.txt")
+    cl_type<-getClusterType()
+    cl <- parallel::makeCluster(nSlaves, type = cl_type) #, outfile="log.txt")
   #exporting all functions to cluster but only calcRGTV is needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
-    parallel::clusterExport(cl, ex)
+    if(identical(cl_type,"PSOCK")) {
+      message("Using PSOCK type cluster, this increases memory requirements.")
+      message("Reduce number of slaves if your have out of memory errors.")
+      message("Exporting variables to cluster...")
+      parallel::clusterExport(cl, ex)
+    }
     result <- parallel::parLapply(cl, tasks, optimizeRetGroupSlaveCluster, xset, 
                                   parameters)
     parallel::stopCluster(cl)

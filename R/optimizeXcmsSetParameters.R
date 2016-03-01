@@ -604,12 +604,18 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
   tasks <- 1:nrow(design)  
   
   if(nSlaves > 1) {
-    cl <- parallel::makeCluster(nSlaves, type = "PSOCK")
+    cl_type<-getClusterType()
+    cl <- parallel::makeCluster(nSlaves, type = cl_type)
     response <- matrix(0, nrow=length(design[[1]]), ncol=5)
  
     #exporting all functions to cluster but only calcPPS and toMatrix are needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
-    parallel::clusterExport(cl, ex)
+    if(identical(cl_type,"PSOCK")) {
+      message("Using PSOCK type cluster, this increases memory requirements.")
+      message("Reduce number of slaves if your have out of memory errors.")
+      message("Exporting variables to cluster...")
+      parallel::clusterExport(cl, ex)
+    }
     response <- parallel::parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, 
                                     example_sample, scanrange, isotopeIdentification,
                                     ..., USE.NAMES=FALSE)

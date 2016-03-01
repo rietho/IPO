@@ -446,3 +446,12 @@ writeParamsTable <-
 function(peakPickingSettings, retCorGroupSettings, file, ...) {
   write.table(combineParams(peakPickingSettings, retCorGroupSettings), file, ...)
 }
+
+
+getClusterType <-
+function() {
+  if( .Platform$OS.type=="unix" ) {
+    return("FORK")
+  }
+  return("PSOCK")
+}
