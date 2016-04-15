@@ -328,6 +328,9 @@ function(params, xset, nSlaves=4) {
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
   if(nSlaves > 1) {
+    # unload snow (if loaded) to prevent conflicts with usage of package 'parallel'
+    unloadNamespace("snow")
+    
     cl_type<-getClusterType()
     cl <- parallel::makeCluster(nSlaves, type = cl_type) #, outfile="log.txt")
   #exporting all functions to cluster but only calcRGTV is needed

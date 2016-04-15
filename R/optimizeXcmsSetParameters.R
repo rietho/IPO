@@ -604,6 +604,9 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
   tasks <- 1:nrow(design)  
   
   if(nSlaves > 1) {
+    # unload snow (if loaded) to prevent conflicts with usage of package 'parallel'
+    unloadNamespace("snow")
+    
     cl_type<-getClusterType()
     cl <- parallel::makeCluster(nSlaves, type = cl_type)
     response <- matrix(0, nrow=length(design[[1]]), ncol=5)
