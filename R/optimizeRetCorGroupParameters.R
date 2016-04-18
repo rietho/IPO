@@ -329,7 +329,8 @@ function(params, xset, nSlaves=4) {
   
   if(nSlaves > 1) {
     # unload snow (if loaded) to prevent conflicts with usage of package 'parallel'
-    unloadNamespace("snow")
+    if('snow' %in% rownames(installed.packages()))
+      unloadNamespace("snow")
     
     cl_type<-getClusterType()
     cl <- parallel::makeCluster(nSlaves, type = cl_type) #, outfile="log.txt")
