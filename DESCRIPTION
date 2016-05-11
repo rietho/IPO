@@ -31,6 +31,6 @@ Description: The outcome of XCMS data processing strongly depends on the
     surface models.
 License: GPL (>= 2) + file LICENSE
 URL: https://github.com/glibiseller/IPO
-BugReports: https://github.com/glibiseller/IPOs/issues/new
+BugReports: https://github.com/glibiseller/IPO/issues/new
 biocViews: Metabolomics, MassSpectrometry
 RoxygenNote: 5.0.1
