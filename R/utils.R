@@ -493,3 +493,12 @@ function(peakPickingSettings, retCorGroupSettings, file, ...) {
                             retCorGroupSettings), 
               file, ...)
 }
+
+
+getClusterType <-
+function() {
+  if( .Platform$OS.type=="unix" ) {
+    return("FORK")
+  }
+  return("PSOCK")
+}

@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.7.5
+--------------------------
+  o added usage of clustering method FORK on unix-systems (thanks to Pablo Moreno)
+  o fixed bug in parallelization to prevent conflicts with package 'snow'
+
+
 CHANGES IN VERSION 1.7.4
 --------------------------
   o preceded parallel-functions with 'parallel::' to use right package

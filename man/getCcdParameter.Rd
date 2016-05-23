@@ -40,9 +40,8 @@ Gunnar Libiseller
  \code{\link{getBbdParameter}}
 }
 \examples{
-
 params <- getDefaultXcmsSetStartingParams()
 typ_params <- typeCastParams(params)
 design <- getCcdParameter(typ_params$to_optimize) 
-
+}
 \keyword{method}
