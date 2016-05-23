@@ -4,7 +4,7 @@
 	Writes XCMS settings to a file.
 }
 \description{
-	This function write findPeaks, retcor and grouping parameters to a
+	This function writes findPeaks, retcor and grouping parameters to a
 	file using write.table.
 }
 \usage{

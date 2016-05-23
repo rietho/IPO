@@ -2,10 +2,13 @@ checkRetGroupSetParams <-
 function(params) {
 
   if(params$retcorMethod == "obiwarp") {
-    quantitative_parameters <- c("profStep", "gapInit", "gapExtend", "response", "factorDiag", 
+    quantitative_parameters <- 
+      c("profStep", "gapInit", "gapExtend", "response", "factorDiag", 
                                  "factorGap")
-    qualitative_parameters <- c("distFunc", "plottype", "localAlignment", "center")
-    unsupported_parameters <- c("col", "ty", "initPenalty")
+    qualitative_parameters <- 
+      c("distFunc", "plottype", "localAlignment", "center")
+    unsupported_parameters <- 
+      c("col", "ty", "initPenalty")
   } else {
     if(params$retcorMethod == "loess") {
       quantitative_parameters <- c("missing", "extra", "span")
@@ -14,11 +17,13 @@ function(params) {
     }    
   }
   
-  quantitative_parameters <- c(quantitative_parameters, "minfrac", "minsamp", "bw", "mzwid", "max")
-  unsupported_parameters <- c(unsupported_parameters, "sleep")
+  quantitative_parameters <- 
+    c(quantitative_parameters, "minfrac", "minsamp", "bw", "mzwid", "max")
+  unsupported_parameters <- 
+    c(unsupported_parameters, "sleep")
   
-
-  checkParams(params, quantitative_parameters, qualitative_parameters, unsupported_parameters)
+  checkParams(params, quantitative_parameters, qualitative_parameters, 
+              unsupported_parameters)
 }
 
 

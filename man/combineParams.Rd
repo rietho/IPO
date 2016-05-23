@@ -5,7 +5,7 @@
 }
 \description{
 	This function combines two lists of parameters. The first is a list of parameters
-	which should be optimized. This parameters have different values set by Design of 
+	which should be optimized. These parameters have different values set by Design of 
 	Experimnt. The second list consists of parameters which should not be optimized, 
 	hence only one value is set for each parameter. The parameters of the second list
 	are replicated to have the same length as the number experiments in the DoE. Then

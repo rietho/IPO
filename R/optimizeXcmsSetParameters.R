@@ -252,8 +252,12 @@ getIntensitiesFromRawdata <- function(rawdata, peak) {
   for(i in 1:(length(scanIndices)-1)) {
     scanRange <- c(scanIndices[i]+1, scanIndices[i+1])
     mz <- rawdata$mz[scanRange[1]:scanRange[2]]
-    y <- c(y, max(0, (rawdata$intensity[scanRange[1]:scanRange[2]][mz >= peak[,"mzmin"] & 
-                                                                     mz <= peak[,"mzmax"]])))  
+    y <- 
+      c(y, 
+        max(0, (rawdata$intensity[scanRange[1]:scanRange[2]][
+          mz >= peak[,"mzmin"] & mz <= peak[,"mzmax"]])
+            )
+        )
   }
   
   y
@@ -339,56 +343,73 @@ calcMaximumCarbon <-
     
   }    
 
-calculateXcmsSet <- function(files, xcmsSetParameters, scanrange=NULL, task=1, nSlaves=1) {
+calculateXcmsSet <- 
+  function(files, xcmsSetParameters, scanrange=NULL, task=1, nSlaves=1) {
   xset <- NULL  
   
-  if(is.null(xcmsSetParameters$step)) {     #centWave    
-    xset <- xcmsSet(files=files, method="centWave", 
-                    peakwidth=c(xcmsSetParameters$min_peakwidth[task], xcmsSetParameters$max_peakwidth[task]),
-                    ppm=xcmsSetParameters$ppm[task], 
-                    noise=xcmsSetParameters$noise[task], 
-                    snthresh=xcmsSetParameters$snthresh[task], 
-                    mzdiff=xcmsSetParameters$mzdiff[task],
-                    prefilter=c(xcmsSetParameters$prefilter[task], xcmsSetParameters$value_of_prefilter[task]),
-                    mzCenterFun=xcmsSetParameters$mzCenterFun[task], 
-                    integrate=xcmsSetParameters$integrate[task],
-                    fitgauss=xcmsSetParameters$fitgauss[task], 
-                    verbose.columns=xcmsSetParameters$verbose.columns[task],
-                    scanrange=scanrange, 
-                    nSlaves=nSlaves*xcmsSetParameters$nSlaves[task])
+  if(is.null(xcmsSetParameters$step)) { # centWave    
+    xset <- 
+      xcmsSet(files = files, 
+              method = "centWave", 
+              peakwidth = 
+                c(xcmsSetParameters$min_peakwidth[task],
+                  xcmsSetParameters$max_peakwidth[task]),
+              ppm         = xcmsSetParameters$ppm[task], 
+              noise       = xcmsSetParameters$noise[task], 
+              snthresh    = xcmsSetParameters$snthresh[task], 
+              mzdiff      = xcmsSetParameters$mzdiff[task],
+              prefilter = 
+                c(xcmsSetParameters$prefilter[task],
+                  xcmsSetParameters$value_of_prefilter[task]),
+              mzCenterFun = xcmsSetParameters$mzCenterFun[task], 
+              integrate   = xcmsSetParameters$integrate[task],
+              fitgauss    = xcmsSetParameters$fitgauss[task], 
+              verbose.columns = 
+                xcmsSetParameters$verbose.columns[task],
+              scanrange   = scanrange, 
+              nSlaves     = nSlaves*xcmsSetParameters$nSlaves[task])
     
   } else {     #matchedFilter  
-    try(xset <- xcmsSet(files=files, method="matchedFilter", 
-                        fwhm=xcmsSetParameters$fwhm[task], 
-                        snthresh=xcmsSetParameters$snthresh[task],
-                        step=xcmsSetParameters$step[task], 
-                        steps=xcmsSetParameters$steps[task],
-                        sigma=xcmsSetParameters$sigma[task], 
-                        max=xcmsSetParameters$max[task], 
-                        mzdiff=xcmsSetParameters$mzdiff[task], 
-                        index=xcmsSetParameters$index[task],
-                        scanrange=scanrange, 
-                        nSlaves=nSlaves*xcmsSetParameters$nSlaves[task]))  
+    try(xset <- 
+          xcmsSet(files     = files, 
+                  method    = "matchedFilter", 
+                  fwhm      = xcmsSetParameters$fwhm[task], 
+                  snthresh  = xcmsSetParameters$snthresh[task],
+                  step      = xcmsSetParameters$step[task], 
+                  steps     = xcmsSetParameters$steps[task],
+                  sigma     = xcmsSetParameters$sigma[task], 
+                  max       = xcmsSetParameters$max[task], 
+                  mzdiff    = xcmsSetParameters$mzdiff[task], 
+                  index     = xcmsSetParameters$index[task],
+                  scanrange = scanrange, 
+                  nSlaves   = nSlaves*xcmsSetParameters$nSlaves[task]))  
   }
-  
   return(xset)
-  
 }
 
 
 checkXcmsSetParams <-
   function(params) {
-    if(is.null(params$step)) {     #centWave   
-      quantitative_parameters <- c("ppm", "min_peakwidth", "max_peakwidth", "snthresh", "mzdiff", "noise", 
-                                   "prefilter", "value_of_prefilter")
-      qualitative_parameters <- c("integrate", "fitgauss", "verbose.columns", "mzCenterFun", "nSlaves")
-      unsupported_parameters <- c("sleep", "ROI.list") #"scanrange" can only be set, but not optimized
+    if(is.null(params$step)) { # centWave   
+      quantitative_parameters <- 
+        c("ppm", "min_peakwidth", "max_peakwidth", "snthresh", 
+          "mzdiff", "noise", "prefilter", "value_of_prefilter")
+      qualitative_parameters <- 
+        c("integrate", "fitgauss", "verbose.columns", "mzCenterFun",
+          "nSlaves")
+      unsupported_parameters <- 
+        c("sleep", "ROI.list") # "scanrange" can only be set,
+                               # but not optimized
     } else {    
-      quantitative_parameters <- c("fwhm", "sigma", "max", "snthresh", "step", "steps", "mzdiff")
-      qualitative_parameters <- c("index", "nSlaves")
-      unsupported_parameters <- c("sleep")  
+      quantitative_parameters <- 
+        c("fwhm", "sigma", "max", "snthresh", "step", "steps", "mzdiff")
+      qualitative_parameters <- 
+        c("index", "nSlaves")
+      unsupported_parameters <- 
+        c("sleep")  
     } 
-    checkParams(params, quantitative_parameters, qualitative_parameters, unsupported_parameters)
+    checkParams(params, quantitative_parameters, qualitative_parameters,
+                unsupported_parameters)
   }
 
 
@@ -398,14 +419,30 @@ getDefaultXcmsSetStartingParams <-
     method <- match.arg(method)
     
     if(method=="centWave")
-      return(list(min_peakwidth=c(12,28), max_peakwidth=c(35,65), ppm=c(17,32),
-                  mzdiff=c(-0.001, 0.01), snthresh=10, noise=0, prefilter=3, 
-                  value_of_prefilter=100,  mzCenterFun="wMean", integrate=1, 
-                  fitgauss=FALSE, verbose.columns=FALSE, nSlaves=1))
+      return(list(min_peakwidth      = c(12,28), 
+                  max_peakwidth      = c(35,65), 
+                  ppm                = c(17,32),
+                  mzdiff             = c(-0.001, 0.01), 
+                  snthresh           = 10, 
+                  noise              = 0, 
+                  prefilter          = 3, 
+                  value_of_prefilter = 100,  
+                  mzCenterFun        = "wMean", 
+                  integrate          = 1, 
+                  fitgauss           = FALSE, 
+                  verbose.columns    = FALSE, 
+                  nSlaves            = 1))
     
     if(method=="matchedFilter")
-      return(list(fwhm=c(25,35), snthresh=c(3,17), step=c(0.05, 0.15), steps=c(1,3), 
-                  sigma=0, max=5, mzdiff=0, index=FALSE, nSlaves=1)) 
+      return(list(fwhm     = c(25,35), 
+                  snthresh = c(3,17), 
+                  step     = c(0.05, 0.15), 
+                  steps    = c(1,3), 
+                  sigma    = 0,
+                  max      = 5, 
+                  mzdiff   = 0, 
+                  index    = FALSE, 
+                  nSlaves  = 1)) 
     
   }
 
@@ -432,8 +469,9 @@ optimizeSlaveCluster <-
 
 
 optimizeXcmsSet <-
-  function(files=NULL, params=getDefaultXcmsSetStartingParams(), isotopeIdentification=
-             c("IPO", "CAMERA"), nSlaves=4, subdir="IPO", ...) { 
+  function(files=NULL, params=getDefaultXcmsSetStartingParams(), 
+           isotopeIdentification=c("IPO", "CAMERA"), nSlaves=4, 
+           subdir="IPO", ...) { 
     
     scanrange <- params$scanrange
     params$scanrange <- NULL    
@@ -446,6 +484,7 @@ optimizeXcmsSet <-
     
     isotopeIdentification <- match.arg(isotopeIdentification)
     
+    # only matchedFilter-method has parameter fwhm
     centWave <- is.null(params$fwhm)  
     
     history <- list()
@@ -460,12 +499,15 @@ optimizeXcmsSet <-
     while(iterator < 50) { #dummy stop :-)
       message("\n\n")
       message("starting new DoE with:")
-      message(paste(rbind(paste(names(params), sep="", ": "), paste(params, sep="", "\n")),sep=""))
+      message(paste(rbind(paste(names(params), sep="", ": "), 
+                          paste(params, sep="", "\n")),sep=""))
       
-      xcms_result <- xcmsSetExperimentsCluster(files, params, scanrange, isotopeIdentification, 
-                                               nSlaves, ...) 
+      xcms_result <- 
+        xcmsSetExperimentsCluster(files, params, scanrange, 
+                                  isotopeIdentification, nSlaves, ...) 
 	  
-      xcms_result <- xcmsSetStatistic(files, scanrange, isotopeIdentification, xcms_result, 
+      xcms_result <- xcmsSetStatistic(files, scanrange, 
+                                      isotopeIdentification, xcms_result, 
                                       subdir, iterator, nSlaves, ...)
       history[[iterator]] <- xcms_result     
       params <- xcms_result$params 
@@ -481,9 +523,11 @@ optimizeXcmsSet <-
           }
         }
         
-        xcms_parameters <- as.list(decodeAll(history[[max_index]]$max_settings[-1], 
-                                             history[[max_index]]$params$to_optimize))      
-        xcms_parameters <- combineParams(xcms_parameters, params$no_optimization)
+        xcms_parameters <- 
+          as.list(decodeAll(history[[max_index]]$max_settings[-1],
+                            history[[max_index]]$params$to_optimize))      
+        xcms_parameters <- combineParams(xcms_parameters, 
+                                         params$no_optimization)
         
         if(!is.list(xcms_parameters))
           xcms_parameters <- as.list(xcms_parameters)
@@ -497,7 +541,9 @@ optimizeXcmsSet <-
         history$best_settings <- best_settings
         
         message("best parameter settings:")
-        message(paste(rbind(paste(names(xcms_parameters), sep="", ": "), paste(xcms_parameters, sep="", "\n")),sep=""))
+        message(paste(rbind(paste(names(xcms_parameters), 
+                                  sep="", ": "), 
+                            paste(xcms_parameters, sep="", "\n")), sep=""))
         
         return(history)   
       }
@@ -507,14 +553,23 @@ optimizeXcmsSet <-
         parameter_setting <- xcms_result$max_settings[i+1]
         bounds <- params$to_optimize[[i]] 
         fact <- names(params$to_optimize)[i]
-        min_factor <- ifelse(fact=="min_peakwidth", 3, ifelse(fact=="mzdiff", ifelse(centWave,-100000000, 0.001), 
+        min_factor <- 
+          ifelse(fact=="min_peakwidth", 3, 
+                 ifelse(fact=="mzdiff", 
+                        ifelse(centWave,-100000000, 0.001), 
                              ifelse(fact=="step",0.0005,1)))
         
-        #if the parameter is NA, we increase the range by 20%, if it was within the inner 
-        #25% of the previous range or at the minimum value we decrease the range by 20%
-        step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) < best_range), 
-                              0.8, ifelse(parameter_setting==-1 & decode(-1, params$to_optimize[[i]]) ==
-                              min_factor,0.8,1)))
+        # if the parameter is NA, we increase the range by 20%, 
+        # if it was within the inner 
+        # 25% of the previous range or at the minimum value we decrease 
+        # the range by 20%
+        step_factor <- 
+          ifelse(is.na(parameter_setting), 1.2, 
+                 ifelse((abs(parameter_setting) < best_range), 
+                              0.8, 
+                        ifelse(parameter_setting==-1 & 
+                                 decode(-1, params$to_optimize[[i]]) ==
+                              min_factor, 0.8, 1)))
         step <- (diff(bounds) / 2) * step_factor
         
         if(is.na(parameter_setting))
@@ -530,7 +585,8 @@ optimizeXcmsSet <-
         
         names(new_bounds) <- NULL         
         
-        if(names(params$to_optimize)[i] == "steps" | names(params$to_optimize)[i] == "prefilter") {
+        if(names(params$to_optimize)[i] == "steps" | 
+           names(params$to_optimize)[i] == "prefilter") {
           params$to_optimize[[i]] <- round(new_bounds, 0)
         } else { 
           params$to_optimize[[i]] <- new_bounds
@@ -539,17 +595,24 @@ optimizeXcmsSet <-
       
       if(centWave) {
         #checking peakwidths plausiability
-        if(!is.null(params$to_optimize$min_peakwidth) | !is.null(params$to_optimize$max_peakwidth)) {
-          pw_min <- ifelse(is.null(params$to_optimize$min_peakwidth), params$no_optimization$min_peakwidth, 
-                           max(params$to_optimize$min_peakwidth))
-          pw_max <- ifelse(is.null(params$to_optimize$max_peakwidth), params$no_optimization$max_peakwidth, 
-                           min(params$to_optimize$max_peakwidth))
+        if(!is.null(params$to_optimize$min_peakwidth) | 
+           !is.null(params$to_optimize$max_peakwidth)) {
+          pw_min <- 
+            ifelse(is.null(params$to_optimize$min_peakwidth), 
+                   params$no_optimization$min_peakwidth, 
+                   max(params$to_optimize$min_peakwidth))
+          pw_max <- 
+            ifelse(is.null(params$to_optimize$max_peakwidth), 
+                   params$no_optimization$max_peakwidth, 
+                   min(params$to_optimize$max_peakwidth))
           if(pw_min >= pw_max) {
             additional <- abs(pw_min-pw_max) + 1
             if(!is.null(params$to_optimize$max_peakwidth)) {		  
-              params$to_optimize$max_peakwidth <- params$to_optimize$max_peakwidth + additional
+              params$to_optimize$max_peakwidth <- 
+                params$to_optimize$max_peakwidth + additional
             } else {
-              params$no_optimization$max_peakwidth <- params$no_optimization$max_peakwidth + additional
+              params$no_optimization$max_peakwidth <- 
+                params$no_optimization$max_peakwidth + additional
             }
           }
         }
@@ -610,6 +673,7 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
     #exporting all functions to cluster but only calcPPS and toMatrix are needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
     parallel::clusterExport(cl, ex)
+    parallel::clusterCall(cl, function() library(xcms))
     response <- parallel::parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, 
                                     example_sample, scanrange, isotopeIdentification,
                                     ..., USE.NAMES=FALSE)
@@ -644,15 +708,20 @@ function(files, scanrange, isotopeIdentification, xcms_result, subdir, iterator,
   xcms_result$model <- model                  
      
   max_settings <- getMaximumLevels(xcms_result$model)
-  tmp <- max_settings[1,-1]
-  tmp[is.na(tmp)] <- 1
+  
+  # plotting rms
+  tmp <- max_settings[1,-1] # first row without response
+  tmp[is.na(tmp)] <- 1 # if Na (i.e. -1, and 1), show +1
   if(!is.null(subdir) & length(tmp) > 1)
-    plotContours(xcms_result$model, tmp, paste(subdir,"/rsm_", iterator, sep=""))
+    plotContours(xcms_result$model, tmp, 
+                 paste(subdir, "/rsm_", iterator, sep=""))
 	
   xcms_result$max_settings <- max_settings
   
-  xcms_parameters <- as.list(decodeAll(max_settings[-1], params$to_optimize))      
-  xcms_parameters <- combineParams(xcms_parameters, params$no_optimization)
+  xcms_parameters <- 
+    as.list(decodeAll(max_settings[-1], params$to_optimize))      
+  xcms_parameters <- 
+    combineParams(xcms_parameters, params$no_optimization)
         
   if(!is.list(xcms_parameters))
      xcms_parameters <- as.list(xcms_parameters)
