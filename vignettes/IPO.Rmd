@@ -1,6 +1,6 @@
 ---
 title: "XCMS Parameter Optimization with IPO"
-author: "Gunnar Libiseller<br>Joanneum Research Forschungsgesellschaft m.b.H., Graz, Austria"
+author: "Gunnar Libiseller<br>JOANNEUM RESEARCH Forschungsgesellschaft m.b.H., Graz, Austria"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -20,7 +20,9 @@ are recommended. The optimization process looks as following:
 
 <br>
 <b>IPO optimization process</b>
-<p><img src="FlowChart.jpg"" width="695" height="745"</p>
+<p>
+<img src="FlowChart.jpg" width="695" height="745">
+</p>
 
 ## Installation
 
@@ -38,7 +40,8 @@ install.packages("rsm")
 
 <b>Install RTools</b><br><br>
   For windows:<br>
-    Download and install RTools from [http://cran.r-project.org/bin/windows/Rtools/](http://cran.r-project.org/bin/windows/Rtools/)<br>
+    Download and install RTools from 
+      [http://cran.r-project.org/bin/windows/Rtools/](http://cran.r-project.org/bin/windows/Rtools/)<br>
   For Unix: <br>
     Install the R-development-packages (r-devel or r-base-dev)<br>
 <br>
@@ -62,9 +65,11 @@ install_github("glibiseller/IPO")
 <b>Installing suggested packages</b>
 
 ```{r install_IPO_suggestions, eval=FALSE}
-#installing suggested packages
-biocLite("msdata") #for examples of peak picking parameter optimization
-install_github("sneumann/mtbls2") #for examples of optimization of retention time correction and grouping parameters
+# installing suggested packages
+biocLite("msdata") # for examples of peak picking parameter optimization
+# for examples of optimization of retention time correction and grouping
+# parameters:
+install_github("sneumann/mtbls2")
 install.packages("RUnit") #needed for Unittest when checking the package
 
 ```
@@ -141,8 +146,11 @@ peakpickingParameters$min_peakwidth <- c(10,20)
 peakpickingParameters$max_peakwidth <- c(26,42)
 #setting only one value for ppm therefore this parameter is not optimized
 peakpickingParameters$ppm <- 20 
-resultPeakpicking <- optimizeXcmsSet(files=mzdatafiles[1:4], 
-                         params=peakpickingParameters, nSlaves=4, subdir='rsmDirectory')
+resultPeakpicking <- 
+  optimizeXcmsSet(files = mzdatafiles[1:4], 
+                  params = peakpickingParameters, 
+                  nSlaves = 4, 
+                  subdir = 'rsmDirectory')
 optimizedXcmsSetObject <- resultPeakpicking$best_settings$xset
 
 ```
@@ -153,19 +161,20 @@ parameter optimization of peak picking look as following:
 
 <br>
 <b>Response surface models of DoE 1 of peak picking parameter optimization</b>
-<p><img src="rsmDirectory/rsm_1.jpg"" width="695" height="521"</p>
+<p><img src="rsmDirectory/rsm_1.jpg" width="695" height="521"></p>
 <br>
 <b>Response surface models of DoE 2 of peak picking parameter optimization</b>
-<p><img src="rsmDirectory/rsm_2.jpg"" width="695" height="521"</p>
+<p><img src="rsmDirectory/rsm_2.jpg" width="695" height="521"></p>
 <br>
 <b>Response surface models of DoE 3 of peak picking parameter optimization</b>
-<p><img src="rsmDirectory/rsm_3.jpg"" width="695" height="521"</p>
+<p><img src="rsmDirectory/rsm_3.jpg" width="695" height="521"></p>
 
 
 ```{r plot_peak_picking_rsm, echo=FALSE, fig.width=9, fig.height=7}
 
 #  DoEs <- (length(resultPeakpicking)-1)
-#  opt_params <- sum(unlist(lapply(peakpickingParameters, function(x) {length(x)==2})))
+#  opt_params <- 
+#   sum(unlist(lapply(peakpickingParameters, function(x) {length(x)==2})))
 #  
 #  plots <- c()
 #  for(i in 1:(opt_params-1)) {
@@ -175,7 +184,8 @@ parameter optimization of peak picking look as following:
 #  }
 #  
 #  plot_rows <- round(sqrt(length(plots)))
-#  plot_cols <- if(plot_rows==1){length(plots)}else{ceiling(sqrt(length(plots)))}
+#  plot_cols <- 
+#   if(plot_rows==1){length(plots)}else{ceiling(sqrt(length(plots)))}
 #  
 #  for(i in 1:3) {#(DoEs)) {
 #    #plot.new()
@@ -183,7 +193,8 @@ parameter optimization of peak picking look as following:
 #    max <- resultPeakpicking[[i]]$max_settings[-1]
 #    max[is.na(max)] <- 1
 #    contours <- contour(resultPeakpicking[[i]]$model, plots, image=TRUE, at=max) 
-#    mtext(paste('Response surface models of DoE', i), side = 3, line = -2, outer = TRUE)
+#    mtext(paste('Response surface models of DoE', i), side = 3, 
+#     line = -2, outer = TRUE)
 #  } 
 
 ```
@@ -234,8 +245,11 @@ optimized retention time correction and grouping parameters
 ```{r optimize_retcor_group, eval=FALSE}
 retcorGroupParameters <- getDefaultRetGroupStartingParams()
 retcorGroupParameters$profStep <- 1
-resultRetcorGroup <- optimizeRetGroup(xset=optimizedXcmsSetObject, params=retcorGroupParameters, 
-                         nSlaves=4, subdir="rsmDirectory")
+resultRetcorGroup <-
+  optimizeRetGroup(xset = optimizedXcmsSetObject, 
+                   params = retcorGroupParameters, 
+                   nSlaves = 4, 
+                   subdir = "rsmDirectory")
 
 ```
 
@@ -244,23 +258,35 @@ The response surface models of all optimization steps for the
 retention time correction and grouping parameters look as following:
 
 <br>
-<b>Response surface models of DoE 1 of retention time correction and grouping parameter optimization</b>
-<p><img src="rsmDirectory/retgroup_rsm_1.jpg"" width="695" height="348"</p>
+<b>
+  Response surface models of DoE 1 of retention time correction and grouping 
+  parameter optimization</b>
+<p><img src="rsmDirectory/retgroup_rsm_1.jpg" width="695" height="348"></p>
 <br>
-<b>Response surface models of DoE 2 of retention time correction and grouping parameter optimizationn</b>
-<p><img src="rsmDirectory/retgroup_rsm_2.jpg"" width="695" height="348"</p>
+<b>
+  Response surface models of DoE 2 of retention time correction and grouping 
+  parameter optimizationn
+</b>
+<p><img src="rsmDirectory/retgroup_rsm_2.jpg" width="695" height="348"></p>
 <br>
-<b>Response surface models of DoE 3 of retention time correction and grouping parameter optimization</b>
-<p><img src="rsmDirectory/retgroup_rsm_3.jpg"" width="695" height="348"</p>
+<b>
+  Response surface models of DoE 3 of retention time correction and grouping 
+  parameter optimization
+</b>
+<p><img src="rsmDirectory/retgroup_rsm_3.jpg" width="695" height="348"></p>
 <br>
-<b>Response surface models of DoE 4 of retention time correction and grouping parameter optimization</b>
-<p><img src="rsmDirectory/retgroup_rsm_4.jpg"" width="695" height="348"</p>
+<b>
+  Response surface models of DoE 4 of retention time correction and grouping 
+  parameter optimization
+</b>
+<p><img src="rsmDirectory/retgroup_rsm_4.jpg" width="695" height="348"></p>
 
 
 ```{r plot_retcor_group_rsm, echo=FALSE, fig.width=9, fig.height=7}
 
 # DoEs <- (length(resultRetcorGroup)-1)
-# opt_params <- sum(unlist(lapply(retcorGroupParameters, function(x) {length(x)==2})))
+# opt_params <- 
+#   sum(unlist(lapply(retcorGroupParameters, function(x) {length(x)==2})))
 # 
 # plots <- c()
 # for(i in 1:(opt_params-1)) {
@@ -278,7 +304,8 @@ retention time correction and grouping parameters look as following:
 #   max <- resultRetcorGroup[[i]]$max_settings[-1]
 #   max[is.na(max)] <- 1
 #   contours <- contour(resultRetcorGroup[[i]]$model, plots, image=TRUE, at=max) 
-#   mtext(paste('Response surface models of DoE', i), side = 3, line = -2, outer = TRUE)
+#   mtext(paste('Response surface models of DoE', i), side = 3, 
+#     line = -2, outer = TRUE)
 # }
 
 
@@ -296,7 +323,9 @@ can be generated by using the function 'writeRScript'.
 
 
 ```{r display_settings, eval=FALSE}
-writeRScript(resultPeakpicking$best_settings$parameters, resultRetcorGroup$best_settings, nSlaves=4)
+writeRScript(resultPeakpicking$best_settings$parameters, 
+             resultRetcorGroup$best_settings, 
+             nSlaves=4)
 
 ```
 

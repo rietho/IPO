@@ -1,5 +1,4 @@
-attachList <-
-function(params_1, params_2) {
+attachList <- function(params_1, params_2) {
   params <- params_1
   for(factor in params_2)
 	params[[length(params)+1]] <- factor
@@ -9,9 +8,11 @@ function(params_1, params_2) {
 }
 
 
-checkParams <-
-function(params, quantitative_parameters, qualitative_parameters, 
-         unsupported_parameters) { 
+checkParams <- 
+  function(params, 
+           quantitative_parameters,
+           qualitative_parameters, 
+           unsupported_parameters) { 
 
   if(length(typeCastParams(params)$to_optimize)==0) {
     stop("No parameters for optimization specified; stopping!")  
@@ -59,8 +60,7 @@ function(params, quantitative_parameters, qualitative_parameters,
 }
 
 
-combineParams <-
-function(params_1, params_2) {
+combineParams <- function(params_1, params_2) {
   len <- max(unlist(sapply(params_1, length)))
   #num_params <- length(params_1)
   
@@ -108,8 +108,7 @@ function(params_1, params_2) {
 
 }
 
-createModel <-
-function(design, params, resp) {
+createModel <- function(design, params, resp) {
   # add response to the design, which gives the data for the model
   design$resp <- resp
   if(length(params) > 1) {
@@ -136,8 +135,7 @@ function(design, params, resp) {
 }
 
 
-decode <-
-function(value, bounds) {
+decode <- function(value, bounds) {
   if(is.na(value))
     value <- 1
   x <- (value+1)/2 # from [-1,1] to [0, 1]
@@ -147,8 +145,7 @@ function(value, bounds) {
 }
 
 
-decodeAll <-
-function(values, params) {
+decodeAll <- function(values, params) {
 
   ret <- rep(0, length(params))
   for(i in 1:length(params))
@@ -159,16 +156,14 @@ function(values, params) {
   return(ret)
 }
 
-encode <-
-function(value, bounds) {
+encode <- function(value, bounds) {
   x <- (value - min(bounds)) / (max(bounds) - min(bounds))
   
   return(x*2-1)
 }
 
 
-getBbdParameter <-
-function(params) {
+getBbdParameter <- function(params) {
  
   lower_bounds <- unlist(lapply(X=params, FUN=function(x) x[1]))
   higher_bounds <- unlist(lapply(X=params, FUN=function(x) x[2]))
@@ -188,8 +183,7 @@ function(params) {
 }
 
 
-getCcdParameter <-
-function(params) {
+getCcdParameter <- function(params) {
  
   lower_bounds <- unlist(lapply(X=params, FUN=function(x) x[1]))
   higher_bounds <- unlist(lapply(X=params, FUN=function(x) x[2]))
@@ -220,8 +214,7 @@ function(params) {
 
 
 
-getMaximumLevels <-
-function(model) {  
+getMaximumLevels <- function(model) {  
   # dimension of the modeled space
   dimensions <- length(model$coding)
   
@@ -261,7 +254,7 @@ function(model) {
   
 }
 
-getMaxSettings <-  function(testdata, model) {
+getMaxSettings <- function(testdata, model) {
     
   response <- predict(model, testdata)
   max_response <- max(response)
@@ -326,15 +319,15 @@ expand.grid.subset  <- function(subset, sequence, dimensions) {
 #  if(parameters > 5)
 #    step <- 0.2
 
-#  m <- matrix(rep(seq(-1,1,step),parameters), byrow=FALSE, ncol=parameters,   dimnames=list(NULL, paste("x", 1:parameters,  sep=""))) 
+#  m <- matrix(rep(seq(-1,1,step),parameters), byrow=FALSE, ncol=parameters,   
+#  dimnames=list(NULL, paste("x", 1:parameters,  sep=""))) 
   #colnames(m) <-  paste("x", 1:parameters,  sep="")
   
 #  return(expand.grid(data.frame(m)))
 #}
 
 
-plotContours <-
-function(model, maximum_slice, plot_name) {
+plotContours <- function(model, maximum_slice, plot_name) {
   # generate for all variable combinations formulas
   # (which will give the plots)
   plots <- c()
@@ -371,8 +364,7 @@ function(model, maximum_slice, plot_name) {
 }
 
 
-toMatrix <-
-function(data) {
+toMatrix <- function(data) {
 
   if(!is.matrix(data)) {
     tmp <- names(data)
@@ -385,8 +377,7 @@ function(data) {
 }
 
 
-typeCastParams <-
-function(params) {
+typeCastParams <- function(params) {
   ret_1 <- list()
   ret_2 <- list()  
   ret <- list()
@@ -407,8 +398,7 @@ function(params) {
 }
 
 
-writeRScript <-
-function(peakPickingSettings, retCorGroupSettings, nSlaves) {
+writeRScript <- function(peakPickingSettings, retCorGroupSettings, nSlaves) {
   message("library(xcms)\n")
   message("library(Rmpi)\n")
 
@@ -487,16 +477,18 @@ function(peakPickingSettings, retCorGroupSettings, nSlaves) {
 }
 
 
-writeParamsTable <- 
-function(peakPickingSettings, retCorGroupSettings, file, ...) {
+writeParamsTable <-  
+  function(peakPickingSettings, 
+           retCorGroupSettings, 
+           file, 
+           ...) {
   write.table(combineParams(peakPickingSettings, 
                             retCorGroupSettings), 
               file, ...)
 }
 
 
-getClusterType <-
-function() {
+getClusterType <- function() {
   if( .Platform$OS.type=="unix" ) {
     return("FORK")
   }

@@ -1,5 +1,4 @@
-checkRetGroupSetParams <-
-function(params) {
+checkRetGroupSetParams <- function(params) {
 
   if(params$retcorMethod == "obiwarp") {
     quantitative_parameters <- 
@@ -27,8 +26,7 @@ function(params) {
 }
 
 
-getDefaultRetCorCenterSample <-
-function(xset) {
+getDefaultRetCorCenterSample <- function(xset) {
   ret <- NULL
   for(i in 1:length(filepaths(xset))) {
     ret <- c(ret, sum(peaks(xset)[,"sample"] == i))
@@ -38,8 +36,9 @@ function(xset) {
 
 
 getDefaultRetGroupStartingParams <-
-function(retcorMethod = c("obiwarp", "loess", "none"), distfunc=c("cor_opt", "cor", "cov", "prd", "euc"), 
-         high_resolution=TRUE) {
+  function(retcorMethod = c("obiwarp", "loess", "none"), 
+           distfunc=c("cor_opt", "cor", "cov", "prd", "euc"), 
+           high_resolution=TRUE) {
 
   retcorMethod <- match.arg(retcorMethod)
   ret <- NULL  
@@ -47,15 +46,25 @@ function(retcorMethod = c("obiwarp", "loess", "none"), distfunc=c("cor_opt", "co
   if(retcorMethod == "obiwarp") {
     distfunc <- match.arg(distfunc)
     if(distfunc=="cor")
-      ret <- (list(distFunc="cor", gapInit=c(0.0, 0.4), gapExtend=c(2.1, 2.7)))
+      ret <- (list(distFunc="cor", 
+                   gapInit=c(0.0, 0.4), 
+                   gapExtend=c(2.1, 2.7)))
 	  if(distfunc=="cor_opt")
-	    ret <- (list(distFunc="cor_opt", gapInit=c(0.0, 0.4), gapExtend=c(2.1, 2.7)))
+	    ret <- (list(distFunc="cor_opt", 
+	                 gapInit=c(0.0, 0.4), 
+	                 gapExtend=c(2.1, 2.7)))
     if(distfunc=="cov")
-	    ret <- (list(distFunc="cov", gapInit=c(0.0, 0.4), gapExtend=c(11.4, 12.0)))
+	    ret <- (list(distFunc="cov", 
+	                 gapInit=c(0.0, 0.4), 
+	                 gapExtend=c(11.4, 12.0)))
 	  if(distfunc=="prd")
-	    ret <- (list(distFunc="prd", gapInit=c(0.0, 0.4), gapExtend=c(7.5, 8.1)))
+	    ret <- (list(distFunc="prd", 
+	                 gapInit=c(0.0, 0.4), 
+	                 gapExtend=c(7.5, 8.1)))
 	  if(distfunc=="euc")
-	    ret <- (list(distFunc="euc", gapInit=c(0.7, 1.1), gapExtend=c(1.5, 2.1)))
+	    ret <- (list(distFunc="euc", 
+	                 gapInit=c(0.7, 1.1), 
+	                 gapExtend=c(1.5, 2.1)))
 
     ret$profStep <- c(0.7, 1)
     ret$plottype <- "none"
@@ -98,8 +107,7 @@ function(retcorMethod = c("obiwarp", "loess", "none"), distfunc=c("cor_opt", "co
 }
 
 
-getNormalizedResponse <-
-function(response) {
+getNormalizedResponse <- function(response) {
 
   #good_groups <- sapply(response, "[[", "good_groups")
   #bad_groups <- sapply(response, "[[", "bad_groups")
@@ -125,20 +133,25 @@ function(response) {
 }
 
 
-getRGTVValues <-
-function(xset, exp_index=1, retcor_penalty=1) {
+getRGTVValues <- function(xset, exp_index=1, retcor_penalty=1) {
 
   relative_rt_diff <- c()
   
   if(nrow(xcms::groups(xset)) > 0) {
     for(i in 1:nrow(xcms::groups(xset))) {
       feature_rtmed <- xcms::groups(xset)[i, "rtmed"]
-	    relative_rt_diff <- c(relative_rt_diff, mean(abs(feature_rtmed - 
-	                                                 peaks(xset)[groupidx(xset)[[i]], "rt"])/feature_rtmed))
+	    relative_rt_diff <- 
+	      c(relative_rt_diff, 
+	        mean(abs(feature_rtmed - 
+	                   peaks(xset)[groupidx(xset)[[i]], "rt"]) / feature_rtmed))
     }
-    good_groups <- sum(unlist(lapply(X=groupidx(xset), FUN=function(x, xset) {
-      ifelse(length(unique(peaks(xset)[x,"sample"]))==length(filepaths(xset)) & 
-               length(peaks(xset)[x,"sample"])==length(filepaths(xset)),1,0)}, xset)))
+    good_groups <- 
+      sum(unlist(lapply(X=groupidx(xset), FUN = function(x, xset) {
+        ifelse(length(unique(peaks(xset)[x,"sample"])) == 
+                 length(filepaths(xset)) & 
+                 length(peaks(xset)[x,"sample"]) == 
+                 length(filepaths(xset)), 1, 0)
+      }, xset)))
     bad_groups <- nrow(xcms::groups(xset)) - good_groups
   } else {
     relative_rt_diff <- 1
@@ -151,8 +164,11 @@ function(xset, exp_index=1, retcor_penalty=1) {
   
   ARTS <- (mean(relative_rt_diff)) * retcor_penalty
   
-  ret <- list(exp_index=exp_index, good_groups=good_groups, bad_groups=bad_groups, 
-              GS=tmp_good_groups^2/tmp_bad_groups, RCS=1/ARTS)
+  ret <- list(exp_index   = exp_index, 
+              good_groups = good_groups, 
+              bad_groups  = bad_groups, 
+              GS          = tmp_good_groups^2/tmp_bad_groups, 
+              RCS         = 1/ARTS)
   
   ret$retcor_done = retcor_penalty        
   
@@ -160,8 +176,11 @@ function(xset, exp_index=1, retcor_penalty=1) {
 }
 
 
-optimizeRetGroup <-
-function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO") {
+optimizeRetGroup <- 
+  function(xset, 
+           params=getDefaultRetGroupStartingParams(), 
+           nSlaves=4, 
+           subdir="IPO") {
                                                  
   iterator = 1 
   history <- list()  
@@ -179,11 +198,15 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
   while(iterator < 50) {
     message("\n\n")
     message("starting new DoE with:\n")
-    message(paste(rbind(paste(names(params), sep="", ": "), paste(params, sep="", "\n")),sep=""))
+    message(paste(rbind(paste(names(params), sep="", ": "), 
+                        paste(params, sep="", "\n")),
+                  sep=""))
         
-    retcor_result <- retGroupCalcExperimentsCluster(params, xset, nSlaves)  
+    retcor_result <- 
+      retGroupCalcExperimentsCluster(params, xset, nSlaves)  
                        
-    retcor_result <- retGroupExperimentStatistic(retcor_result, subdir, iterator, xset)
+    retcor_result <- 
+      retGroupExperimentStatistic(retcor_result, subdir, iterator, xset)
     
     history[[iterator]] <- retcor_result 
          
@@ -208,8 +231,9 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
                    ifelse(curParam == "bw",0.25,
                    ifelse(curParam == "span",0.001,0))))		
       
-      step_factor <- ifelse(is.na(parameter_setting), 1.2, ifelse((abs(parameter_setting) <= best_range), 
-                                                                  0.8, 1))
+      step_factor <- 
+        ifelse(is.na(parameter_setting), 1.2, 
+               ifelse((abs(parameter_setting) <= best_range), 0.8, 1))
       step <- (diff(bounds) / 2) * step_factor
       
       if(is.na(parameter_setting)) {      
@@ -229,7 +253,8 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
            #center around optimum
            new_center <- decode(parameter_setting, bounds)
            step <- diff(bounds) / 2
-	         if(abs(parameter_setting) < best_range) { #if parameter are within range, decrease parameter-range
+           #if parameter are within range, decrease parameter-range
+	         if(abs(parameter_setting) < best_range) { 
 	           step <- step * 0.8
            }
 
@@ -273,12 +298,12 @@ function(xset, params=getDefaultRetGroupStartingParams(), nSlaves=4, subdir="IPO
   return(history)
 }
 
-optimizeRetGroupSlaveCluster <-
-function(task, xset, parameters) {
+optimizeRetGroupSlaveCluster <- function(task, xset, parameters) {
       
   processedData <- retcorGroup(xset, parameters, task)
 
-  result <- getRGTVValues(processedData$xset, task, processedData$retcor_failed)
+  result <- 
+    getRGTVValues(processedData$xset, task, processedData$retcor_failed)
 	return(result)
 
   
@@ -286,8 +311,7 @@ function(task, xset, parameters) {
 
 
 
-RCSandGSIncreased <-
-function(history) {
+RCSandGSIncreased <- function(history) {
 
   index = length(history)
   if(index < 2)
@@ -306,7 +330,9 @@ function(history) {
     prev_tv$good_groups = prev_tv$good_groups + 1
   }
   
-  if((cur_tv$good_groups^2/cur_tv$bad_groups <= prev_tv$good_groups^2/prev_tv$bad_groups) | (cur_tv$RCS <= prev_tv$RCS))
+  if((cur_tv$good_groups^2/cur_tv$bad_groups <= 
+      prev_tv$good_groups^2/prev_tv$bad_groups) | 
+     (cur_tv$RCS <= prev_tv$RCS))
     return(FALSE)
     
   return(TRUE)
@@ -314,8 +340,7 @@ function(history) {
 }
 
 
-retGroupCalcExperimentsCluster <-
-function(params, xset, nSlaves=4) {
+retGroupCalcExperimentsCluster <- function(params, xset, nSlaves=4) {
 
   typ_params <- typeCastParams(params)
   
@@ -326,20 +351,24 @@ function(params, xset, nSlaves=4) {
     design <- data.frame(run.order=1:9, a=seq(-1,1,0.25))
     colnames(design)[2] <- names(typ_params$to_optimize)
     parameters <- design
-    parameters[,2] <- seq(min(typ_params$to_optimize[[1]]), max(typ_params$to_optimize[[1]]), diff(typ_params$to_optimize[[1]])/8)
+    parameters[,2] <- 
+      seq(min(typ_params$to_optimize[[1]]), 
+          max(typ_params$to_optimize[[1]]), 
+          diff(typ_params$to_optimize[[1]])/8)
   }  
   
   tasks <- as.list(1:nrow(design))      
   parameters <- combineParams(parameters, typ_params$no_optimization)
   
   if(nSlaves > 1) {
-    # unload snow (if loaded) to prevent conflicts with usage of package 'parallel'
+    # unload snow (if loaded) to prevent conflicts with usage of 
+    # package 'parallel'
     if('snow' %in% rownames(installed.packages()))
       unloadNamespace("snow")
     
     cl_type<-getClusterType()
     cl <- parallel::makeCluster(nSlaves, type = cl_type) #, outfile="log.txt")
-  #exporting all functions to cluster but only calcRGTV is needed
+    #exporting all functions to cluster but only calcRGTV is needed
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
     if(identical(cl_type,"PSOCK")) {
       message("Using PSOCK type cluster, this increases memory requirements.")
@@ -367,8 +396,7 @@ function(params, xset, nSlaves=4) {
 
 }
 
-retGroupExperimentStatistic <-
-function(retcor_result, subdir, iterator, xset) {
+retGroupExperimentStatistic <- function(retcor_result, subdir, iterator, xset) {
 
   params <- retcor_result$params
   resp <- getNormalizedResponse(retcor_result$response)
@@ -380,7 +408,9 @@ function(retcor_result, subdir, iterator, xset) {
   tmp <- max_settings[1,-1]
   tmp[is.na(tmp)] <- 1
   if(!is.null(subdir) & length(tmp) > 1)
-    plotContours(retcor_result$model, tmp, paste(subdir,"/retgroup_rsm_", iterator, sep=""))
+    plotContours(retcor_result$model, 
+                 tmp, 
+                 paste(subdir, "/retgroup_rsm_", iterator, sep = ""))
       
   parameters <- as.list(decodeAll(max_settings[-1], params$to_optimize)) 
   parameters <- combineParams(parameters, params$no_optimization)
@@ -389,7 +419,8 @@ function(retcor_result, subdir, iterator, xset) {
   exp_index <- 1  
   processedData <- retcorGroup(xset_tmp, parameters, exp_index)
 
-  tv <- getRGTVValues(processedData$xset, exp_index, processedData$retcor_failed)
+  tv <- 
+    getRGTVValues(processedData$xset, exp_index, processedData$retcor_failed)
 
   retcor_result$max_settings <- max_settings
   retcor_result$target_value <- tv   
@@ -406,19 +437,27 @@ retcorGroup <- function(xset, parameters, exp_index=1) {
   retcor_failed = ifelse(do_retcor, 1.1, 1) 
   
   if(parameters$retcorMethod[exp_index] == "loess") {
-    try(xset <- group(xset, method="density", 
-                      bw=parameters$bw[exp_index], 
-                      mzwid=parameters$mzwid[exp_index], 
-                      minfrac=parameters$minfrac[exp_index], 
-                      minsamp=parameters$minsamp[exp_index], 
-                      max=parameters$max[exp_index])) 
+    try(
+      xset <- group(
+        xset, 
+        method  = "density", 
+        bw      = parameters$bw[exp_index], 
+        mzwid   = parameters$mzwid[exp_index], 
+        minfrac = parameters$minfrac[exp_index], 
+        minsamp = parameters$minsamp[exp_index], 
+        max     = parameters$max[exp_index])
+      )
     
-    try(retcor_failed <- retcor(xset, method="loess", 
-                                plottype=parameters$plottype[exp_index], 
-                                family=parameters$family[exp_index],
-                                missing=parameters$missing[exp_index], 
-                                extra=parameters$extra[exp_index], 
-                                span=parameters$span[exp_index]))  		  
+    try(
+      retcor_failed <- retcor(
+        xset, 
+        method   = "loess", 
+        plottype = parameters$plottype[exp_index], 
+        family   = parameters$family[exp_index],
+        missing  = parameters$missing[exp_index], 
+        extra    = parameters$extra[exp_index], 
+        span     = parameters$span[exp_index])
+      )  		  
     
     if(!is.numeric(retcor_failed)) {
       xset <- retcor_failed
@@ -427,30 +466,41 @@ retcorGroup <- function(xset, parameters, exp_index=1) {
   }
   
   if(parameters$retcorMethod[exp_index] == "obiwarp") {
-    try(retcor_failed <- retcor(xset, method="obiwarp", 
-                                plottype=parameters$plottype[exp_index], 
-                                distFunc=parameters$distFunc[exp_index],
-                                profStep=parameters$profStep[exp_index], 
-                                center=parameters$center[exp_index], 
-                                response=parameters$response[exp_index], 
-                                gapInit=parameters$gapInit[exp_index], 
-                                gapExtend=parameters$gapExtend[exp_index],
-                                factorDiag=parameters$factorDiag[exp_index],
-                                factorGap=parameters$factorGap[exp_index], 
-                                localAlignment=parameters$localAlignment[exp_index]))  	
+    try(
+      retcor_failed <- 
+        retcor(xset, 
+               method         = "obiwarp", 
+               plottype       = parameters$plottype[exp_index], 
+               distFunc       = parameters$distFunc[exp_index],
+               profStep       = parameters$profStep[exp_index], 
+               center         = parameters$center[exp_index], 
+               response       = parameters$response[exp_index], 
+               gapInit        = parameters$gapInit[exp_index], 
+               gapExtend      = parameters$gapExtend[exp_index],
+               factorDiag     = parameters$factorDiag[exp_index],
+               factorGap      = parameters$factorGap[exp_index], 
+               localAlignment = parameters$localAlignment[exp_index])
+      )  	
     
     if(!is.numeric(retcor_failed)) {
       xset <- retcor_failed
-      retcor_failed=1
+      retcor_failed = 1
     }       
   } 
   
-  try(xset <- group(xset, method="density", bw=parameters$bw[exp_index], 
-                    mzwid=parameters$mzwid[exp_index], minfrac=parameters$minfrac[exp_index], 
-                    minsamp=parameters$minsamp[exp_index], max=parameters$max[exp_index]))
+  try(
+    xset <- group(
+      xset, 
+      method  = "density", 
+      bw      = parameters$bw[exp_index], 
+      mzwid   = parameters$mzwid[exp_index], 
+      minfrac = parameters$minfrac[exp_index], 
+      minsamp = parameters$minsamp[exp_index], 
+      max     = parameters$max[exp_index])
+    )
   
   
-  return(list(xset=xset, retcor_failed=retcor_failed))
+  return(list(xset = xset, retcor_failed = retcor_failed))
 }
 
 

@@ -1,5 +1,4 @@
-calcPPS <-
-  function(xset, isotopeIdentification=c("IPO", "CAMERA"), ...) {
+calcPPS <- function(xset, isotopeIdentification=c("IPO", "CAMERA"), ...) {
     
     isotopeIdentification <- match.arg(isotopeIdentification)
     
@@ -43,7 +42,8 @@ calcPPS <-
         int_cutoff <- mean(tmp[1:max(round((length(tmp)/33),0),1)])
       
         masses <- speaks[!na_int, "mz"]
-        maximum_carbon <- calcMaximumCarbon(masses)#floor((masses-2*CH3)/CH2) + 2
+        #floor((masses-2*CH3)/CH2) + 2
+        maximum_carbon <- calcMaximumCarbon(masses)
         carbon_probabilty <- maximum_carbon*isotope_abundance
       
         iso_int <- intensities * carbon_probabilty
@@ -68,7 +68,8 @@ calcPPS <-
 
 
 findIsotopes.IPO <- 
-  function(xset, checkPeakShape=c("none", "borderIntensity", "sinusCurve", "normalDistr")) {
+  function(xset, checkPeakShape=c("none", "borderIntensity", "sinusCurve", 
+                                  "normalDistr")) {
     
     checkPeakShape <- match.arg(checkPeakShape)
     
@@ -117,20 +118,24 @@ findIsotopes.IPO <-
           } else {          
             upper_bound <- speaks[split,"mzmax"] + isotope_mass          
             end_point <- sum(speaks[,"mz"] < upper_bound)
-            part_peaks <- speaks[1:end_point,,drop=FALSE] #toMatrix(speaks[1:end_point,])
+            part_peaks <- speaks[1:end_point,,drop=FALSE]
           }		
           
           rt <- part_peaks[,"rt"]
           rt_window <- rt * 0.005
           rt_lower <- part_peaks[,"rt"] - rt_window
           rt_upper <- part_peaks[,"rt"] + rt_window
-          rt_matrix <-  t(matrix(rep(rt, nrow(part_peaks)), ncol=nrow(part_peaks)))
+          rt_matrix <-  
+            t(matrix(rep(rt, nrow(part_peaks)), ncol=nrow(part_peaks)))
           rt_matrix_bool <- rt_matrix >= rt_lower & rt_matrix <= rt_upper
           
           mz <- part_peaks[,"mz"]
-          mz_lower <- part_peaks[,"mzmin"] + isotope_mass #isotope_masses - mz_window
-          mz_upper <- part_peaks[,"mzmax"] + isotope_mass #isotope_masses + mz_window
-          mz_matrix <-  t(matrix(rep(mz, nrow(part_peaks)), ncol=nrow(part_peaks)))
+          #isotope_masses - mz_window
+          mz_lower <- part_peaks[,"mzmin"] + isotope_mass
+          #isotope_masses + mz_window
+          mz_upper <- part_peaks[,"mzmax"] + isotope_mass
+          mz_matrix <-  
+            t(matrix(rep(mz, nrow(part_peaks)), ncol=nrow(part_peaks)))
           mz_matrix_bool <- mz_matrix >= mz_lower & mz_matrix <= mz_upper
           
           rt_mz_matrix_bool <- rt_matrix_bool & mz_matrix_bool
@@ -142,29 +147,36 @@ findIsotopes.IPO <-
           for(i in rt_mz_peak_ids) {
             current <- part_peaks[i, ,drop=FALSE]
             rt_mz_peaks <- part_peaks[rt_mz_matrix_bool[i,],,drop=FALSE]
-            rt_difference <- abs(current[,"rt"] - rt_mz_peaks[, "rt"]) / current[,"rt"]
+            rt_difference <- 
+              abs(current[,"rt"] - rt_mz_peaks[, "rt"]) / current[,"rt"]
             rt_mz_peaks <- cbind(rt_mz_peaks, rt_difference)
             #test intensity_window
-            maximum_carbon <- calcMaximumCarbon(current[,"mz"]) #floor((current["mz"]-2*CH3)/CH2) + 2
+            #floor((current["mz"]-2*CH3)/CH2) + 2
+            maximum_carbon <- calcMaximumCarbon(current[,"mz"]) 
             carbon_probabilty <- c(1,maximum_carbon)*isotope_abundance
             iso_intensity <- current[,"into"] * carbon_probabilty
             
-            int_bools <- rt_mz_peaks[,"into"] >= iso_intensity[1] & rt_mz_peaks[,"into"] <= iso_intensity[2]
+            int_bools <- 
+              rt_mz_peaks[,"into"] >= iso_intensity[1] & 
+              rt_mz_peaks[,"into"] <= iso_intensity[2]
             
             if(sum(int_bools) > 0) {
               int_peaks <- rt_mz_peaks[int_bools,,drop=FALSE]
               boundary_bool <- rep(TRUE, (nrow(int_peaks)+1))
               if(!(checkPeakShape=="none")) {
                 if(checkPeakShape=="borderIntensity") {
-                  boundary_bool <- checkIntensitiesAtRtBoundaries(rawdata, 
-                                          rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
+                  boundary_bool <- checkIntensitiesAtRtBoundaries(
+                    rawdata, 
+                    rbind(current,int_peaks[,-ncol(int_peaks), drop=FALSE]))
                 } else {
                   if(checkPeakShape=="sinusCurve") {                
-                    boundary_bool <- checkSinusDistribution(rawdata, 
-                                          rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
+                    boundary_bool <- checkSinusDistribution(
+                      rawdata, 
+                      rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
                   } else {                  
-                    boundary_bool <- checkNormalDistribution(rawdata, 
-                                          rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
+                    boundary_bool <- checkNormalDistribution(
+                      rawdata, 
+                      rbind(current,int_peaks[,-ncol(int_peaks),drop=FALSE]))
                   }
                 }
               } #else {
@@ -172,7 +184,8 @@ findIsotopes.IPO <-
               #}              
               if(boundary_bool[1] & sum(boundary_bool[-1])>0) {                 
                 iso_peaks <- int_peaks[boundary_bool[-1],,drop=FALSE]
-                iso_id <- iso_peaks[which.min(iso_peaks[,"rt_difference"]), "id"]
+                iso_id <- 
+                  iso_peaks[which.min(iso_peaks[,"rt_difference"]), "id"]
                 #iso_list[[length(iso_list)+1]] <- c(current[,"id"], iso_id)            
                 iso_mat <- rbind(iso_mat, c(current[,"id"], iso_id))                
               }
@@ -186,9 +199,13 @@ findIsotopes.IPO <-
     return(iso_mat)
   }
 
-#checking intensities at rtmin and rtmax. peaks[,"maxo"] must be at least double as high
-#does not work for retention time corrected data 
-checkIntensitiesAtRtBoundaries <- function(rawdata, peaks, minBoundaryToMaxo=1/3, ppmstep=15) {
+# checking intensities at rtmin and rtmax. peaks[,"maxo"] must be at least 
+# double as high does not work for retention time corrected data 
+checkIntensitiesAtRtBoundaries <-
+  function(rawdata, 
+           peaks, 
+           minBoundaryToMaxo=1/3, 
+           ppmstep=15) {
   ret <- rep(TRUE, nrow(peaks))
   for(i in 1:nrow(peaks)) {
     peak <- peaks[i,]
@@ -206,7 +223,8 @@ checkIntensitiesAtRtBoundaries <- function(rawdata, peaks, minBoundaryToMaxo=1/3
         intensities <- rawdata$intensity[(rtIndices[1]+1):rtIndices[2]]
         
         ppm <- peak[c("mzmin", "mzmax")]*ppmstep/1000000
-        mzIntensities <- c(0,intensities[mz>=peak["mzmin"]-ppm[1] & mz<=peak["mzmax"]+ppm[2]])
+        mzIntensities <- 
+          c(0, intensities[mz>=peak["mzmin"]-ppm[1] & mz<=peak["mzmax"]+ppm[2]])
         maxBoundaryIntensity <- max(mzIntensities)
         ret[i] <- ret[i] & maxBoundaryIntensity<peak["maxo"]*minBoundaryToMaxo
       }
@@ -239,7 +257,8 @@ getIntensitiesFromRawdata <- function(rawdata, peak) {
   rt <- rawdata$rt >= peak[,"rtmin"] & rawdata$rt <= peak[,"rtmax"]
 
   rtRange <- c(min(which(rt)), max(which(rt))+1)  
-  scanIndices <- rawdata$scanindex[rtRange[1]:min(rtRange[2], length(rawdata$scanindex))]
+  scanIndices <- 
+    rawdata$scanindex[rtRange[1]:min(rtRange[2], length(rawdata$scanindex))]
   #  scanIndices <- scanIndices[!is.na(scanIndices)]
   if(rtRange[2]>length(rawdata$scanindex)) {
     scanIndices <- c(scanIndices, length(rawdata$intensity))
@@ -448,7 +467,12 @@ getDefaultXcmsSetStartingParams <-
 
 
 optimizeSlaveCluster <-
-  function(task, xcmsSet_parameters, files, scanrange, isotopeIdentification, ...) {
+  function(task, 
+           xcmsSet_parameters,
+           files, 
+           scanrange, 
+           isotopeIdentification, 
+           ...) {
     
     message(task)  
     
@@ -536,7 +560,8 @@ optimizeXcmsSet <-
         best_settings$parameters <- xcms_parameters
         
         best_settings$xset <- history[[max_index]]$xset
-        target_value <- history[[max_index]]$PPS #calcPPS(xset, isotopeIdentification, ...)#, ppm, rt_diff)
+        #calcPPS(xset, isotopeIdentification, ...)#, ppm, rt_diff)
+        target_value <- history[[max_index]]$PPS 
         best_settings$result <- target_value
         history$best_settings <- best_settings
         
@@ -633,7 +658,8 @@ resultIncreased <-
     
     index = length(history)
     if(history[[index]]$PPS["PPS"] == 0 & index == 1)
-      stop("No isotopes have been detected, peak picking not optimizable by IPO!")
+      stop(paste("No isotopes have been detected,",
+                 "peak picking not optimizable by IPO!"))
     
     if(index < 2)
       return(TRUE)
@@ -648,7 +674,12 @@ resultIncreased <-
 
 
 xcmsSetExperimentsCluster <-
-function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ...) { 
+  function(example_sample, 
+           params, 
+           scanrange, 
+           isotopeIdentification, 
+           nSlaves=4, 
+           ...) { 
 
   typ_params <- typeCastParams(params) 
 
@@ -659,15 +690,18 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
     design <- data.frame(run.order=1:9, a=seq(-1,1,0.25))
       colnames(design)[2] <- names(typ_params$to_optimize)
       xcms_design <- design
-      xcms_design[,2] <- seq(min(typ_params$to_optimize[[1]]), max(typ_params$to_optimize[[1]]), 
-                             diff(typ_params$to_optimize[[1]])/8)
+      xcms_design[,2] <- 
+        seq(min(typ_params$to_optimize[[1]]), 
+            max(typ_params$to_optimize[[1]]), 
+            diff(typ_params$to_optimize[[1]])/8)
   }
 
   xcms_design <- combineParams(xcms_design, typ_params$no_optimization)   
   tasks <- 1:nrow(design)  
   
   if(nSlaves > 1) {
-    # unload snow (if loaded) to prevent conflicts with usage of package 'parallel'
+    # unload snow (if loaded) to prevent conflicts with usage of
+    # package 'parallel'
     if('snow' %in% rownames(installed.packages()))
       unloadNamespace("snow")
     
@@ -683,9 +717,9 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
       message("Exporting variables to cluster...")
       parallel::clusterExport(cl, ex)
     }
-    response <- parallel::parSapply(cl, tasks, optimizeSlaveCluster, xcms_design, 
-                                    example_sample, scanrange, isotopeIdentification,
-                                    ..., USE.NAMES=FALSE)
+    response <- parallel::parSapply(cl, tasks, optimizeSlaveCluster,
+                                    xcms_design, example_sample, scanrange, 
+                                    isotopeIdentification, ..., USE.NAMES=FALSE)
     parallel::stopCluster(cl)
   } else {
     response <- sapply(tasks, optimizeSlaveCluster, xcms_design, example_sample, 
@@ -707,7 +741,14 @@ function(example_sample, params, scanrange, isotopeIdentification, nSlaves=4, ..
 
 
 xcmsSetStatistic <-
-function(files, scanrange, isotopeIdentification, xcms_result, subdir, iterator,  nSlaves, ...) {
+  function(files, 
+           scanrange, 
+           isotopeIdentification, 
+           xcms_result, 
+           subdir, 
+           iterator,  
+           nSlaves, 
+           ...) {
 
   params <- xcms_result$params
   resp <- xcms_result$response[, "PPS"]
