@@ -30,18 +30,20 @@ test_ipo <- function() {
   #checking peak picking optimization using CAMERA isotope identification
   resultPPCamera <- optimizeXcmsSet(mzmlfile, paramsPP, isotopeIdentification="CAMERA", 
                                     subdir=NULL, nSlaves=8, ppm=15, maxcharge=2)
+  
   checkTrue(all(resultPPCamera$best_settings$result[1:4]== c(0, 221, 65, 101)))
   checkEqualsNumeric(resultPPCamera$best_settings$result[5], 156.9385, tolerance=1e-3)
   
   
   #checking single parameter peak picking optimization
-  paramsPP$max_peakwidth <- 15
-  paramsPP$ppm <- 50
-  resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, subdir=NULL, nSlaves=8, 
-                              checkPeakShape="borderIntensity") 
+  # paramsPP$max_peakwidth <- 15
+  # paramsPP$ppm <- 50
+  # resultPP <- optimizeXcmsSet(mzmlfile, paramsPP, subdir=NULL, nSlaves=8, 
+  #                             checkPeakShape="borderIntensity") 
+  # 
+  # checkTrue(all(resultPP$best_settings$result[1:4]== c(0, 216, 93, 61)))
+  # checkEqualsNumeric(resultPP$best_settings$result[5], 40.0175, tolerance=1e-3)  
   
-  checkTrue(all(resultPP$best_settings$result[1:4]== c(0, 216, 93, 61)))
-  checkEqualsNumeric(resultPP$best_settings$result[5], 40.0175, tolerance=1e-3)  
   
   #checking retention time correction and grouping optimization
   mtbls2files <- list.files(paste(find.package("mtbls2"), "/mzData", sep=""), 
@@ -64,12 +66,12 @@ test_ipo <- function() {
 
   
   #checking single parameter retention time correction and grouping optimization
-  paramsRG$gapExtend <- 2.4
-  resultRG <- optimizeRetGroup(xset, paramsRG, subdir=NULL, nSlaves=8)
-  
-  TV <- unlist(resultRG[[2]]$target_value)
-  checkTrue(all(TV[-c(5)]== c(1, 185, 0, 34596, 1)))
-  checkEqualsNumeric(TV[5], 1723.209, tolerance=1e-2)
+  # paramsRG$gapExtend <- 2.4
+  # resultRG <- optimizeRetGroup(xset, paramsRG, subdir=NULL, nSlaves=8)
+  # 
+  # TV <- unlist(resultRG[[2]]$target_value)
+  # checkTrue(all(TV[-c(5)]== c(1, 185, 0, 34596, 1)))
+  # checkEqualsNumeric(TV[5], 1723.209, tolerance=1e-2)
   
   #checking loess
   paramsRG <- getDefaultRetGroupStartingParams("loess")

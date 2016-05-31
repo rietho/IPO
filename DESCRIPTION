@@ -1,8 +1,8 @@
 Package: IPO
 Type: Package
 Title: Automated Optimization of XCMS Data Processing parameters
-Version: 0.99.0
-Date: 2016-05-27
+Version: 0.99.1
+Date: 2016-05-31
 Author: Libiseller, Gunnar <Gunnar.Libiseller@joanneum.at>
     Magnes, Christoph <christoph.magnes@joanneum.at>
 Maintainer: Riebenbauer, Thomas <Thomas.Riebenbauer@joanneum.at>
@@ -15,6 +15,7 @@ Suggests:
     BiocGenerics,
     msdata,
     mtbls2,
+    faahKO,
     knitr
 Enhances: parallel
 VignetteBuilder: knitr
@@ -30,7 +31,7 @@ Description: The outcome of XCMS data processing strongly depends on the
     by design of experiment. The resulting scores are evaluated using response
     surface models.
 License: GPL (>= 2) + file LICENSE
-URL: https://github.com/glibiseller/IPO
-BugReports: https://github.com/glibiseller/IPO/issues/new
+URL: https://github.com/rietho/IPO
+BugReports: https://github.com/rietho/IPO/issues/new
 biocViews: Metabolomics, MassSpectrometry
 RoxygenNote: 5.0.1
