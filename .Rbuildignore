@@ -2,3 +2,4 @@
 ^.*\.pdf$
 ^\.Rproj\.user$
 ^install\.R$
+^\.travis\.yml$

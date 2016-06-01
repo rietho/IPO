@@ -372,7 +372,7 @@ retGroupCalcExperimentsCluster <- function(params, xset, nSlaves=4) {
     ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
     if(identical(cl_type,"PSOCK")) {
       message("Using PSOCK type cluster, this increases memory requirements.")
-      message("Reduce number of slaves if your have out of memory errors.")
+      message("Reduce number of slaves if you have out of memory errors.")
       message("Exporting variables to cluster...")
       parallel::clusterExport(cl, ex)
     }
