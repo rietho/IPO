@@ -3,6 +3,9 @@
 language: R
 r: bioc-devel
 warnings_are_errors: true
-sudo: false
+sudo: required
 cache: packages
-bioc_required: true
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install libnetcdf-dev
