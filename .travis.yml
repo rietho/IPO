@@ -5,7 +5,18 @@ r: bioc-devel
 warnings_are_errors: true
 sudo: required
 cache: packages
+<<<<<<< HEAD
 
 before_install:
   - sudo apt-get update
   - sudo apt-get install libnetcdf-dev
+=======
+bioc_required: true
+
+bioc_packages:
+  - xcms
+  - CAMERA
+  - msdata
+  - mtbls2
+  - BiocGenerics
+>>>>>>> cd7b611c4d57d86f673501876f881399caf9fdcc
