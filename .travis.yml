@@ -6,3 +6,10 @@ warnings_are_errors: true
 sudo: false
 cache: packages
 bioc_required: true
+
+bioc_packages:
+  - xcms
+  - CAMERA
+  - msdata
+  - mtbls2
+  - BiocGenerics
