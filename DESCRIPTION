@@ -15,7 +15,8 @@ Suggests:
     BiocGenerics,
     msdata,
     mtbls2,
-    knitr
+    knitr,
+    rmarkdown
 Enhances: parallel
 VignetteBuilder: knitr
 Description: The outcome of XCMS data processing strongly depends on the
