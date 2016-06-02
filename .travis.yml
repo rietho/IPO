@@ -9,3 +9,7 @@ cache: packages
 before_install:
   - sudo apt-get update
   - sudo apt-get install libnetcdf-dev
+
+script :
+ - travis_wait 100 R CMD build 
+ - travis_wait 100 R CMD check "${PKG_FILE_NAME}" --as-cran
