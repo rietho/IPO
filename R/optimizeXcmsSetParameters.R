@@ -584,10 +584,9 @@ optimizeXcmsSet <-
                         ifelse(centWave,-100000000, 0.001), 
                              ifelse(fact=="step",0.0005,1)))
         
-        # if the parameter is NA, we increase the range by 20%, 
-        # if it was within the inner 
-        # 25% of the previous range or at the minimum value we decrease 
-        # the range by 20%
+        # - if the parameter is NA, we increase the range by 20%, 
+        # - if it was within the inner 25% of the previous range or
+        #   at the minimum value we decrease the range by 20%
         step_factor <- 
           ifelse(is.na(parameter_setting), 1.2, 
                  ifelse((abs(parameter_setting) < best_range), 
