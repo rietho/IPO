@@ -54,8 +54,8 @@ that can be processed by 'xcms'.
 
 
 ```{r file_choosing}
-mzdatapath <- system.file("cdf", package = "faahKO")
-mzdatafiles <- list.files(mzdatapath, recursive = TRUE, full.names=TRUE)
+datapath <- system.file("cdf", package = "faahKO")
+datafiles <- list.files(datapath, recursive = TRUE, full.names=TRUE)
 ```
 
 
@@ -118,11 +118,13 @@ peakpickingParameters$fwhm <- c(40, 50)
 #setting only one value for steps therefore this parameter is not optimized
 peakpickingParameters$steps <- 2
 
+time.xcmsSet <- system.time({ # measuring time
 resultPeakpicking <- 
-  optimizeXcmsSet(files = mzdatafiles[1:2], 
+  optimizeXcmsSet(files = datafiles[1:2], 
                   params = peakpickingParameters, 
                   nSlaves = 1, 
                   subdir = "rsmDirectory")
+})
 optimizedXcmsSetObject <- resultPeakpicking$best_settings$xset
 ```
 
@@ -183,11 +185,13 @@ optimized retention time correction and grouping parameters
 retcorGroupParameters <- getDefaultRetGroupStartingParams()
 retcorGroupParameters$profStep <- 1
 retcorGroupParameters$gapExtend <- 2.7
+time.RetGroup <- system.time({ # measuring time
 resultRetcorGroup <-
   optimizeRetGroup(xset = optimizedXcmsSetObject, 
                    params = retcorGroupParameters, 
                    nSlaves = 1, 
                    subdir = "rsmDirectory")
+})
 ```
 
 
@@ -228,3 +232,17 @@ writeRScript(resultPeakpicking$best_settings$parameters,
              resultRetcorGroup$best_settings, 
              nSlaves=1)
 ```
+
+
+
+## Running times and session info
+
+The above calculations proceeded with the following running times
+```{r times}
+time.xcmsSet # time for optimizing peak picking parameters
+time.RetGroup # time for optimizing retention time correction and grouping parameters
+
+sessionInfo()
+```
+
+
