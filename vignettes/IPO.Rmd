@@ -1,6 +1,6 @@
 ---
 title: "XCMS Parameter Optimization with IPO"
-author: "Gunnar Libiseller<br>JOANNEUM RESEARCH Forschungsgesellschaft m.b.H., Graz, Austria"
+author: "Gunnar Libiseller, Thomas Riebenbauer<br>JOANNEUM RESEARCH Forschungsgesellschaft m.b.H., Graz, Austria"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -9,7 +9,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-```{r, echo = FALSE, message = FALSE}
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(faahKO)
 ```
@@ -110,7 +110,7 @@ calculated with these parameters and the response this
 library(IPO)
 ```
 
-```{r optimize_peak_picking}
+```{r optimize_peak_picking, results = 'hide', warning = FALSE}
 peakpickingParameters <- getDefaultXcmsSetStartingParams('matchedFilter')
 #setting levels for step to 0.2 and 0.3 (hence 0.25 is the center point)
 peakpickingParameters$step <- c(0.2, 0.3)
@@ -125,6 +125,7 @@ resultPeakpicking <-
                   nSlaves = 1, 
                   subdir = "rsmDirectory")
 })
+resultPeakpicking$best_settings$result
 optimizedXcmsSetObject <- resultPeakpicking$best_settings$xset
 ```
 
@@ -181,7 +182,7 @@ optimized retention time correction and grouping parameters
 ('\$best_settings').
 
 
-```{r optimize_retcor_group}
+```{r optimize_retcor_group, results = 'hide', warning = FALSE}
 retcorGroupParameters <- getDefaultRetGroupStartingParams()
 retcorGroupParameters$profStep <- 1
 retcorGroupParameters$gapExtend <- 2.7
@@ -237,7 +238,7 @@ writeRScript(resultPeakpicking$best_settings$parameters,
 
 ## Running times and session info
 
-The above calculations proceeded with the following running times
+Above calculations proceeded with following runtimes
 ```{r times}
 time.xcmsSet # time for optimizing peak picking parameters
 time.RetGroup # time for optimizing retention time correction and grouping parameters
