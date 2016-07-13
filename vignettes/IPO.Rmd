@@ -125,6 +125,9 @@ resultPeakpicking <-
                   nSlaves = 1, 
                   subdir = "rsmDirectory")
 })
+```
+
+```{r optimize_peak_picking_result}
 resultPeakpicking$best_settings$result
 optimizedXcmsSetObject <- resultPeakpicking$best_settings$xset
 ```
@@ -238,7 +241,7 @@ writeRScript(resultPeakpicking$best_settings$parameters,
 
 ## Running times and session info
 
-Above calculations proceeded with following runtimes
+Above calculations proceeded with following running times.
 ```{r times}
 time.xcmsSet # time for optimizing peak picking parameters
 time.RetGroup # time for optimizing retention time correction and grouping parameters
