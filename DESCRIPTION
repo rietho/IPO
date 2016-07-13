@@ -9,7 +9,11 @@ Maintainer: Riebenbauer, Thomas <Thomas.Riebenbauer@joanneum.at>
 Depends:
     xcms,
     rsm,
-    CAMERA
+    CAMERA,
+    grDevices,
+    graphics, 
+    stats,
+    utils
 Suggests:
     RUnit,
     BiocGenerics,

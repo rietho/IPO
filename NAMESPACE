@@ -2,6 +2,11 @@ import("xcms")
 import("rsm")
 import("CAMERA")
 
+importFrom("grDevices", "dev.off", "jpeg")
+importFrom("graphics", "contour", "par")
+importFrom("stats", "as.formula", "cor", "dnorm", "lm", "predict")
+importFrom("utils", "installed.packages", "write.table")
+
 export("attachList")
 export("calcPPS")
 export("calculateXcmsSet")
