@@ -1,0 +1,158 @@
+CHANGES IN VERSION 1.7.5
+--------------------------
+  o added usage of clustering method FORK on unix-systems (thanks to Pablo Moreno)
+  o fixed bug in parallelization to prevent conflicts with package 'snow'
+
+
+CHANGES IN VERSION 1.7.4
+--------------------------
+  o preceded parallel-functions with 'parallel::' to use right package
+  o fixed bug in function writeRScript using 'loess' retention time cor.
+  o decreased runtime for R CMD check IPO
+
+
+CHANGES IN VERSION 1.7.3
+--------------------------
+  o added runnable examples
+  o decreased size of pictures in vignettes/rsmDirectory
+  o decreased runtime for unit-tests
+  o replaces expand.grid with expand.grid.subset (in utils.R)
+
+
+CHANGES IN VERSION 1.7.2
+--------------------------
+  o bugfix: try to prevent error in calcPPS possibly caused by NAs
+  o replaced cat() and print() calls with message()
+
+CHANGES IN VERSION 1.7.1
+--------------------------
+  o checking correlation of peak-shape with sinus curve (-pi/2 to pi*1.5), normal distribution or checkBorderIntensity
+  o findIsotopes.IPO renamed parameter checkBorderIntensity to checkPeakShape
+  o performance improvement calcPPS for checkPeakShape=FALSE
+  o calculating xcmsSet-object and respective PPS for each DoE. (PPS is not estimated from rsm anymore)
+  o additionally forwarding nSlaves for xcmsSet-function (also see getDefaultXcmsSetStartingParams())
+
+CHANGES IN VERSION 1.7.0
+--------------------------
+  o added support for XCMS-method retcor.loess
+  o updated help files
+  o changed return value of getRGTVValues
+  o adapted unit tests
+  o parameter scanrange for XCMS-methods findPeaks can be set
+    but not optimized
+
+CHANGES IN VERSION 1.6.2
+--------------------------
+  o Updated the function getNormalizedResponse() to prevent NAs
+
+CHANGES IN VERSION 1.6.1
+--------------------------
+  o Added installation script and installation description in vignette
+
+CHANGES IN VERSION 1.6
+--------------------------
+  o Added support of CAMERA isotope identification (findIsotopes.CAMERA)
+  o selectivity of findIsotopes.IPO may be increased if checkBorderIntensity 
+    is set to TRUE: 'maxo' of each peak of an isotopologue must be three 
+    times higher than the intensities at 'rtmin' and 'rtmax'
+  o simplified return value of calcPPS() to vector with meaningful names
+  o changed getDefaultXcmsSetStartingParams() for min_peakdwidth = c(12, 28) 
+    and for ppm to c(17, 32)
+	
+CHANGES IN VERSION 1.5.7.1
+--------------------------
+  o using predict() to identify best levels and expand.grid to generate testdata for model
+
+CHANGES IN VERSION 1.5.7
+--------------------------
+  o supporting single parameter optimization. Only basic version with
+    redundant levels in consecutive DoEs
+  o removed integer-rounding in maximum focusing for all findPeaks 
+    parameters except prefilter(I) and steps
+  o Update documentation to match code
+  o Remove use of getwd() preventing absolute subdir paths
+  
+CHANGES IN VERSION 1.5.6
+--------------------------
+  o updated vignette
+  o generally using Central-Composite design instead of Box-Behnken design
+	o fixed bug when defining subdir=NULL in functions optimizeXcmsSet and optimizeRetGroup
+	o modified unit tests to handle versions > 1.5.6
+	o added function writeRScript to NAMESPACE export
+  o updated man for optimizeXcmsSet and optimizeRetGroup
+
+CHANGES IN VERSION 1.5.5
+--------------------------
+    o increased recall of reliable peaks in calcPPS. Changed exponent for PPS calculation from 1.5 to 2
+
+CHANGES IN VERSION 1.5.4.8
+--------------------------
+    o remove file lookup in optimizeXcmsSet, and leave that to xcmsSet()
+
+CHANGES IN VERSION 1.5.4.7
+--------------------------
+    o explicitely use serial evaluation if nSlaves=1, to help debugging
+
+CHANGES IN VERSION 1.5.4.6
+--------------------------
+    o remove dependency on Rmpi
+
+CHANGES IN VERSION 1.5.4.5
+--------------------------
+    o added examples from msdata
+    o fix Depends, imports and library() and require() calls
+
+CHANGES IN VERSION 1.5.4.4
+--------------------------
+
+USER VISIBLE CHANGES
+
+  o packaged script
+	o changed method name attachparams to attachList
+	o changed method name calculateRGTV to getRGTVValues
+	o changed method name getDefaultStartingXcmsParams to getDefaultXcmsSetStartingParams
+	o changed method name typeCastFactor to typeCastParams
+	o changed method name writeRSkript to writeRScript
+	o changed the parameter name n_slaves to nSlaves
+	o resultIncreased: if last optimization score was 0, no isotopes have been found hence
+					   the dataset is not optimizable with IPO.
+	o added man files for attachList, calcPPS, combineParams, createModel, decode, decodeAll, 
+	encode, getBbdParameter, getCcdParameter, 
+	getDefaultRetCorCenterSample, getDefaultRetGroupStartingParams, getDefaultXcmsSetStartingParams, 
+	getNormalizedResponse, getRGTVValues, IPO-package, optimizeRetGroup, optimizeXcmsSet, 
+	startSlaves, toMatrix, typeCastParams
+	o removed xcmsSetsettingsAsString.R
+	o getResponses: now able to handle NULL value for slices parameter
+	o calcPPS: peaks with NA values are removed before isotopes identification
+	o if subdir is NULL, no rsm's are saved
+	o optimizeXcmsSet: lowere minimum value for min_peakwith from 5 to 3
+
+#IPO_V1.5.4.3: * LIP calculation in calcPPS fixed 
+
+#IPO_V1.5.4.2: * added initial parameter check
+#              * renamed all factor-variables to params
+#              * in optimizeXcmsSet: - also look for mzML-files
+#                                    - check if files were found
+#  		   * bug in optimization for matchedFilter fixed; sigma and mzdiff have to be 
+#                    definded later (combineFactors()) when sigma and step as well as steps are already known
+
+#IPO_V1.5.4.1: changes in calcPPS: 
+#                   rt_window <- rt * 0.005
+#                   rt_lower <- part_peaks[,"rt"] - rt_window
+#	              	  rt_upper <- part_peaks[,"rt"] + rt_window
+
+#IPO_V1.5.4: if bad_group == 0; bad_group = 1 && good_group += 1
+
+#IPO_V1.5.3: no parameter for isotope detection. 
+#            c13_peak[,"mz"] has to be within (mzmin + isotope_mass) and (mzmax + isotope_mass)
+#            c13_peak[,"rt"] has to be within (rtmin + isotope_mass) and (rtmax + isotope_mass)
+
+#IPO_V1.5.: in RCSandGSIncreased: also used good_groups ^ 2
+
+#IPO_V1.4.: vectorized isotope identification; 
+#           no intensity window, between intensity of max carbon and 1
+
+#IPO_V1.3.: good_groups ^ 2 to increase recall 
+
+
+

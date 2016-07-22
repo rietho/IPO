@@ -1,0 +1,252 @@
+---
+title: "XCMS Parameter Optimization with IPO"
+author: "Gunnar Libiseller, Thomas Riebenbauer<br>JOANNEUM RESEARCH Forschungsgesellschaft m.b.H., Graz, Austria"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{XCMS Parameter Optimization with IPO}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(faahKO)
+```
+
+## Introduction
+
+This document describes how to use the R-package 'IPO' 
+to optimize 'xcms' parameters. Code examples on how to
+use 'IPO' are provided. Additional to 'IPO' the R-packages
+'xcms' and 'rsm' are required. The R-package 'msdata' and'mtbls2' 
+are recommended. The optimization process looks as following:
+
+<br>
+<b>IPO optimization process</b>
+<p>
+<img src="FlowChart.jpg" width="695" height="745">
+</p>
+
+## Installation
+
+```{r install_IPO, eval=FALSE}
+# try http:// if https:// URLs are not supported
+source("https://bioconductor.org/biocLite.R")
+biocLite("IPO")
+```
+
+<b>Installing main suggested packages</b>
+
+```{r install_IPO_suggestions, eval=FALSE}
+# for examples of peak picking parameter optimization:
+biocLite("msdata")
+# for examples of optimization of retention time correction and grouping
+# parameters:
+biocLite("faahKO")
+```
+
+
+## Raw data
+
+'xcms' handles the file processing hence all files can be used 
+that can be processed by 'xcms'.
+
+
+```{r file_choosing}
+datapath <- system.file("cdf", package = "faahKO")
+datafiles <- list.files(datapath, recursive = TRUE, full.names=TRUE)
+```
+
+
+
+## Optimize peak picking parameters
+
+To optimize parameters different values (levels) have to 
+tested for these parameters. To efficiently test many 
+different levels design of experiment (DoE) is used. 
+Box-Behnken and central composite designs set three
+evenly spaced levels for each parameter. The method 
+'getDefaultXcmsSetStartingParams' provides default values
+for the lower and upper levels defining a range. Since
+the levels are evenly spaced the middle level or center 
+point is calculated automatically. To edit the starting levels
+of a parameter set the lower and upper level as desired.
+If a parameter should not be optimized, set a single 
+default value for 'xcms' processing, do not set this
+parameter to NULL. 
+
+The method 'getDefaultXcmsSetStartingParams' creates a 
+list with default values for the optimization of the
+peak picking methods 'centWave' or 'matchedFilter'. To
+choose between these two method set the parameter accordingly.
+
+The method 'optimizeXcmsSet' has the following parameters:
+- files: the raw data which is the basis for optimization. 
+  This does not necessarly need to be the whole dataset, 
+  only quality controls should suffice.
+- params: a list consisting of items named according to 
+  'xcms' peak picking methods parameters. A default list 
+  is created by 'getDefaultXcmsSetStartingParams'.
+- nSlaves: the number ofexperiments of an DoE processed in parallel
+- subdir: a directory where the response surface models are
+  stored. Can also be NULL if no rsm's should be saved.
+
+The optimization process starts at the specified levels. After
+the calculation of the DoE is finished the result is 
+evaluated and the levels automatically set accordingly.
+Then a new DoE is generated and processed. This continues 
+until an optimum is found.
+
+The result of peak picking optimization is a list consisting
+of all calculated DoEs including the used levels, design, 
+response, rsm and best setting. Additionally the last list 
+item is a list ('\$best_settings') providing the optimized 
+parameters ('\$parameters'), an xcmsSet object ('\$xset') 
+calculated with these parameters and the response this 
+'xcms'-object gives.
+
+```{r load_IPO, message=FALSE}
+library(IPO)
+```
+
+```{r optimize_peak_picking, results = 'hide', warning = FALSE}
+peakpickingParameters <- getDefaultXcmsSetStartingParams('matchedFilter')
+#setting levels for step to 0.2 and 0.3 (hence 0.25 is the center point)
+peakpickingParameters$step <- c(0.2, 0.3)
+peakpickingParameters$fwhm <- c(40, 50)
+#setting only one value for steps therefore this parameter is not optimized
+peakpickingParameters$steps <- 2
+
+time.xcmsSet <- system.time({ # measuring time
+resultPeakpicking <- 
+  optimizeXcmsSet(files = datafiles[1:2], 
+                  params = peakpickingParameters, 
+                  nSlaves = 1, 
+                  subdir = "rsmDirectory")
+})
+```
+
+```{r optimize_peak_picking_result}
+resultPeakpicking$best_settings$result
+optimizedXcmsSetObject <- resultPeakpicking$best_settings$xset
+```
+
+
+The response surface models of all optimization steps for the
+parameter optimization of peak picking look as following:
+
+<br>
+<b>Response surface models of DoE 1 of peak picking parameter optimization</b>
+<p><img src="rsmDirectory/rsm_1.jpg" width="695" height="521"></p>
+<br>
+<b>Response surface models of DoE 2 of peak picking parameter optimization</b>
+<p><img src="rsmDirectory/rsm_2.jpg" width="695" height="521"></p>
+
+Currently the 'xcms' peak picking methods 'centWave' 
+and 'matchedFilter' are supported. The parameter 'peakwidth' of
+the peak picking method 'centWave' needs two values defining
+a minimum and maximum peakwidth. These two values need separate
+optimization and are therefore split into 'min_peakwidth' and
+'max_peakwidth' in 'getDefaultXcmsSetStartingParams'. Also for
+the 'centWave' parameter prefilter two values have to be set.
+To optimize these use set 'prefilter' to optimize the first value
+and 'prefilter_value' to optimize the second value respectively.
+
+
+
+## Optimize retention time correction and grouping parameters
+
+Optimization of retention time correction and grouping
+parameters is done simultaneously. The method 
+'getDefaultRetGroupStartingParams' provides default 
+optimization levels for the 'xcms' retention time correction
+method 'obiwarp' and the grouping method 'density'. 
+Modifying these levels should be done the same way done 
+for the peak picking parameter optimization.
+
+The method 'getDefaultRetGroupStartingParams' only supports
+one retention time correction method ('obiwarp') and one grouping 
+method ('density') at the moment. 
+
+The method 'optimizeRetGroup' provides the following parameter:
+- xset: an 'xcmsSet'-object used as basis for retention time 
+  correction and grouping.
+- params:  a list consisting of items named according to 'xcms' 
+  retention time correction and grouping methods parameters. 
+  A default list is created by 'getDefaultRetGroupStartingParams'.
+- nSlaves: the number ofexperiments of an DoE processed in parallel
+- subdir: a directory where the response surface models are
+  stored. Can also be NULL if no rsm's should be saved.
+
+A list is returned similar to the one returned from peak 
+picking optimization. The last list item consists of the
+optimized retention time correction and grouping parameters
+('\$best_settings').
+
+
+```{r optimize_retcor_group, results = 'hide', warning = FALSE}
+retcorGroupParameters <- getDefaultRetGroupStartingParams()
+retcorGroupParameters$profStep <- 1
+retcorGroupParameters$gapExtend <- 2.7
+time.RetGroup <- system.time({ # measuring time
+resultRetcorGroup <-
+  optimizeRetGroup(xset = optimizedXcmsSetObject, 
+                   params = retcorGroupParameters, 
+                   nSlaves = 1, 
+                   subdir = "rsmDirectory")
+})
+```
+
+
+The response surface models of all optimization steps for the
+retention time correction and grouping parameters look as following:
+
+<br>
+<b>
+  Response surface models of DoE 1 of retention time correction and grouping 
+  parameter optimization</b>
+<p><img src="rsmDirectory/retgroup_rsm_1.jpg" width="695" height="348"></p>
+<br>
+<b>
+  Response surface models of DoE 2 of retention time correction and grouping 
+  parameter optimizationn
+</b>
+<p><img src="rsmDirectory/retgroup_rsm_2.jpg" width="695" height="348"></p>
+<br>
+<b>
+  Response surface models of DoE 3 of retention time correction and grouping 
+  parameter optimization
+</b>
+<p><img src="rsmDirectory/retgroup_rsm_3.jpg" width="695" height="348"></p>
+
+Currently the 'xcms' retention time correction method
+'obiwarp' and grouping method 'density' are supported.
+
+
+
+## Display optimized settings
+
+A script which you can use to process your raw data
+can be generated by using the function 'writeRScript'.
+
+
+```{r display_settings}
+writeRScript(resultPeakpicking$best_settings$parameters, 
+             resultRetcorGroup$best_settings, 
+             nSlaves=1)
+```
+
+
+
+## Running times and session info
+
+Above calculations proceeded with following running times.
+```{r times}
+time.xcmsSet # time for optimizing peak picking parameters
+time.RetGroup # time for optimizing retention time correction and grouping parameters
+
+sessionInfo()
+```
+
+
