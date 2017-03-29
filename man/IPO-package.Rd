@@ -16,7 +16,7 @@ An overview of how to use the package, including the most important functions
 \author{
 Gunnar Libiseller
 
-Maintainer: gunnar.libiseller@joanneum.at
+Maintainer: Thomas Riebenbauer <Thomas.Riebenbauer@joanneum.at>
 }
 \references{
 

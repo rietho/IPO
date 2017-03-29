@@ -2,4 +2,5 @@
 ^.*\.pdf$
 ^\.Rproj\.user$
 ^install\.R$
+^README\.Rmd$
 ^\.travis\.yml$

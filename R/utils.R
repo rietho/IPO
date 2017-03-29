@@ -327,7 +327,7 @@ expand.grid.subset  <- function(subset, sequence, dimensions) {
 #}
 
 
-plotContours <- function(model, maximum_slice, plot_name) {
+plotContours <- function(model, maximum_slice, plot_name = NULL) {
   # generate for all variable combinations formulas
   # (which will give the plots)
   plots <- c()
@@ -351,8 +351,7 @@ plotContours <- function(model, maximum_slice, plot_name) {
     plot_name = paste(plot_name, ".jpg", sep="")
     jpeg(plot_name, width=4*plot_cols, height=2*plot_rows+2, 
          units="in", res=c(200,200))
-  } else # otherwise plot on new device
-    dev.new(width=4*plot_cols, height=2*plot_rows+2)
+  } # otherwise plot on device
   
   par(mfrow=c(plot_rows, plot_cols), oma=c(3,0,2,0))  
   # contour.lm is called

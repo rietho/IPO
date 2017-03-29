@@ -1,20 +1,25 @@
 Package: IPO
 Type: Package
 Title: Automated Optimization of XCMS Data Processing parameters
-Version: 1.7.5
-Date: 2016-04-15
-Author: Libiseller, Gunnar <Gunnar.Libiseller@joanneum.at>
-    Magnes, Christoph <christoph.magnes@joanneum.at>
-Maintainer: Riebenbauer, Thomas <Thomas.Riebenbauer@joanneum.at>
+Version: 0.99.5
+Date: 2016-07-12
+Author: Gunnar Libiseller <Gunnar.Libiseller@joanneum.at>,
+        Christoph Magnes <christoph.magnes@joanneum.at>
+Maintainer: Thomas Riebenbauer <Thomas.Riebenbauer@joanneum.at>
 Depends:
     xcms,
     rsm,
-    CAMERA
+    CAMERA,
+    grDevices,
+    graphics, 
+    stats,
+    utils
 Suggests:
     RUnit,
     BiocGenerics,
     msdata,
     mtbls2,
+    faahKO,
     knitr,
     rmarkdown
 Enhances: parallel
