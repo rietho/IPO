@@ -10,4 +10,10 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install libnetcdf-dev
 
-r_check_args: --no-tests
+# r_check_args: --no-examples --no-vignettes
+
+script: 
+  - |
+    R CMD build .
+    travis_wait 40 R CMD check IPO.tar.gz
+
