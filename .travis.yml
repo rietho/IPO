@@ -11,16 +11,16 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install libnetcdf-dev
 
-r_build_args: "--no-build-vignettes"
-r_check_args: "--no-build-vignettes"
+#r_build_args: "--no-build-vignettes"
+#r_check_args: "--no-build-vignettes"
 
 r_packages:
   - covr
 
 script: 
   - |
-    R CMD build .
-    travis_wait 40 R CMD check IPO.tar.gz
+    travis_wait 40 R CMD build .
+    travis_wait 40 R CMD check --no-vignettes IPO.tar.gz
 
 after_success:
   - Rscript -e 'library(covr); codecov()'
