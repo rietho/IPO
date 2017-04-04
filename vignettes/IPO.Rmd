@@ -82,6 +82,7 @@ peak picking methods 'centWave' or 'matchedFilter'. To
 choose between these two method set the parameter accordingly.
 
 The method 'optimizeXcmsSet' has the following parameters:
+
 - files: the raw data which is the basis for optimization. 
   This does not necessarly need to be the whole dataset, 
   only quality controls should suffice.
