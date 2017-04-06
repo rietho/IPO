@@ -369,12 +369,14 @@ retGroupCalcExperimentsCluster <- function(params, xset, nSlaves=4) {
     cl_type<-getClusterType()
     cl <- parallel::makeCluster(nSlaves, type = cl_type) #, outfile="log.txt")
     #exporting all functions to cluster but only calcRGTV is needed
-    ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
+    ex <- Filter(function(x) is.function(get(x, asNamespace("IPO"))), 
+                 ls(asNamespace("IPO")))
     if(identical(cl_type,"PSOCK")) {
       message("Using PSOCK type cluster, this increases memory requirements.")
       message("Reduce number of slaves if you have out of memory errors.")
       message("Exporting variables to cluster...")
-      parallel::clusterExport(cl, ex)
+      clusterEvalQ(cl, library("xcms"))
+      clusterExport(cl, ex, envir = asNamespace("IPO"))
     }
     result <- parallel::parLapply(cl, tasks, optimizeRetGroupSlaveCluster, xset, 
                                   parameters)
@@ -438,7 +440,7 @@ retcorGroup <- function(xset, parameters, exp_index=1) {
   
   if(parameters$retcorMethod[exp_index] == "loess") {
     try(
-      xset <- group(
+      xset <- xcms::group(
         xset, 
         method  = "density", 
         bw      = parameters$bw[exp_index], 
@@ -449,7 +451,7 @@ retcorGroup <- function(xset, parameters, exp_index=1) {
       )
     
     try(
-      retcor_failed <- retcor(
+      retcor_failed <- xcms::retcor(
         xset, 
         method   = "loess", 
         plottype = parameters$plottype[exp_index], 
@@ -468,7 +470,7 @@ retcorGroup <- function(xset, parameters, exp_index=1) {
   if(parameters$retcorMethod[exp_index] == "obiwarp") {
     try(
       retcor_failed <- 
-        retcor(xset, 
+        xcms::retcor(xset, 
                method         = "obiwarp", 
                plottype       = parameters$plottype[exp_index], 
                distFunc       = parameters$distFunc[exp_index],
@@ -489,7 +491,7 @@ retcorGroup <- function(xset, parameters, exp_index=1) {
   } 
   
   try(
-    xset <- group(
+    xset <- xcms::group(
       xset, 
       method  = "density", 
       bw      = parameters$bw[exp_index], 
