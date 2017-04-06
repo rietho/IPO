@@ -28,8 +28,9 @@ test_ipo <- function() {
   
   
   #checking peak picking optimization using CAMERA isotope identification
-  resultPPCamera <- optimizeXcmsSet(mzmlfile, paramsPP, isotopeIdentification="CAMERA", 
-                                    subdir=NULL, nSlaves=1, ppm=15, maxcharge=2)
+  resultPPCamera <- 
+    optimizeXcmsSet(mzmlfile, paramsPP, isotopeIdentification="CAMERA", 
+                    subdir=NULL, nSlaves=1, ppm=15, maxcharge=2)
   
   checkTrue(all(resultPPCamera$best_settings$result[1:4]== c(0, 221, 65, 101)))
   checkEqualsNumeric(resultPPCamera$best_settings$result[5], 156.9385, tolerance=1e-3)
@@ -49,7 +50,7 @@ test_ipo <- function() {
   mtbls2files <- list.files(paste(find.package("mtbls2"), "/mzData", sep=""), 
                             full.names=TRUE)
   xset <- xcmsSet(mtbls2files[1:2], method="centWave", 
-                  peakwidth=c(12, 30), ppm=30, noise=10000, nSlaves=1)
+                  peakwidth=c(12, 30), ppm=30, noise=10000)
   
   
   #checking obiwarp
