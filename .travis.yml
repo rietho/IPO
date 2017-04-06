@@ -11,7 +11,8 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install libnetcdf-dev
 
-# r_check_args: --no-examples --no-vignettes
+r_build_args: "--no-build-vignettes"
+r_check_args: "--no-build-vignettes"
 
 r_packages:
   - covr
