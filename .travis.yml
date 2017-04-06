@@ -23,4 +23,4 @@ script:
     travis_wait 40 R CMD check --no-vignettes IPO*tar.gz
 
 after_success:
-  - Rscript -e 'library(covr); codecov()'
+  - travis_wait 40 Rscript -e 'library(covr); codecov()'
