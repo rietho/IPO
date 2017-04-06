@@ -14,8 +14,8 @@ before_install:
 #r_build_args: "--no-build-vignettes"
 #r_check_args: "--no-build-vignettes"
 
-r_packages:
-  - covr
+# r_packages:
+#  - covr
 
 script: 
   - |
