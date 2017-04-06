@@ -1,6 +1,7 @@
 import("xcms")
 import("rsm")
 import("CAMERA")
+import("BiocParallel")
 
 importFrom("grDevices", "dev.off", "jpeg")
 importFrom("graphics", "contour", "par")
