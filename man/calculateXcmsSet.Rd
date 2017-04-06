@@ -7,19 +7,26 @@ Calculation of an xcmsSet-Object
 	This function encapsulates xcms::findPeaks-methods for IPO
 }
 \usage{
-calculateXcmsSet(files, xcmsSetParameters, scanrange=NULL, task=1, nSlaves=1) 
+calculateXcmsSet(files, xcmsSetParameters, scanrange=NULL, task=1, 
+  BPPARAM = bpparam(), nSlaves=0) 
 }
 
 \arguments{
   \item{files}{a vector containing the files for peak picking}
-  \item{xcmsSetParameters}{a list with all parameters for xcmsSet-methods as list-items}
+  \item{xcmsSetParameters}{
+    a list with all parameters for \code{\link[xcms]{xcmsSet}}-methods as list-items}
   \item{scanrange}{
      scan range to process. See \code{\link[xcms]{findPeaks.centWave}}.}
   \item{task}{
     The task-id when using this method in parallel calculations.}
+  \item{BPPARAM}{a \code{BiocParallel} parameter object to control how
+    and if parallel processing of \code{\link[xcms]{xcmsSet}} should be performed. 
+    Such objects can be created by the \code{\link[BiocParallel]{SerialParam}},
+    \code{\link[BiocParallel]{MulticoreParam}} or
+    \code{\link[BiocParallel]{SnowParam}} functions.
+  }
   \item{nSlaves}{
-    The number of cores to use for parallelisation. nSlaves is multiplied with xcmsSetParameters$nSlaves.}
-     
+    \code{\link[xcms]{xcmsSet}}'s \code{nSlaves}-argument is deprecated., use \code{BPPARAM} argument instead.}
 }
 \details{
   Encapsulation of xcms::findPeaks-methods used in IPO.
@@ -39,7 +46,8 @@ calculateXcmsSet(files, xcmsSetParameters, scanrange=NULL, task=1, nSlaves=1)
   Bioinformatics, 9:504 (2008)
 }
 \author{
-	Gunnar Libiseller
+	Gunnar Libiseller,
+	Thomas Riebenbauer (\email{thomas.riebenbauer@joanneum.at})
 }
 \seealso{
 \code{\link[xcms]{findPeaks}}

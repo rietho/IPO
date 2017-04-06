@@ -8,7 +8,7 @@
 	retcor and grouping parameters to the screen.
 }
 \usage{
-writeRScript(peakPickingSettings, retCorGroupSettings, nSlaves)
+writeRScript(peakPickingSettings, retCorGroupSettings, nSlaves = 0)
 }
 
 \arguments{
@@ -18,20 +18,23 @@ writeRScript(peakPickingSettings, retCorGroupSettings, nSlaves)
   \item{retCorGroupSettings}{
 	The optimized settings for xcms-methods for retcor.obiwarp and group.density
 }
-  \item{nSlaves}{
-	The number of slaves which should be used in the script
+  \item{nSlaves}{DEPRECATED
 }
 }
 \details{
-	This function that prints a script out of the optimized findPeaks, 
+	This function prints a script out of the optimized findPeaks, 
 	retcor and grouping parameters to the screen.
-  
+	
+  The function \code{message} is used to print the script. For capuring the
+  output \code{capture.output(writeRScript(...), type = "message")} might
+  be used.
 }
 \value{
 	none
 }
 \author{
-Gunnar Libiseller
+  Gunnar Libiseller,
+  Thomas Riebenbauer (\email{thomas.riebenbauer@joanneum.at})
 }
 
 \examples{
