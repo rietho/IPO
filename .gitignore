@@ -3,3 +3,5 @@
 *~
 /install.R
 .Rproj.user
+tmp*
+test_tmp*
