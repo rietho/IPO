@@ -1,3 +1,28 @@
+CHANGES IN VERSION 1.1.1
+--------------------------
+  o use package BiocParallel (via argument `BPPARAM`) instead of `nSlaves` 
+    to controll `xcms`-parallelization 
+  o depends on xcms >= 1.50.0
+  o formatting `writeRScript` to output more beautifully
+
+CHANGES IN VERSION 1.1.0
+--------------------------
+  o merge Bioconductor 1.0.0 release code with Github code.
+
+
+CHANGES IN VERSION 1.0.0
+--------------------------
+  o Biocondcutor release 3.4
+
+==========================
+BIOCONDUCTOR release
+==========================
+
+After version 1.7.5 IPO was put on Biocondcutor. After that  the 
+versioning schema changes to meet the Bioconductor version numbering 
+and starts with 1.0.0.
+
+
 CHANGES IN VERSION 1.7.5
 --------------------------
   o added usage of clustering method FORK on unix-systems (thanks to Pablo Moreno)
