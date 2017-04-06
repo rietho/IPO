@@ -26,7 +26,7 @@ source("https://bioconductor.org/biocLite.R")
 biocLite("IPO")
 ````
 
-Or the development version from [Github](http://bioconductor.org/packages/IPO/):
+Or the development version from [Github](https://github.com/rietho/IPO/):
 
 ```R
 # install.packages("devtools")
