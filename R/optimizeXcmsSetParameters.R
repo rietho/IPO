@@ -772,10 +772,10 @@ xcmsSetExperimentsCluster <-
       message("Using PSOCK type cluster, this increases memory requirements.")
       message("Reduce number of slaves if you have out of memory errors.")
       message("Exporting variables to cluster...")
-      clusterEvalQ(cl, library("xcms"))
-      clusterExport(cl, ex, envir = asNamespace("IPO"))
+      parallel::clusterEvalQ(cl, library("xcms"))
+      parallel::clusterExport(cl, ex, envir = asNamespace("IPO"))
     }
-    response <- parSapply(
+    response <- parallel::parSapply(
       cl = cl,
       X = tasks,
       FUN = optimizeSlaveCluster,
