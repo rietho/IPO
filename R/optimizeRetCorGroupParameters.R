@@ -375,8 +375,8 @@ retGroupCalcExperimentsCluster <- function(params, xset, nSlaves=4) {
       message("Using PSOCK type cluster, this increases memory requirements.")
       message("Reduce number of slaves if you have out of memory errors.")
       message("Exporting variables to cluster...")
-      clusterEvalQ(cl, library("xcms"))
-      clusterExport(cl, ex, envir = asNamespace("IPO"))
+      parallel::clusterEvalQ(cl, library("xcms"))
+      parallel::clusterExport(cl, ex, envir = asNamespace("IPO"))
     }
     result <- parallel::parLapply(cl, tasks, optimizeRetGroupSlaveCluster, xset, 
                                   parameters)
