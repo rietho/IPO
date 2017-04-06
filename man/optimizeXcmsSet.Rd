@@ -8,12 +8,13 @@ Optimisation of peak picking parameters by using natural, stable 13C isotopes
     stable 13C isotopes.
 }
 \usage{
-    optimizeXcmsSet(files, params = getDefaultXcmsSetStartingParams(),
-isotopeIdentification=c("IPO", "CAMERA"), nSlaves = 4, subdir = "IPO", ...)
+optimizeXcmsSet(files, params = getDefaultXcmsSetStartingParams(),
+  isotopeIdentification=c("IPO", "CAMERA"), BPPARAM = bpparam(), 
+  nSlaves = 4, subdir = "IPO", ...)
 }
 \arguments{
-  \item{files}{A directory or list of files, passed to xcmsSet(). If no
-    files are given, xcmsSet() will check recursively all MS files in
+  \item{files}{A directory or list of files, passed to \code{\link[xcms]{xcmsSet}}. 
+    If no files are given, xcmsSet() will check recursively all MS files in
     the current working directory. }
   \item{params}{
      A list of parameters which are needed by XCMS::findPeaks-Methods. List-items with
@@ -24,6 +25,13 @@ isotopeIdentification=c("IPO", "CAMERA"), nSlaves = 4, subdir = "IPO", ...)
      This parameter defines the method for isotope identification. The method 'IPO' 
      was especially implemented for high resolution data. CAMERA is an established 
      isotope and adduct annotation package.
+  }
+  \item{BPPARAM}{a \code{BiocParallel} parameter object to control how
+    and if parallel processing of \code{\link[xcms]{xcmsSet}} should be performed. 
+    Such objects can be created by the \code{\link[BiocParallel]{SerialParam}},
+    \code{\link[BiocParallel]{MulticoreParam}} or
+    \code{\link[BiocParallel]{SnowParam}} functions.
+    Note: \code{\link[xcms]{xcmsSet}}'s \code{nSlaves}-argument is deprecated.
   }
   \item{nSlaves}{Number of slaves the optimization process should spawn.}
   \item{subdir}{
@@ -48,8 +56,10 @@ isotopeIdentification=c("IPO", "CAMERA"), nSlaves = 4, subdir = "IPO", ...)
 	3. Responses from calcPPS for every experiment in the design\cr 
 	4. Response surface model for the design\cr 
 	5. The normalized parameter settings giving the best PPS (values between -1 and 1)
-  6. an xcmsSet-object calculated with the best settings from the response surface model
+  6. an \code{\link[xcms]{xcmsSet-class}}-object calculated with the best settings 
+    from the response surface model
   7. PPS calculated from the xcmsSet}
+  
   \item{comp(n+1) }{A LIST containing:\cr   
     1. Parameters giving the best PPS\cr 
 	2. An xcmsSet-object created with the optimized parameters\cr 
@@ -77,12 +87,13 @@ isotopeIdentification=c("IPO", "CAMERA"), nSlaves = 4, subdir = "IPO", ...)
 
 }
 \author{
-Gunnar Libiseller
+  Gunnar Libiseller,
+  Thomas Riebenbauer (\email{thomas.riebenbauer@joanneum.at})
 }
 \seealso{
-  \code{\link{getDefaultXcmsSetStartingParams}}
-  \code{\link{calcPPS}}
-  \code{\link{findIsotopes.IPO}}
+  \code{\link{getDefaultXcmsSetStartingParams}},
+  \code{\link{calcPPS}},
+  \code{\link{findIsotopes.IPO}},
   \code{\link{findIsotopes.CAMERA}}
 }
 \examples{
