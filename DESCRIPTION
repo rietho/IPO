@@ -1,12 +1,21 @@
 Package: IPO
 Type: Package
 Title: Automated Optimization of XCMS Data Processing parameters
-Version: 1.1.0
+Version: 1.1.1
 Date: 2016-07-12
 Author: Gunnar Libiseller <Gunnar.Libiseller@joanneum.at>,
-        Christoph Magnes <christoph.magnes@joanneum.at>
+        Christoph Magnes <christoph.magnes@joanneum.at>,
+        Thomas Riebenbauer <Thomas.Riebenbauer@joanneum.at>
 Maintainer: Thomas Riebenbauer <Thomas.Riebenbauer@joanneum.at>
-Depends: xcms, rsm, CAMERA, grDevices, graphics, stats, utils
+Depends:
+  xcms (>= 1.50.0), 
+  rsm, 
+  CAMERA, 
+  grDevices, 
+  graphics, 
+  stats, 
+  utils
+Imports: BiocParallel
 Suggests: RUnit, BiocGenerics, msdata, mtbls2, faahKO, knitr
 Enhances: parallel
 VignetteBuilder: knitr
@@ -28,5 +37,5 @@ License: GPL (>= 2) + file LICENSE
 URL: https://github.com/rietho/IPO
 BugReports: https://github.com/rietho/IPO/issues/new
 biocViews: Metabolomics, MassSpectrometry
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 NeedsCompilation: no
