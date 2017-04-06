@@ -13,7 +13,7 @@ Devel:
 [![Build Status Travis-CI](https://travis-ci.org/rietho/IPO.svg?branch=master)](https://travis-ci.org/rietho/IPO)
 
 
-IPO (‘Isotopologue Parameter Optimization’) is a tool for automated Optimization of XCMS Parameters. It is a fast and free of labeling steps, and applicable to data from different kinds of samples and data from different methods of liquid chromatography - high resolution mass spectrometry and data from different instruments.
+IPO (‘Isotopologue Parameter Optimization’) is a tool for automated Optimization of [XCMS](http://bioconductor.org/packages/xcms/) Parameters. It is a fast and free of labeling steps, and applicable to data from different kinds of samples and data from different methods of liquid chromatography - high resolution mass spectrometry and data from different instruments.
 
 Find out more about the usage in the [package vignette](https://bioconductor.org/packages/devel/bioc/vignettes/IPO/inst/doc/IPO.html) (Biocondcutor development version). The publication is available from http://www.biomedcentral.com/1471-2105/16/118.
 
