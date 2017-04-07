@@ -16,10 +16,10 @@ library(faahKO)
 
 ## Introduction
 
-This document describes how to use the R-package 'IPO' 
-to optimize 'xcms' parameters. Code examples on how to
-use 'IPO' are provided. Additional to 'IPO' the R-packages
-'xcms' and 'rsm' are required. The R-package 'msdata' and'mtbls2' 
+This document describes how to use the R-package `IPO` 
+to optimize `xcms` parameters. Code examples on how to
+use `IPO` are provided. Additional to `IPO` the R-packages
+`xcms` and `rsm` are required. The R-package `msdata` and`mtbls2` 
 are recommended. The optimization process looks as following:
 
 <br>
@@ -49,13 +49,13 @@ biocLite("faahKO")
 
 ## Raw data
 
-'xcms' handles the file processing hence all files can be used 
-that can be processed by 'xcms'.
+`xcms` handles the file processing hence all files can be used 
+that can be processed by `xcms`.
 
 
 ```{r file_choosing}
 datapath <- system.file("cdf", package = "faahKO")
-datafiles <- list.files(datapath, recursive = TRUE, full.names=TRUE)
+datafiles <- list.files(datapath, recursive = TRUE, full.names = TRUE)
 ```
 
 
@@ -67,31 +67,34 @@ tested for these parameters. To efficiently test many
 different levels design of experiment (DoE) is used. 
 Box-Behnken and central composite designs set three
 evenly spaced levels for each parameter. The method 
-'getDefaultXcmsSetStartingParams' provides default values
+`getDefaultXcmsSetStartingParams` provides default values
 for the lower and upper levels defining a range. Since
 the levels are evenly spaced the middle level or center 
 point is calculated automatically. To edit the starting levels
 of a parameter set the lower and upper level as desired.
 If a parameter should not be optimized, set a single 
-default value for 'xcms' processing, do not set this
+default value for `xcms` processing, do not set this
 parameter to NULL. 
 
-The method 'getDefaultXcmsSetStartingParams' creates a 
+The method `getDefaultXcmsSetStartingParams` creates a 
 list with default values for the optimization of the
-peak picking methods 'centWave' or 'matchedFilter'. To
+peak picking methods `centWave` or `matchedFilter`. To
 choose between these two method set the parameter accordingly.
 
-The method 'optimizeXcmsSet' has the following parameters:
+The method `optimizeXcmsSet` has the following parameters:
 
 - files: the raw data which is the basis for optimization. 
   This does not necessarly need to be the whole dataset, 
   only quality controls should suffice.
 - params: a list consisting of items named according to 
-  'xcms' peak picking methods parameters. A default list 
-  is created by 'getDefaultXcmsSetStartingParams'.
-- nSlaves: the number ofexperiments of an DoE processed in parallel
+  `xcms` peak picking methods parameters. A default list 
+  is created by `getDefaultXcmsSetStartingParams()`.
+- BPPARAM: a `BiocParallelParam`-object (see `?BiocParallel::BiocParallelParam`)
+  to controll the use of parallelisation of `xcms`.
+  Defaults to `bpparam()`.
+- nSlaves: the number of experiments of an DoE processed in parallel
 - subdir: a directory where the response surface models are
-  stored. Can also be NULL if no rsm's should be saved.
+  stored. Can also be `NULL` if no rsm's should be saved.
 
 The optimization process starts at the specified levels. After
 the calculation of the DoE is finished the result is 
@@ -102,16 +105,16 @@ until an optimum is found.
 The result of peak picking optimization is a list consisting
 of all calculated DoEs including the used levels, design, 
 response, rsm and best setting. Additionally the last list 
-item is a list ('\$best_settings') providing the optimized 
-parameters ('\$parameters'), an xcmsSet object ('\$xset') 
+item is a list (`\$best_settings`) providing the optimized 
+parameters (`\$parameters`), an xcmsSet object (`\$xset`) 
 calculated with these parameters and the response this 
-'xcms'-object gives.
+`xcms`-object gives.
 
 ```{r load_IPO, message=FALSE}
 library(IPO)
 ```
 
-```{r optimize_peak_picking, results = 'hide', warning = FALSE}
+```{r optimize_peak_picking, fig.height=7, fig.width=7, warning=FALSE}
 peakpickingParameters <- getDefaultXcmsSetStartingParams('matchedFilter')
 #setting levels for step to 0.2 and 0.3 (hence 0.25 is the center point)
 peakpickingParameters$step <- c(0.2, 0.3)
@@ -124,7 +127,7 @@ resultPeakpicking <-
   optimizeXcmsSet(files = datafiles[1:2], 
                   params = peakpickingParameters, 
                   nSlaves = 1, 
-                  subdir = "rsmDirectory")
+                  subdir = NULL)
 })
 ```
 
@@ -135,24 +138,24 @@ optimizedXcmsSetObject <- resultPeakpicking$best_settings$xset
 
 
 The response surface models of all optimization steps for the
-parameter optimization of peak picking look as following:
+parameter optimization of peak picking are shown above.
 
-<br>
-<b>Response surface models of DoE 1 of peak picking parameter optimization</b>
-<p><img src="rsmDirectory/rsm_1.jpg" width="695" height="521"></p>
-<br>
-<b>Response surface models of DoE 2 of peak picking parameter optimization</b>
-<p><img src="rsmDirectory/rsm_2.jpg" width="695" height="521"></p>
+<!-- <br> -->
+<!-- <b>Response surface models of DoE 1 of peak picking parameter optimization</b> -->
+<!-- <p><img src="rsmDirectory/rsm_1.jpg" width="695" height="521"></p> -->
+<!-- <br> -->
+<!-- <b>Response surface models of DoE 2 of peak picking parameter optimization</b> -->
+<!-- <p><img src="rsmDirectory/rsm_2.jpg" width="695" height="521"></p> -->
 
-Currently the 'xcms' peak picking methods 'centWave' 
-and 'matchedFilter' are supported. The parameter 'peakwidth' of
-the peak picking method 'centWave' needs two values defining
+Currently the `xcms` peak picking methods `centWave` 
+and `matchedFilter` are supported. The parameter `peakwidth` of
+the peak picking method `centWave` needs two values defining
 a minimum and maximum peakwidth. These two values need separate
-optimization and are therefore split into 'min_peakwidth' and
-'max_peakwidth' in 'getDefaultXcmsSetStartingParams'. Also for
-the 'centWave' parameter prefilter two values have to be set.
-To optimize these use set 'prefilter' to optimize the first value
-and 'prefilter_value' to optimize the second value respectively.
+optimization and are therefore split into `min_peakwidth` and
+`max_peakwidth` in `getDefaultXcmsSetStartingParams`. Also for
+the `centWave` parameter prefilter two values have to be set.
+To optimize these use set `prefilter` to optimize the first value
+and `prefilter_value` to optimize the second value respectively.
 
 
 
@@ -160,33 +163,33 @@ and 'prefilter_value' to optimize the second value respectively.
 
 Optimization of retention time correction and grouping
 parameters is done simultaneously. The method 
-'getDefaultRetGroupStartingParams' provides default 
-optimization levels for the 'xcms' retention time correction
-method 'obiwarp' and the grouping method 'density'. 
+`getDefaultRetGroupStartingParams` provides default 
+optimization levels for the `xcms` retention time correction
+method `obiwarp` and the grouping method `density`. 
 Modifying these levels should be done the same way done 
 for the peak picking parameter optimization.
 
-The method 'getDefaultRetGroupStartingParams' only supports
-one retention time correction method ('obiwarp') and one grouping 
-method ('density') at the moment. 
+The method `getDefaultRetGroupStartingParams` only supports
+one retention time correction method (`obiwarp`) and one grouping 
+method (`density`) at the moment. 
 
-The method 'optimizeRetGroup' provides the following parameter:
-- xset: an 'xcmsSet'-object used as basis for retention time 
+The method `optimizeRetGroup` provides the following parameter:
+- xset: an `xcmsSet`-object used as basis for retention time 
   correction and grouping.
-- params:  a list consisting of items named according to 'xcms' 
+- params:  a list consisting of items named according to `xcms` 
   retention time correction and grouping methods parameters. 
-  A default list is created by 'getDefaultRetGroupStartingParams'.
-- nSlaves: the number ofexperiments of an DoE processed in parallel
+  A default list is created by `getDefaultRetGroupStartingParams`.
+- nSlaves: the number of experiments of an DoE processed in parallel
 - subdir: a directory where the response surface models are
   stored. Can also be NULL if no rsm's should be saved.
 
 A list is returned similar to the one returned from peak 
 picking optimization. The last list item consists of the
 optimized retention time correction and grouping parameters
-('\$best_settings').
+(`\$best_settings`).
 
 
-```{r optimize_retcor_group, results = 'hide', warning = FALSE}
+```{r optimize_retcor_group, fig.height=7, fig.width=7, warning = FALSE}
 retcorGroupParameters <- getDefaultRetGroupStartingParams()
 retcorGroupParameters$profStep <- 1
 retcorGroupParameters$gapExtend <- 2.7
@@ -195,47 +198,46 @@ resultRetcorGroup <-
   optimizeRetGroup(xset = optimizedXcmsSetObject, 
                    params = retcorGroupParameters, 
                    nSlaves = 1, 
-                   subdir = "rsmDirectory")
+                   subdir = NULL)
 })
 ```
 
 
 The response surface models of all optimization steps for the
-retention time correction and grouping parameters look as following:
+retention time correction and grouping parameters are shown above.
 
-<br>
-<b>
-  Response surface models of DoE 1 of retention time correction and grouping 
-  parameter optimization</b>
-<p><img src="rsmDirectory/retgroup_rsm_1.jpg" width="695" height="348"></p>
-<br>
-<b>
-  Response surface models of DoE 2 of retention time correction and grouping 
-  parameter optimizationn
-</b>
-<p><img src="rsmDirectory/retgroup_rsm_2.jpg" width="695" height="348"></p>
-<br>
-<b>
-  Response surface models of DoE 3 of retention time correction and grouping 
-  parameter optimization
-</b>
-<p><img src="rsmDirectory/retgroup_rsm_3.jpg" width="695" height="348"></p>
+<!-- <br> -->
+<!-- <b> -->
+<!--   Response surface models of DoE 1 of retention time correction and grouping  -->
+<!--   parameter optimization</b> -->
+<!-- <p><img src="rsmDirectory/retgroup_rsm_1.jpg" width="695" height="348"></p> -->
+<!-- <br> -->
+<!-- <b> -->
+<!--   Response surface models of DoE 2 of retention time correction and grouping  -->
+<!--   parameter optimizationn -->
+<!-- </b> -->
+<!-- <p><img src="rsmDirectory/retgroup_rsm_2.jpg" width="695" height="348"></p> -->
+<!-- <br> -->
+<!-- <b> -->
+<!--   Response surface models of DoE 3 of retention time correction and grouping  -->
+<!--   parameter optimization -->
+<!-- </b> -->
+<!-- <p><img src="rsmDirectory/retgroup_rsm_3.jpg" width="695" height="348"></p> -->
 
-Currently the 'xcms' retention time correction method
-'obiwarp' and grouping method 'density' are supported.
+Currently the `xcms` retention time correction method
+`obiwarp` and grouping method `density` are supported.
 
 
 
 ## Display optimized settings
 
 A script which you can use to process your raw data
-can be generated by using the function 'writeRScript'.
+can be generated by using the function `writeRScript`.
 
 
 ```{r display_settings}
 writeRScript(resultPeakpicking$best_settings$parameters, 
-             resultRetcorGroup$best_settings, 
-             nSlaves=1)
+             resultRetcorGroup$best_settings)
 ```
 
 
@@ -249,5 +251,3 @@ time.RetGroup # time for optimizing retention time correction and grouping param
 
 sessionInfo()
 ```
-
-
