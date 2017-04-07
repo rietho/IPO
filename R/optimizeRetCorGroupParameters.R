@@ -219,7 +219,7 @@ optimizeRetGroup <-
 	  
       return(history)
     }
-             
+    
     for(i in 1:length(params)) {
 
       parameter_setting <- retcor_result$max_settings[i+1]
@@ -409,11 +409,14 @@ retGroupExperimentStatistic <- function(retcor_result, subdir, iterator, xset) {
   max_settings <- getMaximumLevels(retcor_result$model)
   tmp <- max_settings[1,-1]
   tmp[is.na(tmp)] <- 1
-  if(!is.null(subdir) & length(tmp) > 1)
-    plotContours(retcor_result$model, 
-                 tmp, 
-                 paste(subdir, "/retgroup_rsm_", iterator, sep = ""))
-      
+  if (!is.null(subdir) & length(tmp) > 1) {
+    plotContours(model =retcor_result$model, 
+                 maximum_slice = tmp, 
+                 plot_name = paste(subdir, "/retgroup_rsm_", iterator, sep = ""))
+  } else if (is.null(subdir) & length(tmp) > 1) {
+    plotContours(model = retcor_result$model, maximum_slice = tmp, plot_name = NULL)
+  }
+  
   parameters <- as.list(decodeAll(max_settings[-1], params$to_optimize)) 
   parameters <- combineParams(parameters, params$no_optimization)
   xset_tmp <- xset

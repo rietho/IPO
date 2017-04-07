@@ -833,15 +833,19 @@ xcmsSetStatistic <-
   
   model <- createModel(xcms_result$design, params$to_optimize, resp)
   xcms_result$model <- model                  
-     
+  
   max_settings <- getMaximumLevels(xcms_result$model)
   
   # plotting rms
   tmp <- max_settings[1,-1] # first row without response
   tmp[is.na(tmp)] <- 1 # if Na (i.e. -1, and 1), show +1
-  if(!is.null(subdir) & length(tmp) > 1)
-    plotContours(xcms_result$model, tmp, 
-                 paste(subdir, "/rsm_", iterator, sep=""))
+  if(!is.null(subdir) & length(tmp) > 1) {
+    plotContours(model = xcms_result$model, 
+                 maximum_slice = tmp,
+                 plot_name = paste(subdir, "/rsm_", iterator, sep=""))
+  } else if(is.null(subdir) & length(tmp) > 1)  {
+    plotContours(xcms_result$model, tmp, plot_name = NULL)
+  }
 	
   xcms_result$max_settings <- max_settings
   
