@@ -351,13 +351,14 @@ plotContours <- function(model, maximum_slice, plot_name = NULL) {
          units="in", res=c(200,200))
   } # otherwise plot on device
   
-  par(mfrow=c(plot_rows, plot_cols), oma=c(3,0,2,0))  
+  op <- par(mfrow = c(plot_rows, plot_cols), oma = c(0,0,0,0))  
   # contour.lm is called
-  contours <- contour(model, plots, image=TRUE, at=maximum_slice)
+  contour(model, plots, image = TRUE, at = maximum_slice)
   
-  if(!is.null(plot_name)) {
+  if (!is.null(plot_name)) {
     dev.off()
   }
+  par(op)
 }
 
 
@@ -404,84 +405,99 @@ writeRScript <- function(peakPickingSettings, retCorGroupSettings, nSlaves = 0) 
   message("library(Rmpi)\n")
 
   if(is.null(peakPickingSettings$step)) {     #centWave     		
-    message(paste("xset <- xcmsSet(method=\"centWave\"", 
-                  ",\n  peakwidth=c(", 
+    message(paste("xset <- xcmsSet(",
+                  " \n  method = \"centWave\"", 
+                  ",\n  peakwidth       = c(", 
                     peakPickingSettings$min_peakwidth, ", ", 
                     peakPickingSettings$max_peakwidth, ")", 
-                  ",\n  ppm=", peakPickingSettings$ppm, 
-                  ",\n  noise=", peakPickingSettings$noise, 
-                  ",\n  snthresh=", peakPickingSettings$snthresh, 
-                  ",\n  mzdiff=", peakPickingSettings$mzdiff,
-                  ",\n  prefilter=c(", 
+                  ",\n  ppm             = ", peakPickingSettings$ppm, 
+                  ",\n  noise           = ", peakPickingSettings$noise, 
+                  ",\n  snthresh        = ", peakPickingSettings$snthresh, 
+                  ",\n  mzdiff          = ", peakPickingSettings$mzdiff,
+                  ",\n  prefilter       = c(", 
                     peakPickingSettings$prefilter, ", ", 
                     peakPickingSettings$value_of_prefilter,	")", 
-                  ",\n  mzCenterFun=\"", peakPickingSettings$mzCenterFun, "\"", 
-                  ",\n  integrate=", peakPickingSettings$integrate,
-                  ",\n  fitgauss=", peakPickingSettings$fitgauss,
-                  ",\n  verbose.columns=", peakPickingSettings$verbose.columns,
-                  #", nSlaves=", nSlaves, ")", 
+                  ",\n  mzCenterFun     = \"", 
+                    peakPickingSettings$mzCenterFun, "\"", 
+                  ",\n  integrate       = ", peakPickingSettings$integrate,
+                  ",\n  fitgauss        = ", peakPickingSettings$fitgauss,
+                  ",\n  verbose.columns = ", 
+                    peakPickingSettings$verbose.columns,
+                  #", nSlaves = ", nSlaves, ")", 
                   ")",
                   sep = ""))
                   
   } else { #matchedFilter  
-    message(paste("xset <- xcmsSet(method=\"matchedFilter\"", 
-                  ",\n  fwhm=", peakPickingSettings$fwhm, 
-                  ",\n  snthresh=",peakPickingSettings$snthresh,
-                  ",\n  step=", peakPickingSettings$step, 
-                  ",\n  steps=", round(peakPickingSettings$steps),
-                  ",\n  sigma=", peakPickingSettings$sigma, 
-                  ",\n  max=", round(peakPickingSettings$max), 
-                  ",\n  mzdiff=", peakPickingSettings$mzdiff,
-                  ",\n  index=", peakPickingSettings$index,
-                  #", nSlaves=", nSlaves, ")", 
+    message(paste("xset <- xcmsSet(",
+                  " \n  method   = \"matchedFilter\"", 
+                  ",\n  fwhm     = ", peakPickingSettings$fwhm, 
+                  ",\n  snthresh = ",peakPickingSettings$snthresh,
+                  ",\n  step     = ", peakPickingSettings$step, 
+                  ",\n  steps    = ", round(peakPickingSettings$steps),
+                  ",\n  sigma    = ", peakPickingSettings$sigma, 
+                  ",\n  max      = ", round(peakPickingSettings$max), 
+                  ",\n  mzdiff   = ", peakPickingSettings$mzdiff,
+                  ",\n  index    = ", peakPickingSettings$index,
+                  #", nSlaves = ", nSlaves, ")", 
                   ")",
-                  sep=""))   
+                  sep = ""))   
   }
 	  
   if(retCorGroupSettings$retcorMethod == "loess")	{
     
-    message(paste("xset <- group(xset, method=\"density\"", 
-                  ", bw=", retCorGroupSettings$bw, 
-                  ", mzwid=", retCorGroupSettings$mzwid, 
-                  ", minfrac=", retCorGroupSettings$minfrac,
-                  ", minsamp=", round(retCorGroupSettings$minsamp), 
-                  ", max=", round(retCorGroupSettings$max), ")", sep=""))	 
+    message(paste("xset <- group(",
+                  " \n  xset",
+                  ",\n  method  = \"density\"", 
+                  ",\n  bw      = ", retCorGroupSettings$bw, 
+                  ",\n  mzwid   = ", retCorGroupSettings$mzwid, 
+                  ",\n  minfrac = ", retCorGroupSettings$minfrac,
+                  ",\n  minsamp = ", round(retCorGroupSettings$minsamp), 
+                  ",\n  max     = ", round(retCorGroupSettings$max), 
+                  ")", 
+                  sep = ""))	 
     
-    message(paste("xset <- retcor(xset", 
-                  ",\n  missing=", round(retCorGroupSettings$missing), 
-                  ",\n  extra=", round(retCorGroupSettings$extra),
-                  ",\n  span=", retCorGroupSettings$span, 
-                  ",\n  smooth=\"", retCorGroupSettings$smooth, "\"", 
-                  ",\n  family=\"", retCorGroupSettings$family, "\"", 
-                  ",\n  plottype=\"", retCorGroupSettings$plottype, "\")", 
-                  sep=""))	 
+    message(paste("xset <- retcor(",
+                  " \n  xset", 
+                  ",\n  missing  = ", round(retCorGroupSettings$missing), 
+                  ",\n  extra    = ", round(retCorGroupSettings$extra),
+                  ",\n  span     = ", retCorGroupSettings$span, 
+                  ",\n  smooth   = \"", retCorGroupSettings$smooth, "\"", 
+                  ",\n  family   = \"", retCorGroupSettings$family, "\"", 
+                  ",\n  plottype = \"", retCorGroupSettings$plottype, "\")", 
+                  sep = ""))	 
   }  
   
   if(retCorGroupSettings$retcorMethod == "obiwarp") {
-    message(paste("xset <- retcor(xset, method=\"obiwarp\"",
-                  ",\n  plottype=\"", retCorGroupSettings$plottype, "\"", 
-                  ",\n  distFunc=\"", retCorGroupSettings$distFunc, "\"", 
-                  ",\n  profStep=", retCorGroupSettings$profStep, 
-                  ",\n  center=", retCorGroupSettings$center, 
-                  ",\n  response=", retCorGroupSettings$response,
-                  ",\n  gapInit=", retCorGroupSettings$gapInit,
-                  ",\n  gapExtend=", retCorGroupSettings$gapExtend,
-                  ",\n  factorDiag=", retCorGroupSettings$factorDiag, 
-                  ",\n  factorGap=", retCorGroupSettings$factorGap, 
-                  ",\n  localAlignment=", retCorGroupSettings$localAlignment, 
+    message(paste("xset <- retcor(",
+                  " \n  xset",
+                  ",\n  method         = \"obiwarp\"",
+                  ",\n  plottype       = \"", 
+                    retCorGroupSettings$plottype, "\"", 
+                  ",\n  distFunc       = \"", 
+                    retCorGroupSettings$distFunc, "\"", 
+                  ",\n  profStep       = ", retCorGroupSettings$profStep, 
+                  ",\n  center         = ", retCorGroupSettings$center, 
+                  ",\n  response       = ", retCorGroupSettings$response,
+                  ",\n  gapInit        = ", retCorGroupSettings$gapInit,
+                  ",\n  gapExtend      = ", retCorGroupSettings$gapExtend,
+                  ",\n  factorDiag     = ", retCorGroupSettings$factorDiag, 
+                  ",\n  factorGap      = ", retCorGroupSettings$factorGap, 
+                  ",\n  localAlignment = ", retCorGroupSettings$localAlignment, 
                   ")", 
-                  sep=""))
+                  sep = ""))
   }
   	   
-  message(paste("xset <- group(xset, method=\"density\"", 
-                ",\n  bw=", retCorGroupSettings$bw, 
-                ",\n  mzwid=", retCorGroupSettings$mzwid,
-                ",\n  minfrac=", retCorGroupSettings$minfrac, 
-                ",\n  minsamp=", retCorGroupSettings$minsamp,
-                ",\n  max=", retCorGroupSettings$max, ")\n", 
-                sep=""))	 
+  message(paste("xset <- group(",
+                " \n  xset",
+                ",\n  method  = \"density\"", 
+                ",\n  bw      = ", retCorGroupSettings$bw, 
+                ",\n  mzwid   = ", retCorGroupSettings$mzwid,
+                ",\n  minfrac = ", retCorGroupSettings$minfrac, 
+                ",\n  minsamp = ", retCorGroupSettings$minsamp,
+                ",\n  max     = ", retCorGroupSettings$max, ")\n", 
+                sep = ""))	 
 	  
-  message(paste("xset <- fillPeaks(xset)", sep=""))	
+  message(paste("xset <- fillPeaks(xset)", sep = ""))	
 	
 }
 
