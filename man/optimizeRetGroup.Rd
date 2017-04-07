@@ -28,7 +28,7 @@ Number of slaves the optimization process should spawn.
   }
   \item{subdir}{
 The name of the subdirectory which is created and where the figures of the response
-     surface models will be saved to.
+     surface models will be saved to. \code{NULL} plots the figures to the graphic device.
   }
 }
 \details{
