@@ -536,6 +536,11 @@ optimizeXcmsSet <- function(files = NULL,
   params$scanrange <- NULL    
   checkXcmsSetParams(params)
   
+  if (!is.numeric(nSlaves)) {
+    warning("'nSlaves' must be numeric! Setting it to 1.")
+    nSlaves <- 1
+  }
+  
   if (!is.null(params$nSlaves)) {
     if (nSlaves != 0) {
       warning("Use of xcmsSet-argument 'nSlaves'  is deprecated!",
