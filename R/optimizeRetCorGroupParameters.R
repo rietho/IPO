@@ -194,6 +194,11 @@ optimizeRetGroup <-
     params$center <- getDefaultRetCorCenterSample(xset) 
 
   checkRetGroupSetParams(params)	
+  
+  if (!is.numeric(nSlaves)) {
+    warning("'nSlaves' must be numeric! Setting it to 1.")
+    nSlaves <- 1
+  }
     
   while(iterator < 50) {
     message("\n\n")
