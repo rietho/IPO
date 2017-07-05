@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.2.1
+--------------------------
+  o bug fix regarding conflict of BPPARAM and nSlaves arguments (thx to @lauzikaite)
+
+CHANGES IN VERSION 1.2.0
+--------------------------
+  o Bioconductor release 3.5
+
 CHANGES IN VERSION 1.1.2
 --------------------------
   o vignette updated
