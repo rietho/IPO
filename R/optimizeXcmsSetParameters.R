@@ -536,6 +536,20 @@ optimizeXcmsSet <- function(files = NULL,
   params$scanrange <- NULL    
   checkXcmsSetParams(params)
   
+  if (!is.numeric(nSlaves)) {
+    warning("'nSlaves' must be numeric! Setting it to 1.")
+    nSlaves <- 1
+  }
+  
+  # check conflict between IPO's nSlaves argument and xcms BPPARAM argument
+  # note: both types of parallelisation cannot be used together
+  if ((bpworkers(BPPARAM) > 1) & (nSlaves > 1)) {
+    warning("IPO (nSlaves-argument) and xcms (BPPARAM-argument) ", 
+            "parallelisation cannot be used together! ",
+            "Setting nSlaves to 1")
+    nSlaves <- 1
+  }
+  
   if (!is.null(params$nSlaves)) {
     if (nSlaves != 0) {
       warning("Use of xcmsSet-argument 'nSlaves'  is deprecated!",
