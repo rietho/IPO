@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.3.2
+--------------------------
+  o bug fix #50: correct peaks-matrix, to handle xcms bug (sneumann/xcms#220) 
+    for older xcms-versions
+
+
 CHANGES IN VERSION 1.3.1
 --------------------------
   o bug fix regarding conflict of BPPARAM and nSlaves arguments (thx to @lauzikaite)
