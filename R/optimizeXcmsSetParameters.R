@@ -8,11 +8,11 @@ calcPPS <- function(xset, isotopeIdentification=c("IPO", "CAMERA"), ...) {
       return(ret)
     } 
     
-    if(nrow(peaks_IPO(xset)) == 0) {
+    if(nrow(peaks(xset)) == 0) {
       return(ret)
     }
     
-    peak_source <- peaks_IPO(xset)[,c("mz", "rt", "sample", "into", "mzmin", 
+    peak_source <- peaks(xset)[,c("mz", "rt", "sample", "into", "mzmin", 
                                  "mzmax", "rtmin", "rtmax"),drop=FALSE]
     ret[2] <- nrow(peak_source)
     
@@ -79,7 +79,7 @@ findIsotopes.IPO <-
     }
     
     colnames(iso_mat) <- c("12C", "13C")
-    peak_source <- peaks_IPO(xset)[,c("mz", "rt", "sample", "into", "maxo", "mzmin",
+    peak_source <- peaks(xset)[,c("mz", "rt", "sample", "into", "maxo", "mzmin",
                                  "mzmax", "rtmin", "rtmax"), drop=FALSE]
     
     for(i in 1:ncol(peak_source)) {
@@ -334,11 +334,11 @@ findIsotopes.CAMERA <-
       return(iso_mat)
     }
     
-    ids <- peaks_IPO(xset)[,"sample", drop=FALSE]
+    ids <- peaks(xset)[,"sample", drop=FALSE]
     ids <- cbind(1:length(ids), ids)
     
-    xsets <- split(xset, unique(peaks_IPO(xset)[,"sample"]))
-    samples <- unique(peaks_IPO(xset)[,"sample"])
+    xsets <- split(xset, unique(peaks(xset)[,"sample"]))
+    samples <- unique(peaks(xset)[,"sample"])
     for(sample in samples) {
       an <- xsAnnotate(xset, sample=sample)
       isos <- findIsotopes(an, ...)@isoID[,c("mpeak", "isopeak"), drop=FALSE]

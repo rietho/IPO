@@ -29,7 +29,7 @@ checkRetGroupSetParams <- function(params) {
 getDefaultRetCorCenterSample <- function(xset) {
   ret <- NULL
   for(i in 1:length(filepaths(xset))) {
-    ret <- c(ret, sum(peaks_IPO(xset)[,"sample"] == i))
+    ret <- c(ret, sum(peaks(xset)[,"sample"] == i))
   }
   return(which.max(ret))
 }
@@ -143,13 +143,13 @@ getRGTVValues <- function(xset, exp_index=1, retcor_penalty=1) {
 	    relative_rt_diff <- 
 	      c(relative_rt_diff, 
 	        mean(abs(feature_rtmed - 
-	                   peaks_IPO(xset)[groupidx(xset)[[i]], "rt"]) / feature_rtmed))
+	                   peaks(xset)[groupidx(xset)[[i]], "rt"]) / feature_rtmed))
     }
     good_groups <- 
       sum(unlist(lapply(X=groupidx(xset), FUN = function(x, xset) {
-        ifelse(length(unique(peaks_IPO(xset)[x,"sample"])) == 
+        ifelse(length(unique(peaks(xset)[x,"sample"])) == 
                  length(filepaths(xset)) & 
-                 length(peaks_IPO(xset)[x,"sample"]) == 
+                 length(peaks(xset)[x,"sample"]) == 
                  length(filepaths(xset)), 1, 0)
       }, xset)))
     bad_groups <- nrow(xcms::groups(xset)) - good_groups

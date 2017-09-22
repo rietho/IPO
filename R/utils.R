@@ -42,10 +42,6 @@ checkParams <- function(params,
         stop(paste("Too many values for parameter", name, "!
                    Please specify only one or two; stopping!"))
       }
-      if(!all(diff(param) > 0)) {
-        stop(paste("Parameter", name, "has wrong order!",
-                   "Please specify in increasing order; stopping!"))
-      }
     }
   }
   missing_params <- 
@@ -328,17 +324,6 @@ expand.grid.subset  <- function(subset, sequence, dimensions) {
 #  return(expand.grid(data.frame(m)))
 #}
 
-
-peaks_IPO <- function(xset) {
-  # peaks function, to work with older xcms-version (<2.99.7)
-  # sample column is missing, if first the first sample processed has no peaks
-  # see https://github.com/sneumann/xcms/issues/220
-  peaks_act <- xcms::peaks(xset)
-  if (!("sample" %in% colnames(peaks_act))) {
-    colnames(peaks_act)[colnames(peaks_act) == ""] <- "sample"
-  }
-  peaks_act
-}
 
 plotContours <- function(model, maximum_slice, plot_name = NULL) {
   # generate for all variable combinations formulas
