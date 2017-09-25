@@ -11,7 +11,7 @@
 }
 \usage{
   optimizeRetGroup(xset, params = getDefaultRetGroupStartingParams(),
-                   nSlaves = 4, subdir = "IPO")
+                   nSlaves = 4, subdir = "IPO", plot = TRUE)
 }
 
 \arguments{
@@ -29,6 +29,11 @@ Number of slaves the optimization process should spawn.
   \item{subdir}{
 The name of the subdirectory which is created and where the figures of the response
      surface models will be saved to. \code{NULL} plots the figures to the graphic device.
+     This parameter is ignored, if \code{plot = TRUE}.
+  }
+  \item{plot}{
+     Defines if plots should be generated (\code{TRUE}) or not (\code{FALSE}). 
+     This parameter overwrites the \code{subdir}-parameter. Defaults to \code{TRUE}.
   }
 }
 \details{

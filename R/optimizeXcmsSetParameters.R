@@ -530,7 +530,8 @@ optimizeXcmsSet <- function(files = NULL,
                             isotopeIdentification = c("IPO", "CAMERA"), 
                             BPPARAM = bpparam(),
                             nSlaves = 4, 
-                            subdir = "IPO", 
+                            subdir = "IPO",
+                            plot = TRUE,
                             ...) {
   scanrange <- params$scanrange
   params$scanrange <- NULL    
@@ -570,8 +571,8 @@ optimizeXcmsSet <- function(files = NULL,
   iterator = 1 
   best_range <- 0.25
   
-  if(!is.null(subdir))
-    if(!file.exists(subdir))
+  if (isTRUE(plot) & !is.null(subdir))
+    if (!file.exists(subdir))
       dir.create(subdir)
   
   
@@ -599,6 +600,7 @@ optimizeXcmsSet <- function(files = NULL,
         BPPARAM = BPPARAM,
         xcms_result = xcms_result,
         subdir = subdir,
+        plot = plot,
         iterator = iterator,
         #nSlaves = nSlaves,
         ...
@@ -836,7 +838,8 @@ xcmsSetStatistic <-
            isotopeIdentification, 
            BPPARAM = bpparam(),
            xcms_result, 
-           subdir, 
+           subdir,
+           plot,
            iterator,  
            #nSlaves, 
            ...) {
@@ -853,12 +856,16 @@ xcmsSetStatistic <-
   # plotting rms
   tmp <- max_settings[1,-1] # first row without response
   tmp[is.na(tmp)] <- 1 # if Na (i.e. -1, and 1), show +1
-  if(!is.null(subdir) & length(tmp) > 1) {
-    plotContours(model = xcms_result$model, 
-                 maximum_slice = tmp,
-                 plot_name = paste(subdir, "/rsm_", iterator, sep=""))
-  } else if(is.null(subdir) & length(tmp) > 1)  {
-    plotContours(xcms_result$model, tmp, plot_name = NULL)
+  if (isTRUE(plot) & length(tmp) > 1) {
+    if (!is.null(subdir)) {
+      plotContours(
+        model = xcms_result$model,
+        maximum_slice = tmp,
+        plot_name = file.path(subdir, paste("rsm_", iterator, sep = ""))
+      )
+    } else if (is.null(subdir))  {
+      plotContours(xcms_result$model, tmp, plot_name = NULL)
+    }
   }
 	
   xcms_result$max_settings <- max_settings

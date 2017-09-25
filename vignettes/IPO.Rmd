@@ -127,7 +127,8 @@ resultPeakpicking <-
   optimizeXcmsSet(files = datafiles[1:2], 
                   params = peakpickingParameters, 
                   nSlaves = 1, 
-                  subdir = NULL)
+                  subdir = NULL,
+                  plot = TRUE)
 })
 ```
 
@@ -198,7 +199,8 @@ resultRetcorGroup <-
   optimizeRetGroup(xset = optimizedXcmsSetObject, 
                    params = retcorGroupParameters, 
                    nSlaves = 1, 
-                   subdir = NULL)
+                   subdir = NULL,
+                   plot = TRUE)
 })
 ```
 

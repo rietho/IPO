@@ -9,8 +9,8 @@ Optimisation of peak picking parameters by using natural, stable 13C isotopes
 }
 \usage{
 optimizeXcmsSet(files, params = getDefaultXcmsSetStartingParams(),
-  isotopeIdentification=c("IPO", "CAMERA"), BPPARAM = bpparam(), 
-  nSlaves = 4, subdir = "IPO", ...)
+  isotopeIdentification = c("IPO", "CAMERA"), BPPARAM = bpparam(), 
+  nSlaves = 4, subdir = "IPO", plot = TRUE, ...)
 }
 \arguments{
   \item{files}{A directory or list of files, passed to \code{\link[xcms]{xcmsSet}}. 
@@ -36,7 +36,12 @@ optimizeXcmsSet(files, params = getDefaultXcmsSetStartingParams(),
   \item{nSlaves}{Number of slaves the optimization process should spawn.}
   \item{subdir}{
      The name of the subdirectory which is created and where the figures of the response
-     surface models will be saved to.  \code{NULL} plots the figures to the graphic device.
+     surface models will be saved to. \code{NULL} plots the figures to the graphic device.
+     This parameter is ignored, if \code{plot = TRUE}.
+  }
+  \item{plot}{
+     Defines if plots should be generated (\code{TRUE}) or not (\code{FALSE}). 
+     This parameter overwrites the \code{subdir}-parameter. Defaults to \code{TRUE}.
   }
   \item{...}{
      Additional parameters to CAMERA's or IPO's findIsotopes functions

@@ -178,16 +178,17 @@ getRGTVValues <- function(xset, exp_index=1, retcor_penalty=1) {
 
 optimizeRetGroup <- 
   function(xset, 
-           params=getDefaultRetGroupStartingParams(), 
-           nSlaves=4, 
-           subdir="IPO") {
+           params = getDefaultRetGroupStartingParams(), 
+           nSlaves = 4, 
+           subdir = "IPO",
+           plot = TRUE) {
                                                  
   iterator = 1 
   history <- list()  
   best_range <- 0.25
-
-  if(!is.null(subdir))
-    if(!file.exists(subdir))
+  
+  if (isTRUE(plot) & !is.null(subdir))
+    if (!file.exists(subdir))
       dir.create(subdir)
 	
   if(is.null(params$center))
@@ -207,11 +208,18 @@ optimizeRetGroup <-
                         paste(params, sep="", "\n")),
                   sep=""))
         
-    retcor_result <- 
-      retGroupCalcExperimentsCluster(params, xset, nSlaves)  
-                       
-    retcor_result <- 
-      retGroupExperimentStatistic(retcor_result, subdir, iterator, xset)
+    retcor_result <-
+      retGroupCalcExperimentsCluster(params = params,
+                                     xset = xset,
+                                     nSlaves = nSlaves)  
+    retcor_result <-
+      retGroupExperimentStatistic(
+        retcor_result = retcor_result,
+        subdir = subdir,
+        plot = plot,
+        iterator = iterator,
+        xset = xset
+      )
     
     history[[iterator]] <- retcor_result 
          
@@ -403,23 +411,36 @@ retGroupCalcExperimentsCluster <- function(params, xset, nSlaves=4) {
 
 }
 
-retGroupExperimentStatistic <- function(retcor_result, subdir, iterator, xset) {
-
+retGroupExperimentStatistic <- function(retcor_result,
+                                        subdir,
+                                        plot,
+                                        iterator,
+                                        xset) {
   params <- retcor_result$params
   resp <- getNormalizedResponse(retcor_result$response)
-  
+    
   model <- createModel(retcor_result$design, params$to_optimize, resp)
   retcor_result$model <- model                  
   
   max_settings <- getMaximumLevels(retcor_result$model)
   tmp <- max_settings[1,-1]
   tmp[is.na(tmp)] <- 1
-  if (!is.null(subdir) & length(tmp) > 1) {
-    plotContours(model =retcor_result$model, 
-                 maximum_slice = tmp, 
-                 plot_name = paste(subdir, "/retgroup_rsm_", iterator, sep = ""))
-  } else if (is.null(subdir) & length(tmp) > 1) {
-    plotContours(model = retcor_result$model, maximum_slice = tmp, plot_name = NULL)
+  if (isTRUE(plot) &
+      length(tmp) > 1) {
+    if (!is.null(subdir)) {
+      plotContours(
+        model = retcor_result$model,
+        maximum_slice = tmp,
+        plot_name = file.path(subdir,
+                              paste("retgroup_rsm_", iterator, sep = ""))
+      )
+    } else if (is.null(subdir)) {
+      plotContours(
+        model = retcor_result$model,
+        maximum_slice = tmp,
+        plot_name = NULL
+      )
+    }
   }
   
   parameters <- as.list(decodeAll(max_settings[-1], params$to_optimize)) 
