@@ -2,7 +2,7 @@
 # Using CodeCov: https://github.com/codecov/example-r
 
 language: R
-r: bioc-devel
+r: bioc-release
 warnings_are_errors: true
 sudo: required
 cache: packages
