@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.4.1
+--------------------------
+  o fix error in plotting to graphic device with too small margins (#53)
+    (thx to @sneumann)
+
 CHANGES IN VERSION 1.4.0
 --------------------------
   o Biocondcutor release 3.6
