@@ -368,7 +368,12 @@ plotContours <- function(model, maximum_slice, plot_name = NULL) {
   
   op <- par(mfrow = c(plot_rows, plot_cols), oma = c(0,0,0,0))  
   # contour.lm is called
-  contour(model, plots, image = TRUE, at = maximum_slice)
+  ret_tr <- try({#may produce errors, if figure margins are too small
+    contour(model, plots, image = TRUE, at = maximum_slice)
+  })
+  if (class(ret_tr) == "try-error") {
+    message("Error in plotting (see above), but IPO continues to work normally!")
+  }
   
   if (!is.null(plot_name)) {
     dev.off()
