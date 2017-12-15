@@ -2,7 +2,7 @@
 
 [![How long since the package was first in a released Bioconductor version (or is it in devel only).](https://bioconductor.org/shields/years-in-bioc/IPO.svg)](https://bioconductor.org/packages/IPO/)
 [![Percentile (top 5/20/50% or 'available') of downloads over last 6 full months. Comparison is done across all package categories (software, annotation, experiment).](http://bioconductor.org/shields/downloads/IPO.svg)](https://bioconductor.org/packages/stats/bioc/IPO/)
-[![Project Status: Inactive - The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](http://www.repostatus.org/badges/latest/inactive.svg)](http://www.repostatus.org/#inactive)
+[![Project Status: Unsupported – The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be desired.](http://www.repostatus.org/badges/latest/unsupported.svg)](http://www.repostatus.org/#unsupported)
 
 Latest release: 
 [![Build Status Biocondcutor Release](http://bioconductor.org/shields/build/release/bioc/IPO.svg)](http://bioconductor.org/packages/release/bioc/html/IPO.html)
