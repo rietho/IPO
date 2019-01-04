@@ -1,7 +1,7 @@
 Package: IPO
 Type: Package
 Title: Automated Optimization of XCMS Data Processing parameters
-Version: 1.9.0
+Version: 1.9.1
 Date: 2017-11-22
 Author: Gunnar Libiseller <Gunnar.Libiseller@joanneum.at>,
         Christoph Magnes <christoph.magnes@joanneum.at>,
@@ -36,6 +36,6 @@ Description: The outcome of XCMS data processing strongly depends on
 License: GPL (>= 2) + file LICENSE
 URL: https://github.com/rietho/IPO
 BugReports: https://github.com/rietho/IPO/issues/new
-biocViews: Metabolomics, MassSpectrometry
+biocViews: ImmunoOncology, Metabolomics, MassSpectrometry
 RoxygenNote: 6.0.1
 NeedsCompilation: no
