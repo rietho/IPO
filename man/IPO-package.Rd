@@ -45,7 +45,7 @@ Maintainer: Thomas Riebenbauer <Thomas.Riebenbauer@joanneum.at>
 }
 \examples{
 \dontrun{
-mtbls2files <- list.files(file.path(find.package("mtbls2"), "mzData"), 
+mtbls2files <- list.files(file.path(find.package("mtbls2"), "mzML"), 
                           full.names=TRUE)
 
  
