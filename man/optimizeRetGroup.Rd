@@ -80,7 +80,7 @@ Gunnar Libiseller
 \donttest{
  
 
-mtbls2files <- list.files(file.path(find.package("mtbls2"), "mzData"), 
+mtbls2files <- list.files(file.path(find.package("mtbls2"), "mzML"), 
                           full.names=TRUE)
 
 params <- list(min_peakwidth=12, max_peakwidth=30, ppm=30,
