@@ -37,7 +37,7 @@ Gunnar Libiseller
 }
 \examples{
 \donttest{
-  mtbls2files <- list.files(paste(find.package("mtbls2"), "/mzData", sep=""), 
+  mtbls2files <- list.files(paste(find.package("mtbls2"), "/mzML", sep=""), 
                             full.names=TRUE)
   xset <- xcmsSet(mtbls2files[1:2], method="centWave", peakwidth=(c(12, 30)), 
                   ppm=30, noise=10000)

@@ -32,18 +32,19 @@ are recommended. The optimization process looks as following:
 
 ```{r install_IPO, eval=FALSE}
 # try http:// if https:// URLs are not supported
-source("https://bioconductor.org/biocLite.R")
-biocLite("IPO")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("IPO")
 ```
 
 <b>Installing main suggested packages</b>
 
 ```{r install_IPO_suggestions, eval=FALSE}
 # for examples of peak picking parameter optimization:
-biocLite("msdata")
+BiocManager::install("msdata")
 # for examples of optimization of retention time correction and grouping
 # parameters:
-biocLite("faahKO")
+BiocManager::install("faahKO")
 ```
 
 

@@ -22,8 +22,9 @@ Find out more about the usage in the [package vignette](https://bioconductor.org
 Get the latest release version from [Bioconductor](http://bioconductor.org/packages/IPO/):
 ```{r}
 ## try http:// if https:// URLs are not supported
-source("https://bioconductor.org/biocLite.R")
-biocLite("IPO")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("IPO")
 ````
 
 Or the development version from [Github](https://github.com/rietho/IPO/):

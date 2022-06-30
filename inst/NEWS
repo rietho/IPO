@@ -1,3 +1,8 @@
+CHANGES IN VERSION 1.21.2
+--------------------------
+  o move examples from mzData to mzML after xcms dropped mzData support
+    (thx to @sneumann)
+
 CHANGES IN VERSION 1.5.1
 --------------------------
   o fix error in plotting to graphic device with too small margins (#53)
